@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -13,29 +14,34 @@ import (
 	"route256/cart/internal/pkg/service/productservice"
 	"strconv"
 	"strings"
+	"time"
 )
 
-func main() {
+type App struct {
+	cartRepository *repository.Repository
+	httpClient     *http.Client
+	productService *productservice.ProductService
+	cartService    *cartservice.CartService
+}
 
+func NewApp() (*App, error) {
 	log.Println("[main] Application start initialization")
 	loadEnv()
-	cartRepository := repository.NewRepository()
+
+	cartRepository := repository.NewRepository(repository.NewStorage())
 
 	maxRetries, err := strconv.Atoi(os.Getenv("MAX_RETRIES"))
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to parse MAX_RETRIES: %w", err)
 	}
 
 	retryMs, err := strconv.Atoi(os.Getenv("RETRY_DELAY_MS"))
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to parse RETRY_DELAY_MS: %w", err)
 	}
 
-	httpClient := client.NewHttpClientWithRetry(maxRetries, int64(retryMs))
+	httpClient := client.NewHttpClientWithRetryWithDefaultTransport(maxRetries, time.Duration(retryMs)*time.Millisecond)
 
-	//Внимание это чувствительная информация, на проде надо реализовать получения секрета по-другому
-	// например через hashicorp vault
-	//но в качестве теста можно
 	token := os.Getenv("TOKEN")
 	baseUrl := os.Getenv("PRODUCT_SERVICE_BASE_URL")
 	path := os.Getenv("PRODUCT_SERVICE_PATH")
@@ -43,24 +49,39 @@ func main() {
 
 	cartService := cartservice.NewService(cartRepository, productService)
 
-	controller := server.New(cartService)
+	return &App{
+		cartRepository: cartRepository,
+		httpClient:     httpClient,
+		productService: productService,
+		cartService:    cartService,
+	}, nil
+}
 
+func (app *App) SetupRoutes() *http.ServeMux {
+	controller := server.New(app.cartService)
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /user/{user_id}/cart/{sku_id}", controller.PostItemHandleFunc)
 	mux.HandleFunc("DELETE /user/{user_id}/cart", controller.DeleteCartByUserIdHandleFunc)
 	mux.HandleFunc("DELETE /user/{user_id}/cart/{sku_id}", controller.DeleteItemBySkuHandleFunc)
 	mux.HandleFunc("GET /user/{user_id}/cart", controller.GetCartContentHandleFunc)
+	return mux
+}
 
+func main() {
+	app, err := NewApp()
+	if err != nil {
+		log.Fatalf("[main] Failed to initialize application: %v", err)
+	}
+
+	mux := app.SetupRoutes()
 	logMux := middleware.NewLogMux(mux)
 
-	log.Println("[main] Application initialization successes")
+	log.Println("[main] Application initialization successful")
 
-	serverHost := os.Getenv("HOST")
-	serverPort := os.Getenv("PORT")
-	connectParam := serverHost + ":" + serverPort
-	log.Printf("[main] Starting server on %s\n", connectParam)
-	if err := http.ListenAndServe(connectParam, logMux); err != nil {
-		panic(err)
+	serverAddress := os.Getenv("HOST") + ":" + os.Getenv("PORT")
+	log.Printf("[main] Starting server on %s\n", serverAddress)
+	if err := http.ListenAndServe(serverAddress, logMux); err != nil {
+		log.Fatalf("[main] Failed to start server: %v", err)
 	}
 }
 

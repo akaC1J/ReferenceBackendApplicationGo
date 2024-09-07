@@ -31,19 +31,8 @@ func NewService(repository CartRepository, service ProductService) *CartService 
 }
 
 func (s *CartService) AddCartItem(ctx context.Context, cartItem model.CartItem) (*model.CartItem, error) {
-	if errSku := checkFieldMustPositive(int64(cartItem.SKU), "sku"); errSku != nil {
-		log.Printf("[cartService] Failed to add item to cart: SKU validation failed for SKU %d", cartItem.SKU)
-		return nil, errSku
-	}
-
-	if errUserId := checkFieldMustPositive(int64(cartItem.UserId), "user_id"); errUserId != nil {
-		log.Printf("[cartService] Failed to add item to cart: UserID validation failed for UserID %d", cartItem.UserId)
-		return nil, errUserId
-	}
-
-	if errCount := checkFieldMustPositive(int64(cartItem.Count), "count"); errCount != nil {
-		log.Printf("[cartService] Failed to add item to cart: Count validation failed for Count %d", cartItem.Count)
-		return nil, errCount
+	if errValidate := cartItem.Validate(); errValidate != nil {
+		return nil, fmt.Errorf("errors during cartservice validate %w", errValidate)
 	}
 
 	log.Printf("[cartService] Fetching product info for SKU %d", cartItem.SKU)

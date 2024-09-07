@@ -1,5 +1,7 @@
 package model
 
+import "fmt"
+
 type SKU int64
 type UserId int64
 
@@ -12,4 +14,18 @@ type CartItem struct {
 type Product struct {
 	Name  string
 	Price uint32
+}
+
+// Validate проверяет, что все поля CartItem корректны
+func (ci *CartItem) Validate() error {
+	if ci.SKU < 1 {
+		return fmt.Errorf("SKU must be positive")
+	}
+	if ci.UserId < 1 {
+		return fmt.Errorf("UserId must be positive")
+	}
+	if ci.Count < 1 {
+		return fmt.Errorf("Сount must be positive")
+	}
+	return nil
 }
