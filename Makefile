@@ -1,5 +1,5 @@
 build-all:
-	cd cart && GOOS=linux GOARCH=amd64 make build
+	cd cart && make build
 
 
 run-all: build-all
