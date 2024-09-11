@@ -73,7 +73,7 @@ func (p *ProductService) GetProductInfo(ctx context.Context, sku model.SKU) (*mo
 	}
 
 	content, err := io.ReadAll(resp.Body)
-	if err != nil {
+	if err != nil || len(content) == 0 {
 		log.Printf("[productservice] Error reading response body for SKU %d: %v", sku, err)
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
