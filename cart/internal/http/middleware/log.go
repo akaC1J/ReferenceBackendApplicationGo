@@ -82,7 +82,7 @@ func (m *LogMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		clientIP = ip
 	}
 
-	rqMessageLog := fmt.Sprintf("Request: Method: %sPath: %sClientIp: %s", r.Method, r.URL.Path, clientIP)
+	rqMessageLog := fmt.Sprintf("Request: Method: %s Path: %s ClientIp: %s ", r.Method, r.URL.Path, clientIP)
 
 	if r.Body != nil {
 		bodyBytes, err := io.ReadAll(r.Body)
@@ -102,7 +102,7 @@ func (m *LogMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	m.h.ServeHTTP(rc, r)
 
-	responseLog := fmt.Sprintf("Response: StatusCode: %dBody: %s", rc.code, rc.body.String())
+	responseLog := fmt.Sprintf("Response: StatusCode: %d Body: %s", rc.code, rc.body.String())
 
 	duration := time.Since(startTime)
 
