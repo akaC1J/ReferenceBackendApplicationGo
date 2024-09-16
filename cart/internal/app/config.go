@@ -2,11 +2,9 @@ package app
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"strconv"
-	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -19,8 +17,11 @@ type Config struct {
 	Port               string
 }
 
-func LoadConfig() (*Config, error) {
-	if err := loadEnv(); err != nil {
+func LoadDefaultConfig() (*Config, error) {
+	return LoadConfig("./.env")
+}
+func LoadConfig(pathToEnv string) (*Config, error) {
+	if err := loadEnv(pathToEnv); err != nil {
 		return nil, fmt.Errorf("failed to load environment variables: %w", err)
 	}
 
@@ -64,16 +65,9 @@ func LoadConfig() (*Config, error) {
 	}, nil
 }
 
-func loadEnv() error {
-	env := os.Getenv("ENV")
-	var envFile string
-	if strings.ToUpper(env) == "TEST" {
-		envFile = ".env.test"
-	} else {
-		envFile = ".env"
-	}
-	if err := godotenv.Load(envFile); err != nil {
-		return fmt.Errorf("failed to load %s: %w", envFile, err)
+func loadEnv(pathToEnv string) error {
+	if err := godotenv.Load(pathToEnv); err != nil {
+		return fmt.Errorf("failed to load %s: %w", pathToEnv, err)
 	}
 	return nil
 }

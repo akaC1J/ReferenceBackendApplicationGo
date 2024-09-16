@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"route256/cart/internal/app"
 	"route256/cart/internal/pkg/service/cartservice"
 	"strconv"
@@ -18,8 +17,7 @@ import (
 )
 
 func startTestServer(stopChan chan struct{}) {
-	os.Setenv("ENV", "TEST")
-	config, err := app.LoadConfig()
+	config, err := app.LoadConfig(".env.test")
 	if err != nil {
 		log.Fatalf("[main] Failed to load configuration: %v", err)
 	}

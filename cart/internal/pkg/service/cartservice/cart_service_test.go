@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/assert"
-	"reflect"
+	"github.com/stretchr/testify/require"
 	"route256/cart/internal/pkg/model"
 	"testing"
 )
@@ -14,17 +14,14 @@ import (
 func TestCartService_AddCartItem(t *testing.T) {
 	mc := minimock.NewController(t)
 
-	// Объявляем контекст для тестов
 	ctx := context.Background()
 
-	// Пример данных для тестов
 	cartItem := model.CartItem{
 		UserId: 1,
 		SKU:    123,
 		Count:  1,
 	}
 
-	// Пример данных для тестов
 	cartItemWithIvalidData := model.CartItem{
 		UserId: 0,
 		SKU:    123,
@@ -154,33 +151,18 @@ func TestCartService_AddCartItem(t *testing.T) {
 		},
 	}
 
-	// Проходимся по каждому тестовому кейсу
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
-
-			// Создаем CartService с моками
 			s := NewService(repoMock, productServiceMock)
-
-			// Вызываем метод AddCartItem
 			got, err := s.AddCartItem(tt.args.ctx, tt.args.cartItem)
 
-			// Проверяем, соответствует ли ошибка ожидаемой
-			if (err != nil) != tt.wantErr {
-				t.Errorf("AddCartItem() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			//Проверяем, количество вызовов методов мока
 			if tt.checkMocks != nil {
 				tt.checkMocks(t, repoMock, productServiceMock)
 			}
-			// Проверяем, что результат совпадает с ожидаемым
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("AddCartItem() got = %v, want %v", got, tt.want)
-			}
+			require.Equal(t, tt.want, got, "AddCartItem() got unexpected result")
 
-			// Используем assert для более удобной проверки
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -289,34 +271,19 @@ func TestCartService_DeleteCartItem(t *testing.T) {
 			},
 			wantErr: true,
 			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock) {
-				// Проверяем, что RemoveItem был вызван 1 раз
 				assert.Equal(t, 1, len(repoMock.RemoveItemMock.Calls()))
 			},
 		},
 	}
 
-	// Проходимся по каждому тестовому кейсу
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
-
-			// Создаем CartService с моками
 			s := NewService(repoMock, nil)
-
-			// Вызываем метод DeleteCartItem
 			err := s.DeleteCartItem(tt.args.ctx, tt.args.userId, tt.args.sku)
-
-			// Проверяем, соответствует ли ошибка ожидаемой
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DeleteCartItem() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
 			if tt.checkMocks != nil {
 				tt.checkMocks(t, repoMock)
 			}
-
-			// Используем assert для более удобной проверки ошибок
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -408,11 +375,6 @@ func TestCartService_CleanUpCart(t *testing.T) {
 			s := NewService(repoMock, nil)
 
 			err := s.CleanUpCart(tt.args.ctx, tt.args.userId)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CleanUpCart() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
 
 			if tt.checkMocks != nil {
 				tt.checkMocks(t, repoMock)
@@ -562,35 +524,21 @@ func TestCartService_GetCartItem(t *testing.T) {
 		},
 	}
 
-	// Проходимся по каждому тестовому кейсу
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
 
-			// Создаем CartService с моками
 			s := NewService(repoMock, productServiceMock)
 
-			// Вызываем метод GetCartItem
 			got, err := s.GetCartItem(tt.args.ctx, tt.args.userId)
 
-			// Проверяем, соответствует ли ошибка ожидаемой
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetCartItem() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-
-			// Проверяем количество вызовов методов
 			if tt.checkMocks != nil {
 				tt.checkMocks(t, repoMock, productServiceMock)
 			}
 
-			// Проверяем, что результат совпадает с ожидаемым
-			if !reflect.DeepEqual(got, tt.wantContent) {
-				t.Errorf("GetCartItem() got = %v, want %v", got, tt.wantContent)
-			}
+			require.Equal(t, tt.wantContent, got, "GetCartItem() got unexpected result")
 
-			// Используем assert для более удобной проверки ошибок
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
