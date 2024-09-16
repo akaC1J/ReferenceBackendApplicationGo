@@ -12,3 +12,7 @@
 /cart/vendor.protogen/
 /loms/pgdata
 bin/
+/cart/reports/coverage.html
+/cart/reports/coverage.out
+/cart/reports/cyclo-report.txt
+/cart/reports/cognit-report.txt

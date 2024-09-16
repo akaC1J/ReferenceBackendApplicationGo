@@ -7,5 +7,5 @@ type productGetProductRequest struct {
 
 type productGetProductResponse struct {
 	Name  string `json:"name" validate:"required"`
-	Price uint32 `json:"price" validate:"required,gt=0"`
+	Price uint32 `json:"price" validate:"required"`
 }
