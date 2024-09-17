@@ -1,4 +1,4 @@
-package app
+package initialization
 
 import (
 	"fmt"
@@ -15,6 +15,7 @@ type Config struct {
 	ProductServicePath string
 	Host_Port          string
 	Port               string
+	LomsBaseUrl        string
 }
 
 func LoadDefaultConfig() (*Config, error) {
@@ -55,6 +56,11 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		return nil, fmt.Errorf("HOST environment variable is required")
 	}
 
+	lomsBaseUrl := os.Getenv("LOMS_BASE_URL")
+	if lomsBaseUrl == "" {
+		return nil, fmt.Errorf("LOMS_BASE_URL environment variable is required")
+	}
+
 	return &Config{
 		MaxRetries:         maxRetries,
 		RetryDelayMs:       retryMs,
@@ -62,6 +68,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		ProductServiceURL:  baseUrl,
 		ProductServicePath: path,
 		Host_Port:          host_port,
+		LomsBaseUrl:        lomsBaseUrl,
 	}, nil
 }
 

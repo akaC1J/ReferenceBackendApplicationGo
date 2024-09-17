@@ -1,3 +1,6 @@
+//go:build e2e
+// +build e2e
+
 package e2e
 
 import (
@@ -7,9 +10,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"route256/cart/internal/app"
+	"route256/cart/internal/app/initialization"
 	"route256/cart/internal/pkg/service/cartservice"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,12 +21,12 @@ import (
 )
 
 func startTestServer(stopChan chan struct{}) {
-	config, err := app.LoadConfig(".env.test")
+	config, err := initialization.LoadConfig(".env.test")
 	if err != nil {
 		log.Fatalf("[main] Failed to load configuration: %v", err)
 	}
 
-	application, err := app.New(config)
+	application, err := initialization.New(config)
 	if err != nil {
 		log.Fatalf("[main] Failed to initialize application: %v", err)
 	}
@@ -76,6 +80,11 @@ func TestGetCartContent_E2E(t *testing.T) {
 	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		var content []byte
+		_, _ = resp.Body.Read(content)
+		if strings.Contains(string(content), "No connection could be made because the target machine actively refused it") {
+			t.Fatalf("Не удалось подключиться к серверу. Возможно, сервис LOMS не запущен - запустите его локально!")
+		}
 		t.Fatalf("Ожидался статус код %d при добавлении товара, получен %d", http.StatusOK, resp.StatusCode)
 	}
 

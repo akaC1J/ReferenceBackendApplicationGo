@@ -4,25 +4,24 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"route256/cart/internal/app"
+	"route256/cart/internal/app/initialization"
 )
 
 func main() {
 	envPath := os.Getenv("ENV_PATH")
-	var config *app.Config
+	var config *initialization.Config
 	var err error
 	if envPath != "" {
-		config, err = app.LoadConfig(envPath)
+		config, err = initialization.LoadConfig(envPath)
 	} else {
-		config, err = app.LoadDefaultConfig()
+		config, err = initialization.LoadDefaultConfig()
 	}
 
 	if err != nil {
 		log.Fatalf("[main] Failed to load configuration: %v", err)
 	}
 
-	application, err := app.New(config)
+	application, err := initialization.New(config)
 	if err != nil {
 		log.Fatalf("[main] Failed to initialize application: %v", err)
 	}

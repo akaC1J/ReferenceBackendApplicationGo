@@ -2,12 +2,11 @@
 
 build-all:
 	cd cart && make build
+	cd loms && make build
 
 run-all: build-all
 	docker-compose up --force-recreate --build -d
 
-test-coverage:
-	cd cart && make test-coverage
-
-lint:
-	cd cart && make lint
+test:
+	cd cart && make test
+	cd loms && make test

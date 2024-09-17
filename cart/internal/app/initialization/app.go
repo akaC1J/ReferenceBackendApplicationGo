@@ -1,9 +1,13 @@
-package app
+package initialization
 
 import (
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"route256/cart/internal/http/middleware"
+	"route256/cart/internal/pkg/service/lomsservice"
+	"route256/loms/pkg/api/loms/v1"
 	"time"
 
 	"route256/cart/internal/app/server"
@@ -22,7 +26,7 @@ type App struct {
 }
 
 func New(config *Config) (*App, error) {
-	log.Println("[app] Starting application initialization")
+	log.Println("[cart] Starting application initialization")
 
 	// Инициализация репозитория корзины
 	cartRepository := repository.NewRepository(repository.NewStorage())
@@ -33,6 +37,11 @@ func New(config *Config) (*App, error) {
 		time.Duration(config.RetryDelayMs)*time.Millisecond,
 	)
 
+	grpcClient := newGRPCClient(config)
+
+	// Инициализация сервиса заказов
+	lomsService := lomsservice.NewLomsService(grpcClient)
+
 	// Инициализация сервиса продуктов
 	productService := productservice.NewProductService(
 		httpClient,
@@ -42,7 +51,7 @@ func New(config *Config) (*App, error) {
 	)
 
 	// Инициализация сервиса корзины
-	cartService := cartservice.NewService(cartRepository, productService)
+	cartService := cartservice.NewService(cartRepository, productService, lomsService)
 
 	app := &App{
 		cartRepository: cartRepository,
@@ -56,6 +65,16 @@ func New(config *Config) (*App, error) {
 	return app, nil
 }
 
+func newGRPCClient(config *Config) loms.LomsClient {
+
+	conn, err := grpc.NewClient("dns:///"+config.LomsBaseUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+		return nil
+	}
+	return loms.NewLomsClient(conn)
+}
+
 func (app *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	app.router.ServeHTTP(w, r)
 }
@@ -67,5 +86,6 @@ func (app *App) setupRoutes() {
 	mux.HandleFunc("DELETE /user/{user_id}/cart", controller.DeleteCartByUserIdHandleFunc)
 	mux.HandleFunc("DELETE /user/{user_id}/cart/{sku_id}", controller.DeleteItemBySkuHandleFunc)
 	mux.HandleFunc("GET /user/{user_id}/cart", controller.GetCartContentHandleFunc)
+	mux.HandleFunc("POST /cart/checkout", controller.CheckoutHandleFunc)
 	app.router = middleware.NewLogMux(mux)
 }

@@ -1,0 +1,28 @@
+### OrderInfo Request
+GRPC localhost:50051/Loms/OrderInfo
+
+{
+  "order_id": 1
+}
+### Expected ERROR order not found
+
+### OrderPay Request
+GRPC localhost:50051/Loms/OrderPay
+
+{
+  "order_id": 1
+}
+### Expected ERROR order not found
+
+### OrderCancel Request
+GRPC localhost:50051/Loms/OrderCancel
+
+{
+  "order_id": 1
+}
+### Expected ERROR order not found
+
+
+
+
+

@@ -1,0 +1,38 @@
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 1002,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected {orderId: int} Status OK, must be create 1 order with 2 items
+
+### OrderPay Request
+GRPC localhost:50051/Loms/OrderPay
+
+{
+  "order_id": 1
+}
+### Expected Status OK, must be pay order with id 1
+
+### OrderCancel Request
+GRPC localhost:50051/Loms/OrderCancel
+
+{
+  "order_id": 1
+}
+### Expected ERROR, invalide order state id 1
+
+
+

@@ -1,0 +1,60 @@
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": -12345,
+    "items": [
+      {
+        "sku": 1002,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected ERROR invalid argument
+
+### OrderPay Request
+GRPC localhost:50051/Loms/OrderPay
+
+{
+  "order_id": "text"
+}
+### Expected ERROR, Unable to build message from provided request body
+
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": -1,
+        "count": 5
+      }
+    ]
+  }
+}
+### Expected ERROR, Unable to build message from provided request body
+
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 1,
+        "count": -1
+      }
+    ]
+  }
+}
+### Expected ERROR, Unable to build message from provided request body
+

@@ -12,8 +12,12 @@ export GOBIN := $(BIN_DIR)
 .PHONY: build test test-coverage install-tools cyclo cognit lint generate_mocks help
 
 # Цель для сборки
-build: test ## Собрать проект
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/app ./cmd/app
+build: ## Собрать проект
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/cart ./cmd/cart
+
+#Цель для быстрого запуска
+fast-run:
+	go run cmd/cart/main.go
 
 # Цель для запуска тестов
 test: generate_mocks ## Запустить тесты с покрытием
@@ -22,7 +26,7 @@ test: generate_mocks ## Запустить тесты с покрытием
 	go tool cover -html=$(REPORTS_DIR)/coverage.out -o $(REPORTS_DIR)/coverage.html
 
 # Цель для установки инструментов
-install-tools: ## Установить необходимые инструменты (gocyclo, gocognit)
+install-tools: ## Установить необходимые инструменты (gocyclo, gocognit, minimock)
 	@mkdir -p $(BIN_DIR)
 	@[ -f $(BIN_DIR)/gocyclo ] || { \
 		echo >&2 "Installing gocyclo..."; \
@@ -33,7 +37,7 @@ install-tools: ## Установить необходимые инструмен
 		go install $(GOCOGNIT_URL); \
 	}
 	@[ -f $(BIN_DIR)/minimock ] || { \
-		echo >&2 "Installing gocognit..."; \
+		echo >&2 "Installing minimock..."; \
 		go install $(MINIMOCK_URL); \
 	}
 
@@ -50,13 +54,15 @@ cognit: install-tools ## Запустить gocognit для анализа ко�
 # Цель для линтинга кода
 lint: cyclo cognit ## Провести линтинг кода с использованием gocyclo и gocognit
 
-# Цель для генерации моков (опционально)
+# Цель для генерации моков
 .PHONY: generate_mocks
-generate_mocks: install-tools ## Генерация моков (требуется установленный minimock)
+generate_mocks: install-tools ## Генерация моков
 	@echo "Generating mocks for all packages"
 	$(BIN_DIR)/minimock -i  route256/cart/internal/pkg/repository.* -o internal/pkg/repository
 	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/cartservice.* -o internal/pkg/service/cartservice
 	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/productservice.* -o internal/pkg/service/productservice
+	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/lomsservice.* -o internal/pkg/service/lomsservice
+	$(BIN_DIR)/minimock -i route256/loms/pkg/api/loms/v1.LomsClient -o internal/pkg/service/lomsservice
 
 # Цель для отображения справки
 help: ## Показать этот справочник

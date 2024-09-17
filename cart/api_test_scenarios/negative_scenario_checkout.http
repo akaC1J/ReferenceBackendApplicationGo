@@ -1,0 +1,11 @@
+### try to big very big count
+POST http://localhost:8082/user/31337/cart/773297411
+Content-Type: application/json
+
+{
+  "count": 32000
+}
+### expected error not enough items in stock
+
+
+

@@ -1,0 +1,42 @@
+### add 5 sku to cart
+POST http://localhost:8082/user/31337/cart/1076963
+Content-Type: application/json
+
+{
+  "count": 5
+}
+
+
+### add another sku to cart
+POST http://localhost:8082/user/31337/cart/1148162
+Content-Type: application/json
+
+{
+  "count": 10
+}
+
+### get list of a cart
+GET http://localhost:8082/user/31337/cart
+Content-Type: application/json
+### expected {} 200 OK; must show cart
+
+### expected {} 200 OK; must add 1 item
+### delete whole sku from cart
+DELETE http://localhost:8082/user/31337/cart/1076963
+Content-Type: application/json
+### expected {} 200 OK; must delete item from cart
+
+### get list of a cart
+GET http://localhost:8082/user/31337/cart
+Content-Type: application/json
+### expected {} 200 OK; must show cart
+
+### delete whole cart
+DELETE http://localhost:8082/user/31337/cart
+Content-Type: application/json
+### expected {} 200 OK; must delete cart
+
+### get list of a cart
+GET http://localhost:8082/user/31337/cart
+Content-Type: application/json
+### expected {} 200 OK; must show cart

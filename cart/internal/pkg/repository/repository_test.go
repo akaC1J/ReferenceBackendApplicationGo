@@ -120,7 +120,7 @@ func TestRepository_GetItem(t *testing.T) {
 			repoMock := tt.mockRepo()
 			repo := NewRepository(repoMock)
 
-			сartItem, err := repo.GetItem(tt.args.ctx, tt.args.userId)
+			сartItem, err := repo.GetCartByUserId(tt.args.ctx, tt.args.userId)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

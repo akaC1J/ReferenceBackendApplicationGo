@@ -37,13 +37,14 @@ func TestCartService_AddCartItem(t *testing.T) {
 		name           string
 		mockRepo       func() *CartRepositoryMock
 		mockProductSvc func() *ProductServiceMock
+		mockLomsSvc    func() *LomsServiceMock
 		args           struct {
 			ctx      context.Context
 			cartItem model.CartItem
 		}
 		want       *model.CartItem
 		wantErr    bool
-		checkMocks func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock)
+		checkMocks func(*testing.T, *CartRepositoryMock, *ProductServiceMock, *LomsServiceMock)
 	}
 
 	tests := []testStruct{
@@ -59,6 +60,12 @@ func TestCartService_AddCartItem(t *testing.T) {
 				productServiceMock.GetProductInfoMock.Return(product, nil)
 				return productServiceMock
 			},
+			mockLomsSvc: func() *LomsServiceMock {
+				lomsServiceMock := NewLomsServiceMock(mc)
+				var enoughCount uint64 = 99999
+				lomsServiceMock.GetStockInfoMock.Return(enoughCount, nil)
+				return lomsServiceMock
+			},
 			args: struct {
 				ctx      context.Context
 				cartItem model.CartItem
@@ -68,10 +75,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 			},
 			want:    &cartItem,
 			wantErr: false,
-			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
+			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock, lomsServiceMock *LomsServiceMock) {
 				assert.Equal(t, 1, len(repoMock.InsertItemMock.Calls()))
-
 				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
+				assert.Equal(t, 1, len(lomsServiceMock.GetStockInfoMock.Calls()))
 			},
 		},
 
@@ -86,6 +93,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 				productServiceMock.GetProductInfoMock.Expect(ctx, cartItem.SKU).Return(nil, fmt.Errorf("product not found for SKU %d", cartItem.SKU))
 				return productServiceMock
 			},
+			mockLomsSvc: func() *LomsServiceMock {
+				lomsServiceMock := NewLomsServiceMock(mc)
+				return lomsServiceMock
+			},
 			args: struct {
 				ctx      context.Context
 				cartItem model.CartItem
@@ -95,11 +106,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
-				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
-
+			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock, lomsServiceMock *LomsServiceMock) {
 				assert.Equal(t, 0, len(repoMock.InsertItemMock.Calls()))
-
+				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
+				assert.Equal(t, 0, len(lomsServiceMock.CreateOrderMock.Calls()))
 			},
 		},
 		{
@@ -112,6 +122,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 				productServiceMock := NewProductServiceMock(mc)
 				return productServiceMock
 			},
+			mockLomsSvc: func() *LomsServiceMock {
+				lomsServiceMock := NewLomsServiceMock(mc)
+				return lomsServiceMock
+			},
 			args: struct {
 				ctx      context.Context
 				cartItem model.CartItem
@@ -121,10 +135,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
+			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock, lomsServiceMock *LomsServiceMock) {
 				assert.Equal(t, 0, len(repoMock.InsertItemMock.Calls()))
-
 				assert.Equal(t, 0, len(productServiceMock.GetProductInfoMock.Calls()))
+				assert.Equal(t, 0, len(lomsServiceMock.CreateOrderMock.Calls()))
 			},
 		},
 		{
@@ -139,6 +153,12 @@ func TestCartService_AddCartItem(t *testing.T) {
 				productServiceMock.GetProductInfoMock.Return(product, nil)
 				return productServiceMock
 			},
+			mockLomsSvc: func() *LomsServiceMock {
+				lomsServiceMock := NewLomsServiceMock(mc)
+				var enoughCount uint64 = 99999
+				lomsServiceMock.GetStockInfoMock.Return(enoughCount, nil)
+				return lomsServiceMock
+			},
 			args: struct {
 				ctx      context.Context
 				cartItem model.CartItem
@@ -149,17 +169,50 @@ func TestCartService_AddCartItem(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name: "error - not enough available stock",
+			mockRepo: func() *CartRepositoryMock {
+				repoMock := NewCartRepositoryMock(mc)
+				return repoMock
+			},
+			mockProductSvc: func() *ProductServiceMock {
+				productServiceMock := NewProductServiceMock(mc)
+				productServiceMock.GetProductInfoMock.Return(product, nil)
+				return productServiceMock
+			},
+			mockLomsSvc: func() *LomsServiceMock {
+				lomsServiceMock := NewLomsServiceMock(mc)
+				notEnoughCount := uint64(cartItem.Count - 1) // Недостаточно товара
+				lomsServiceMock.GetStockInfoMock.Return(notEnoughCount, nil)
+				return lomsServiceMock
+			},
+			args: struct {
+				ctx      context.Context
+				cartItem model.CartItem
+			}{
+				ctx:      ctx,
+				cartItem: cartItem,
+			},
+			want:    nil,
+			wantErr: true,
+			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock, lomsServiceMock *LomsServiceMock) {
+				assert.Equal(t, 0, len(repoMock.InsertItemMock.Calls()))
+				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
+				assert.Equal(t, 1, len(lomsServiceMock.GetStockInfoMock.Calls()))
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
-			s := NewService(repoMock, productServiceMock)
+			lomsServiceMock := tt.mockLomsSvc()
+			s := NewService(repoMock, productServiceMock, lomsServiceMock)
 			got, err := s.AddCartItem(tt.args.ctx, tt.args.cartItem)
 
 			if tt.checkMocks != nil {
-				tt.checkMocks(t, repoMock, productServiceMock)
+				tt.checkMocks(t, repoMock, productServiceMock, lomsServiceMock)
 			}
 			require.Equal(t, tt.want, got, "AddCartItem() got unexpected result")
 
@@ -279,7 +332,7 @@ func TestCartService_DeleteCartItem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
-			s := NewService(repoMock, nil)
+			s := NewService(repoMock, nil, nil)
 			err := s.DeleteCartItem(tt.args.ctx, tt.args.userId, tt.args.sku)
 			if tt.checkMocks != nil {
 				tt.checkMocks(t, repoMock)
@@ -372,7 +425,7 @@ func TestCartService_CleanUpCart(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
 
-			s := NewService(repoMock, nil)
+			s := NewService(repoMock, nil, nil)
 
 			err := s.CleanUpCart(tt.args.ctx, tt.args.userId)
 
@@ -412,7 +465,7 @@ func TestCartService_GetCartItem(t *testing.T) {
 			name: "success - retrieve cart",
 			mockRepo: func() *CartRepositoryMock {
 				repoMock := NewCartRepositoryMock(mc)
-				repoMock.GetItemMock.Return(map[model.SKU]model.CartItem{
+				repoMock.GetCartByUserIdMock.Return(map[model.SKU]model.CartItem{
 					123: {UserId: 1, SKU: 123, Count: 2},
 				}, nil)
 				return repoMock
@@ -437,8 +490,8 @@ func TestCartService_GetCartItem(t *testing.T) {
 			},
 			wantErr: false,
 			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
-				// Проверяем, что GetItem был вызван 1 раз
-				assert.Equal(t, 1, len(repoMock.GetItemMock.Calls()))
+				// Проверяем, что GetCartByUserId был вызван 1 раз
+				assert.Equal(t, 1, len(repoMock.GetCartByUserIdMock.Calls()))
 				// Проверяем, что GetProductInfo был вызван 1 раз
 				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
 			},
@@ -461,8 +514,8 @@ func TestCartService_GetCartItem(t *testing.T) {
 			wantContent: nil,
 			wantErr:     true,
 			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
-				// Проверяем, что GetItem не был вызван
-				assert.Equal(t, 0, len(repoMock.GetItemMock.Calls()))
+				// Проверяем, что GetCartByUserId не был вызван
+				assert.Equal(t, 0, len(repoMock.GetCartByUserIdMock.Calls()))
 				// Проверяем, что GetProductInfo не был вызван
 				assert.Equal(t, 0, len(productServiceMock.GetProductInfoMock.Calls()))
 			},
@@ -472,7 +525,7 @@ func TestCartService_GetCartItem(t *testing.T) {
 			mockRepo: func() *CartRepositoryMock {
 				repoMock := NewCartRepositoryMock(mc)
 				// Ошибка при получении корзины
-				repoMock.GetItemMock.Return(nil, fmt.Errorf("repository error"))
+				repoMock.GetCartByUserIdMock.Return(nil, fmt.Errorf("repository error"))
 				return repoMock
 			},
 			mockProductSvc: func() *ProductServiceMock {
@@ -488,8 +541,8 @@ func TestCartService_GetCartItem(t *testing.T) {
 			wantContent: nil,
 			wantErr:     true,
 			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
-				// Проверяем, что GetItem был вызван 1 раз
-				assert.Equal(t, 1, len(repoMock.GetItemMock.Calls()))
+				// Проверяем, что GetCartByUserId был вызван 1 раз
+				assert.Equal(t, 1, len(repoMock.GetCartByUserIdMock.Calls()))
 				// Проверяем, что GetProductInfo не был вызван
 				assert.Equal(t, 0, len(productServiceMock.GetProductInfoMock.Calls()))
 			},
@@ -498,7 +551,7 @@ func TestCartService_GetCartItem(t *testing.T) {
 			name: "error - product service failure",
 			mockRepo: func() *CartRepositoryMock {
 				repoMock := NewCartRepositoryMock(mc)
-				repoMock.GetItemMock.Return(map[model.SKU]model.CartItem{
+				repoMock.GetCartByUserIdMock.Return(map[model.SKU]model.CartItem{
 					123: {UserId: 1, SKU: 123, Count: 2},
 				}, nil)
 				return repoMock
@@ -518,7 +571,7 @@ func TestCartService_GetCartItem(t *testing.T) {
 			wantContent: nil,
 			wantErr:     true,
 			checkMocks: func(t *testing.T, repoMock *CartRepositoryMock, productServiceMock *ProductServiceMock) {
-				assert.Equal(t, 1, len(repoMock.GetItemMock.Calls()))
+				assert.Equal(t, 1, len(repoMock.GetCartByUserIdMock.Calls()))
 				assert.Equal(t, 1, len(productServiceMock.GetProductInfoMock.Calls()))
 			},
 		},
@@ -529,7 +582,7 @@ func TestCartService_GetCartItem(t *testing.T) {
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
 
-			s := NewService(repoMock, productServiceMock)
+			s := NewService(repoMock, productServiceMock, nil)
 
 			got, err := s.GetCartItem(tt.args.ctx, tt.args.userId)
 

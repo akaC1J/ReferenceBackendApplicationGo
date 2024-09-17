@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "route256/cart/pkg/api/loms/v1;loms";
+
+service Loms {
+    rpc OrderCreate(OrderCreateRequest) returns (OrderCreateResponse) {}
+    rpc OrderPay(OrderPayRequest) returns (google.protobuf.Empty) {}
+    rpc OrderCancel(OrderCancelRequest) returns (google.protobuf.Empty) {}
+    rpc OrderInfo(OrderInfoRequest) returns (OrderInfoResponse) {}
+    rpc StocksInfo(StocksInfoRequest) returns (StocksInfoResponse) {}
+}
+
+message Order {
+    string status = 1;
+    int64 user = 2;
+    repeated Item items = 3;
+}
+
+message Item {
+    uint32 sku = 1;
+    uint32 count = 2;
+}
+
+message OrderInfoRequest {
+    int64 order_id = 1;
+}
+
+message OrderInfoResponse {
+    Order order = 1;
+}
+
+message OrderCreateRequest {
+    Order order = 1;
+}
+
+message OrderCreateResponse {
+    int64 order_id = 1;
+}
+
+message OrderPayRequest {
+    int64 order_id = 1;
+}
+
+message OrderCancelRequest {
+    int64 order_id = 1;
+}
+
+message StocksInfoRequest {
+    uint32 sku = 1;
+}
+
+message StocksInfoResponse {
+   uint64 count = 1;
+}

@@ -1,0 +1,72 @@
+### StocksInfo Request
+GRPC localhost:50051/Loms/StocksInfo
+
+{
+  "sku": 1002
+}
+### Expected {count: int} Status OK, must be return count of items with sku 1002
+
+
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 1002,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected {orderId: int} Status OK, must be create 1 order with 2 items
+
+### StocksInfo Request
+GRPC localhost:50051/Loms/StocksInfo
+
+{
+  "sku": 1002
+}
+### Expected {count from first rq - 5 : int} Status OK, must be return count of items with sku 1003
+
+### OrderInfo Request
+GRPC localhost:50051/Loms/OrderInfo
+
+{
+  "order_id": 1
+}
+### Expected Order with state AWAITING_PAY Status OK, must be return order from second request
+
+### OrderPay Request
+GRPC localhost:50051/Loms/OrderPay
+
+{
+  "order_id": 1
+}
+### Expected Status OK, must be pay order with id 1
+
+### OrderInfo Request
+GRPC localhost:50051/Loms/OrderInfo
+
+{
+  "order_id": 1
+}
+### Expected Order with state PAY Status OK, must be return order from second request
+
+
+### StocksInfo Request
+GRPC localhost:50051/Loms/StocksInfo
+
+{
+  "sku": 1002
+}
+### Expected {count - 5 from first rq: int} Status OK, must be return count of items with sku 1002
+
+
+

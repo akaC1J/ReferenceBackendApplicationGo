@@ -11,6 +11,12 @@ type CartItem struct {
 	Count  uint16
 }
 
+type StockInfo struct {
+	SKU           SKU
+	TotalCount    uint32
+	ReservedCount uint32
+}
+
 type Product struct {
 	Name  string
 	Price uint32

@@ -11,7 +11,7 @@ type CartRepository interface {
 	InsertItem(context.Context, model.CartItem) (*model.CartItem, error)
 	RemoveItem(_ context.Context, userId model.UserId, sku model.SKU) error
 	RemoveByUserId(_ context.Context, userId model.UserId) error
-	GetItem(_ context.Context, userId model.UserId) (map[model.SKU]model.CartItem, error)
+	GetCartByUserId(_ context.Context, userId model.UserId) (map[model.SKU]model.CartItem, error)
 }
 
 type ProductService interface {
@@ -21,13 +21,19 @@ type ProductService interface {
 	GetProductInfo(ctx context.Context, sku model.SKU) (*model.Product, error)
 }
 
+type LomsService interface {
+	CreateOrder(ctx context.Context, userId model.UserId, cart map[model.SKU]model.CartItem) (int64, error)
+	GetStockInfo(ctx context.Context, sku model.SKU) (uint64, error)
+}
+
 type CartService struct {
 	repository     CartRepository
 	productService ProductService
+	lomsService    LomsService
 }
 
-func NewService(repository CartRepository, service ProductService) *CartService {
-	return &CartService{repository: repository, productService: service}
+func NewService(repository CartRepository, service ProductService, lomsService LomsService) *CartService {
+	return &CartService{repository: repository, productService: service, lomsService: lomsService}
 }
 
 func (s *CartService) AddCartItem(ctx context.Context, cartItem model.CartItem) (*model.CartItem, error) {
@@ -40,6 +46,18 @@ func (s *CartService) AddCartItem(ctx context.Context, cartItem model.CartItem) 
 	if err != nil {
 		log.Printf("[cartService] Failed to add item to cart: Product info for SKU %d not found", cartItem.SKU)
 		return nil, err
+	}
+
+	availableCount, err := s.lomsService.GetStockInfo(ctx, cartItem.SKU)
+	if err != nil {
+		log.Printf("[cartService] Failed get info from stock for SKU %d", cartItem.SKU)
+		return nil, err
+	}
+
+	if uint64(cartItem.Count) > availableCount {
+		log.Printf("[cartService] Failed to add item to cart: Not enough items in stock for SKU %d", cartItem.SKU)
+		return nil, fmt.Errorf("not enough items in stock for SKU %d", cartItem.SKU)
+
 	}
 
 	item, err := s.repository.InsertItem(ctx, cartItem)
@@ -100,7 +118,7 @@ func (s *CartService) GetCartItem(ctx context.Context, userId model.UserId) (*Ca
 		return nil, errUserId
 	}
 
-	userCart, err := s.repository.GetItem(ctx, userId)
+	userCart, err := s.repository.GetCartByUserId(ctx, userId)
 	if err != nil {
 		log.Printf("[cartService] Failed to retrieve cart for user %d: %v", userId, err)
 		return nil, err
@@ -122,6 +140,31 @@ func (s *CartService) GetCartItem(ctx context.Context, userId model.UserId) (*Ca
 	log.Printf("[cartService] Cart for user %d successfully retrieved with %d items, total price: %d", userId, len(cartContent.Items), cartContent.TotalPrice)
 
 	return &cartContent, nil
+}
+
+func (s *CartService) Checkout(ctx context.Context, userId model.UserId) (int64, error) {
+	if errUserId := checkFieldMustPositive(int64(userId), "user_id"); errUserId != nil {
+		log.Printf("[cartService] Failed to retrieve cart: validation failed: for UserID %d", userId)
+		return 0, errUserId
+	}
+	userCart, err := s.repository.GetCartByUserId(ctx, userId)
+	if err != nil {
+		log.Printf("[cartService] Failed to retrieve cart for user %d: %v", userId, err)
+		return 0, err
+	}
+	log.Printf("[cartService] Retrieving cart successed %+v", userCart)
+	orderId, err := s.lomsService.CreateOrder(ctx, userId, userCart)
+	if err != nil {
+		log.Printf("[cartService] Failed to create order for user %d: %v", userId, err)
+		return 0, err
+	}
+	err = s.repository.RemoveByUserId(ctx, userId)
+	if err != nil {
+		log.Printf("[cartService] Failed to clean up cart for user %d: %v", userId, err)
+		return 0, err
+
+	}
+	return orderId, nil
 }
 
 func checkFieldMustPositive(value int64, fieldName string) error {

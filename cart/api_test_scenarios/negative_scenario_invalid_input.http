@@ -25,15 +25,6 @@ Content-Type: application/json
 }
 ### expected {} 412 Precondition Failed; invalid sku
 
-### add another sku to cart
-POST http://localhost:8082/user/31337/cart/1148162
-Content-Type: application/json
-
-{
-  "count": 1
-}
-### expected {} 200 OK; must add 1 item
-
 ### invalid user
 POST http://localhost:8082/user/0/cart/1148162
 Content-Type: application/json
@@ -61,24 +52,6 @@ Content-Type: application/json
 }
 ### expected {} 400 Bad Request
 
-# ========================================================================================
-
-### delete whole sku from cart
-DELETE http://localhost:8082/user/31337/cart/1076963
-Content-Type: application/json
-### expected {} 200 OK; must delete item from cart
-
-### delete whole cart
-DELETE http://localhost:8082/user/31337/cart
-Content-Type: application/json
-### expected {} 200 OK; must delete cart
-
-# ========================================================================================
-
-### get list of a cart
-GET http://localhost:8082/user/31337/cart
-Content-Type: application/json
-### expected {} 200 OK; must show cart
 
 ### get invalid list of cart
 GET http://localhost:8082/user/0/cart

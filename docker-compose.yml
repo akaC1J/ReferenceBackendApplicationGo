@@ -2,7 +2,16 @@ version: "3.8"
 
 services:
   cart:
-    container_name: app
+    container_name: cart
     build: ./cart/
     ports:
-      - "8082:8082" # HTTP
+      - "8082:8082"
+    depends_on:
+      - loms
+    environment:
+      - LOMS_BASE_URL=loms:50051
+  loms:
+    container_name: loms
+    build: ./loms/
+    ports:
+      - "50051:50051"

@@ -1,0 +1,27 @@
+### OrderCreate Request
+GRPC localhost:50051/Loms/OrderCreate
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 9999,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected ERROR, not found stock with sku 9999
+
+### OrderInfo Request
+GRPC localhost:50051/Loms/OrderInfo
+
+{
+  "order_id": 1
+}
+### Expected Order with state FAILED Status OK, must be return order from second request

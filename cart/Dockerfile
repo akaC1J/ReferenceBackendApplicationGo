@@ -2,10 +2,10 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY ./bin/app .
+COPY ./bin/cart .
 
 COPY .env .
 
-RUN chmod +x ./app
+RUN chmod +x ./cart
 
-CMD ["./app"]
+CMD ["./cart"]

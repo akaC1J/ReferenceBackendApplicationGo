@@ -16,6 +16,7 @@ type CartInterface interface {
 	DeleteCartItem(ctx context.Context, userId model.UserId, sku model.SKU) error
 	CleanUpCart(ctx context.Context, userId model.UserId) error
 	GetCartItem(ctx context.Context, userId model.UserId) (*cartservice.CartContent, error)
+	Checkout(ctx context.Context, userId model.UserId) (int64, error)
 }
 
 type Server struct {

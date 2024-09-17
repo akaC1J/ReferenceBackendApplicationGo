@@ -39,6 +39,6 @@ func (r *Repository) RemoveByUserId(_ context.Context, userId model.UserId) erro
 }
 
 // GetItem возвращает корзину пользователя
-func (r *Repository) GetItem(_ context.Context, userId model.UserId) (map[model.SKU]model.CartItem, error) {
+func (r *Repository) GetCartByUserId(_ context.Context, userId model.UserId) (map[model.SKU]model.CartItem, error) {
 	return r.storage.GetCart(userId)
 }

@@ -1,0 +1,35 @@
+### add 5 sku to cart
+POST http://localhost:8082/user/31337/cart/773297411
+Content-Type: application/json
+
+{
+  "count": 5
+}
+
+### add 1 sku to cart
+POST http://localhost:8082/user/31337/cart/773297411
+Content-Type: application/json
+
+{
+  "count": 1
+}
+### expected {} 200 OK; must add 1 item
+
+
+### get list of a cart
+GET http://localhost:8082/user/31337/cart
+Content-Type: application/json
+### expected {} 200 OK; must show cart
+
+
+### checkout
+POST http://localhost:8082/cart/checkout
+Content-Type: application/json
+
+{
+  "user": 31337
+}
+
+
+
+
