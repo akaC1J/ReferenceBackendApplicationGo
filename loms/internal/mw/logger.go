@@ -27,6 +27,17 @@ func Logger(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, ha
 
 func WithHTTPLoggingMiddleware(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Hello_World")
+
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Origin", SwaggerUrlForCors)
+
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
+
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.WriteHeader(200)
+			return
+		}
 		log.Println(r.Method)
 		next.ServeHTTP(w, r)
 	}

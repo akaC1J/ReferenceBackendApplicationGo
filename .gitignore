@@ -16,3 +16,4 @@ bin/
 /cart/reports/coverage.out
 /cart/reports/cyclo-report.txt
 /cart/reports/cognit-report.txt
+/loms/vendor-proto/

@@ -1,0 +1,58 @@
+### StocksInfo Request
+GET http://localhost:8081/v1/stocks/1003
+Accept: application/json
+### Expected {count: int} Status OK, must be return count of items with sku 1003
+
+### OrderCreate Request
+POST http://localhost:8081/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 1002,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected {orderId: int} Status OK, must be create 1 order with 2 items
+
+### StocksInfo Request (After OrderCreate)
+GET http://localhost:8081/v1/stocks/1003
+Accept: application/json
+### Expected {count from first rq - 10 : int} Status OK, must be return count of items with sku 1003
+
+
+### OrderInfo Request
+GET http://localhost:8081/v1/orders/1
+Accept: application/json
+### Expected Order with state AWAITING_PAY Status OK, must be return order from second request
+
+### OrderPay Request
+POST http://localhost:8081/v1/orders/1/pay
+Content-Type: application/json
+Accept: application/json
+
+{}
+
+### Expected {orderId: int} Status OK, must be pay order with id 1
+
+### OrderInfo Request (After OrderPay)
+GET http://localhost:8081/v1/orders/1
+Accept: application/json
+
+### Expected Order with state PAYED Status OK, must be return order from second request
+
+### StocksInfo Request (After OrderCancel)
+GET http://localhost:8081/v1/stocks/1003
+Accept: application/json
+
+### Expected {count from first rq - 10 : int} Status OK, must be return count of items with sku 1003

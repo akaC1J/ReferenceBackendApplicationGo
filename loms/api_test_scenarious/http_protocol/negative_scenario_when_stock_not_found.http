@@ -1,0 +1,21 @@
+### OrderCreate Request
+POST http://localhost:8081/v1/orders
+Content-Type: application/json
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 9999,
+        "count": 5
+      }
+    ]
+  }
+}
+### Expected ERROR, not found stock with sku 9999
+
+### OrderInfo Request
+GET http://localhost:8081/v1/orders/1
+Accept: application/json
+### Expected ERROR, not found order with id 1

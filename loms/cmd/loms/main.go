@@ -33,7 +33,14 @@ func main() {
 
 	log.Println("[main] Application initialization successful")
 	log.Printf("[main] server listening at %v", lis.Addr())
-	if err = application.GrpcServer.Serve(lis); err != nil {
+
+	go func() {
+		if err = application.GrpcServer.Serve(lis); err != nil {
+			log.Fatalf("[main] failed to serve: %v", err)
+		}
+	}()
+	log.Printf("[main] server listening at %v", application.GwServer.Addr)
+	if err = application.GwServer.ListenAndServe(); err != nil {
 		log.Fatalf("[main] failed to serve: %v", err)
 	}
 

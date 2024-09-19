@@ -1,56 +1,123 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "route256/cart/pkg/api/loms/v1;loms";
 
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "LOMS API";
+        version: "1.0.0";
+    }
+    host: "localhost:8081";
+};
 service Loms {
-    rpc OrderCreate(OrderCreateRequest) returns (OrderCreateResponse) {}
-    rpc OrderPay(OrderPayRequest) returns (google.protobuf.Empty) {}
-    rpc OrderCancel(OrderCancelRequest) returns (google.protobuf.Empty) {}
-    rpc OrderInfo(OrderInfoRequest) returns (OrderInfoResponse) {}
-    rpc StocksInfo(StocksInfoRequest) returns (StocksInfoResponse) {}
+    // Создание заказа
+    rpc OrderCreate(OrderCreateRequest) returns (OrderCreateResponse) {
+        option (google.api.http) = {
+            post: "/v1/orders"
+            body: "*"
+        };
+    }
+
+    // Оплата заказа
+    rpc OrderPay(OrderPayRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/orders/{order_id}/pay"
+            body: "*"
+        };
+    }
+
+    // Отмена заказа
+    rpc OrderCancel(OrderCancelRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/v1/orders/{order_id}/cancel"
+            body: "*"
+        };
+    }
+
+    // Получение информации о заказе
+    rpc OrderInfo(OrderInfoRequest) returns (OrderInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/{order_id}"
+        };
+    }
+
+    // Получение информации о наличии товаров на складе
+    rpc StocksInfo(StocksInfoRequest) returns (StocksInfoResponse) {
+        option (google.api.http) = {
+            get: "/v1/stocks/{sku}"
+        };
+    }
 }
 
+// Сообщение заказа с валидацией
 message Order {
-    string status = 1;
-    int64 user = 2;
-    repeated Item items = 3;
+    string status = 1 [
+        (validate.rules).string = {in: ["", "new", "awaiting payment", "failed", "payed", "cancelled"]}
+    ];
+    int64 user = 2 [
+        (validate.rules).int64.gt = 0
+    ];
+    repeated Item items = 3 [
+        (validate.rules).repeated.min_items = 1
+    ];
 }
 
+// Сообщение элемента заказа с валидацией
 message Item {
-    uint32 sku = 1;
-    uint32 count = 2;
+    uint32 sku = 1 [
+        (validate.rules).uint32.gt = 0
+    ];
+    uint32 count = 2 [
+        (validate.rules).uint32.gt = 0
+    ];
 }
 
+// Запрос информации о заказе
 message OrderInfoRequest {
-    int64 order_id = 1;
+    int64 order_id = 1 [
+        (validate.rules).int64.gt = 0
+    ];
 }
 
+// Ответ информации о заказе
 message OrderInfoResponse {
     Order order = 1;
 }
 
+// Запрос на создание заказа
 message OrderCreateRequest {
     Order order = 1;
 }
 
+// Ответ на создание заказа
 message OrderCreateResponse {
     int64 order_id = 1;
 }
 
+// Запрос на оплату заказа
 message OrderPayRequest {
     int64 order_id = 1;
 }
 
+// Запрос на отмену заказа
 message OrderCancelRequest {
-    int64 order_id = 1;
+    int64 order_id = 1 [
+        (validate.rules).int64.gt = 0];
 }
 
+// Запрос информации о наличии товара на складе
 message StocksInfoRequest {
-    uint32 sku = 1;
+    uint32 sku = 1 [
+        (validate.rules).uint32.gt = 0];
 }
 
+// Ответ информации о наличии товара на складе
 message StocksInfoResponse {
-   uint64 count = 1;
+    uint64 count = 1 [
+        (validate.rules).uint64.gt = 0];
 }

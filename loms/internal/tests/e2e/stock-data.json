@@ -1,0 +1,28 @@
+[
+  {
+    "sku": 1,
+    "total_count": 150,
+    "reserved": 10
+  },
+  {
+    "sku": 2,
+    "total_count": 200,
+    "reserved": 20
+  },
+  {
+    "sku": 3,
+    "total_count": 250,
+    "reserved": 30
+  },
+  {
+    "sku": 4,
+    "total_count": 300,
+    "reserved": 40
+  },
+  {
+    "sku": 5,
+    "total_count": 350,
+    "reserved": 50
+  }
+]
+

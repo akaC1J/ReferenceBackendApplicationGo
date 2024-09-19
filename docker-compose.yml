@@ -10,8 +10,25 @@ services:
       - loms
     environment:
       - LOMS_BASE_URL=loms:50051
+      - SWAGGER_URL=http://localhost:8080
+
   loms:
     container_name: loms
     build: ./loms/
     ports:
       - "50051:50051"
+      - "8081:8081"
+    environment:
+        - SWAGGER_FOR_CORS_ALLOWED_URL=http://localhost:8080
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./loms/api/openapiv2/loms.swagger.json:/app/swagger.json
+    environment:
+      - SWAGGER_JSON=/app/swagger.json
+    depends_on:
+      - loms

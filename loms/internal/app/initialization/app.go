@@ -1,10 +1,15 @@
 package initialization
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"log"
+	"net/http"
 	"os"
 	"route256/loms/internal/app/grpccontroller"
 	"route256/loms/internal/model"
@@ -22,6 +27,7 @@ type App struct {
 	stockService    *stockservice.Service
 	orderService    *orderservice.Service
 	GrpcServer      *grpc.Server
+	GwServer        *http.Server
 }
 
 func New(config *Config) (*App, error) {
@@ -40,16 +46,35 @@ func New(config *Config) (*App, error) {
 		orderService:    orderService,
 	}
 
+	mw.SwaggerUrlForCors = config.SwagerUrl
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			mw.Panic,
 			mw.Logger,
+			mw.Validate,
 		),
 	)
 	reflection.Register(grpcServer)
 	lomsGrpc.RegisterLomsServer(grpcServer, grpccontroller.NewLomsController(app.orderService, app.stockService))
 
 	app.GrpcServer = grpcServer
+
+	conn, err := grpc.NewClient(":50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalln("Failed to deal:", err)
+	}
+
+	gwmux := runtime.NewServeMux()
+
+	if err = lomsGrpc.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil {
+		log.Fatalln("Failed to register gateway:", err)
+	}
+	gwServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", config.HttpPort),
+		Handler: mw.WithCorsCheckHttpHandler(mw.WithHTTPLoggingMiddleware(gwmux)),
+	}
+
+	app.GwServer = gwServer
 
 	return app, nil
 }

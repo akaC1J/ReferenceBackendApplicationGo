@@ -1,0 +1,67 @@
+### OrderCreate Request
+POST http://localhost:8081/v1/orders
+Content-Type: application/json
+
+{
+  "order": {
+    "user": -12345,
+    "items": [
+      {
+        "sku": 1002,
+        "count": 5
+      },
+      {
+        "sku": 1003,
+        "count": 10
+      }
+    ]
+  }
+}
+### Expected ERROR: invalid argument
+
+
+### OrderPay Request
+POST http://localhost:8081/v1/orders/text/pay
+Content-Type: application/json
+Accept: application/json
+
+{}
+### Expected ERROR: Unable to build message from provided request body
+
+
+### OrderCreate Request
+POST http://localhost:8081/v1/orders
+Content-Type: application/json
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": -1,
+        "count": 5
+      }
+    ]
+  }
+}
+
+### Expected ERROR: Unable to build message from provided request body
+
+
+### OrderCreate Request
+POST http://localhost:8081/v1/orders
+Content-Type: application/json
+
+{
+  "order": {
+    "user": 12345,
+    "items": [
+      {
+        "sku": 1,
+        "count": -1
+      }
+    ]
+  }
+}
+
+### Expected ERROR: Unable to build message from provided request body

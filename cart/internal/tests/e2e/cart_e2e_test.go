@@ -1,5 +1,4 @@
 //go:build e2e
-// +build e2e
 
 package e2e
 
@@ -78,11 +77,10 @@ func TestGetCartContent_E2E(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Не удалось выполнить POST запрос: %v", err)
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		var content []byte
-		_, _ = resp.Body.Read(content)
-		if strings.Contains(string(content), "No connection could be made because the target machine actively refused it") {
+		content, _ := io.ReadAll(resp.Body)
+		if strings.Contains(string(content), "connection error") {
 			t.Fatalf("Не удалось подключиться к серверу. Возможно, сервис LOMS не запущен - запустите его локально!")
 		}
 		t.Fatalf("Ожидался статус код %d при добавлении товара, получен %d", http.StatusOK, resp.StatusCode)
