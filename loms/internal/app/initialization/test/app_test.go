@@ -11,7 +11,7 @@ func TestNew(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to load config: %v", err)
 	}
-	_, err = initialization.New(testConf)
+	_, err = initialization.MustNew(testConf)
 	if err != nil {
 		t.Fatalf("failed to create cart: %v", err)
 	}

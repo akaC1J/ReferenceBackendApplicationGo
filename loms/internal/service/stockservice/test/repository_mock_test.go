@@ -19,16 +19,16 @@ type RepositoryMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
-	funcGetStock          func(ctx context.Context, sku model.SKUType) (s1 model.Stock, err error)
+	funcGetStock          func(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error)
 	funcGetStockOrigin    string
 	inspectFuncGetStock   func(ctx context.Context, sku model.SKUType)
 	afterGetStockCounter  uint64
 	beforeGetStockCounter uint64
 	GetStockMock          mRepositoryMockGetStock
 
-	funcUpdateStock          func(ctx context.Context, items []model.Stock) (err error)
+	funcUpdateStock          func(ctx context.Context, items map[model.SKUType]*model.Stock) (err error)
 	funcUpdateStockOrigin    string
-	inspectFuncUpdateStock   func(ctx context.Context, items []model.Stock)
+	inspectFuncUpdateStock   func(ctx context.Context, items map[model.SKUType]*model.Stock)
 	afterUpdateStockCounter  uint64
 	beforeUpdateStockCounter uint64
 	UpdateStockMock          mRepositoryMockUpdateStock
@@ -91,7 +91,7 @@ type RepositoryMockGetStockParamPtrs struct {
 
 // RepositoryMockGetStockResults contains results of the Repository.GetStock
 type RepositoryMockGetStockResults struct {
-	s1  model.Stock
+	sp1 *model.Stock
 	err error
 }
 
@@ -195,7 +195,7 @@ func (mmGetStock *mRepositoryMockGetStock) Inspect(f func(ctx context.Context, s
 }
 
 // Return sets up results that will be returned by Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) Return(s1 model.Stock, err error) *RepositoryMock {
+func (mmGetStock *mRepositoryMockGetStock) Return(sp1 *model.Stock, err error) *RepositoryMock {
 	if mmGetStock.mock.funcGetStock != nil {
 		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
 	}
@@ -203,13 +203,13 @@ func (mmGetStock *mRepositoryMockGetStock) Return(s1 model.Stock, err error) *Re
 	if mmGetStock.defaultExpectation == nil {
 		mmGetStock.defaultExpectation = &RepositoryMockGetStockExpectation{mock: mmGetStock.mock}
 	}
-	mmGetStock.defaultExpectation.results = &RepositoryMockGetStockResults{s1, err}
+	mmGetStock.defaultExpectation.results = &RepositoryMockGetStockResults{sp1, err}
 	mmGetStock.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
 	return mmGetStock.mock
 }
 
 // Set uses given function f to mock the Repository.GetStock method
-func (mmGetStock *mRepositoryMockGetStock) Set(f func(ctx context.Context, sku model.SKUType) (s1 model.Stock, err error)) *RepositoryMock {
+func (mmGetStock *mRepositoryMockGetStock) Set(f func(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error)) *RepositoryMock {
 	if mmGetStock.defaultExpectation != nil {
 		mmGetStock.mock.t.Fatalf("Default expectation is already set for the Repository.GetStock method")
 	}
@@ -240,8 +240,8 @@ func (mmGetStock *mRepositoryMockGetStock) When(ctx context.Context, sku model.S
 }
 
 // Then sets up Repository.GetStock return parameters for the expectation previously defined by the When method
-func (e *RepositoryMockGetStockExpectation) Then(s1 model.Stock, err error) *RepositoryMock {
-	e.results = &RepositoryMockGetStockResults{s1, err}
+func (e *RepositoryMockGetStockExpectation) Then(sp1 *model.Stock, err error) *RepositoryMock {
+	e.results = &RepositoryMockGetStockResults{sp1, err}
 	return e.mock
 }
 
@@ -267,7 +267,7 @@ func (mmGetStock *mRepositoryMockGetStock) invocationsDone() bool {
 }
 
 // GetStock implements mm_stockservice.Repository
-func (mmGetStock *RepositoryMock) GetStock(ctx context.Context, sku model.SKUType) (s1 model.Stock, err error) {
+func (mmGetStock *RepositoryMock) GetStock(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error) {
 	mm_atomic.AddUint64(&mmGetStock.beforeGetStockCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetStock.afterGetStockCounter, 1)
 
@@ -287,7 +287,7 @@ func (mmGetStock *RepositoryMock) GetStock(ctx context.Context, sku model.SKUTyp
 	for _, e := range mmGetStock.GetStockMock.expectations {
 		if minimock.Equal(*e.params, mm_params) {
 			mm_atomic.AddUint64(&e.Counter, 1)
-			return e.results.s1, e.results.err
+			return e.results.sp1, e.results.err
 		}
 	}
 
@@ -319,7 +319,7 @@ func (mmGetStock *RepositoryMock) GetStock(ctx context.Context, sku model.SKUTyp
 		if mm_results == nil {
 			mmGetStock.t.Fatal("No results are set for the RepositoryMock.GetStock")
 		}
-		return (*mm_results).s1, (*mm_results).err
+		return (*mm_results).sp1, (*mm_results).err
 	}
 	if mmGetStock.funcGetStock != nil {
 		return mmGetStock.funcGetStock(ctx, sku)
@@ -423,13 +423,13 @@ type RepositoryMockUpdateStockExpectation struct {
 // RepositoryMockUpdateStockParams contains parameters of the Repository.UpdateStock
 type RepositoryMockUpdateStockParams struct {
 	ctx   context.Context
-	items []model.Stock
+	items map[model.SKUType]*model.Stock
 }
 
 // RepositoryMockUpdateStockParamPtrs contains pointers to parameters of the Repository.UpdateStock
 type RepositoryMockUpdateStockParamPtrs struct {
 	ctx   *context.Context
-	items *[]model.Stock
+	items *map[model.SKUType]*model.Stock
 }
 
 // RepositoryMockUpdateStockResults contains results of the Repository.UpdateStock
@@ -455,7 +455,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) Optional() *mRepositoryMockUpda
 }
 
 // Expect sets up expected params for Repository.UpdateStock
-func (mmUpdateStock *mRepositoryMockUpdateStock) Expect(ctx context.Context, items []model.Stock) *mRepositoryMockUpdateStock {
+func (mmUpdateStock *mRepositoryMockUpdateStock) Expect(ctx context.Context, items map[model.SKUType]*model.Stock) *mRepositoryMockUpdateStock {
 	if mmUpdateStock.mock.funcUpdateStock != nil {
 		mmUpdateStock.mock.t.Fatalf("RepositoryMock.UpdateStock mock is already set by Set")
 	}
@@ -503,7 +503,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) ExpectCtxParam1(ctx context.Con
 }
 
 // ExpectItemsParam2 sets up expected param items for Repository.UpdateStock
-func (mmUpdateStock *mRepositoryMockUpdateStock) ExpectItemsParam2(items []model.Stock) *mRepositoryMockUpdateStock {
+func (mmUpdateStock *mRepositoryMockUpdateStock) ExpectItemsParam2(items map[model.SKUType]*model.Stock) *mRepositoryMockUpdateStock {
 	if mmUpdateStock.mock.funcUpdateStock != nil {
 		mmUpdateStock.mock.t.Fatalf("RepositoryMock.UpdateStock mock is already set by Set")
 	}
@@ -526,7 +526,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) ExpectItemsParam2(items []model
 }
 
 // Inspect accepts an inspector function that has same arguments as the Repository.UpdateStock
-func (mmUpdateStock *mRepositoryMockUpdateStock) Inspect(f func(ctx context.Context, items []model.Stock)) *mRepositoryMockUpdateStock {
+func (mmUpdateStock *mRepositoryMockUpdateStock) Inspect(f func(ctx context.Context, items map[model.SKUType]*model.Stock)) *mRepositoryMockUpdateStock {
 	if mmUpdateStock.mock.inspectFuncUpdateStock != nil {
 		mmUpdateStock.mock.t.Fatalf("Inspect function is already set for RepositoryMock.UpdateStock")
 	}
@@ -551,7 +551,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) Return(err error) *RepositoryMo
 }
 
 // Set uses given function f to mock the Repository.UpdateStock method
-func (mmUpdateStock *mRepositoryMockUpdateStock) Set(f func(ctx context.Context, items []model.Stock) (err error)) *RepositoryMock {
+func (mmUpdateStock *mRepositoryMockUpdateStock) Set(f func(ctx context.Context, items map[model.SKUType]*model.Stock) (err error)) *RepositoryMock {
 	if mmUpdateStock.defaultExpectation != nil {
 		mmUpdateStock.mock.t.Fatalf("Default expectation is already set for the Repository.UpdateStock method")
 	}
@@ -567,7 +567,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) Set(f func(ctx context.Context,
 
 // When sets expectation for the Repository.UpdateStock which will trigger the result defined by the following
 // Then helper
-func (mmUpdateStock *mRepositoryMockUpdateStock) When(ctx context.Context, items []model.Stock) *RepositoryMockUpdateStockExpectation {
+func (mmUpdateStock *mRepositoryMockUpdateStock) When(ctx context.Context, items map[model.SKUType]*model.Stock) *RepositoryMockUpdateStockExpectation {
 	if mmUpdateStock.mock.funcUpdateStock != nil {
 		mmUpdateStock.mock.t.Fatalf("RepositoryMock.UpdateStock mock is already set by Set")
 	}
@@ -609,7 +609,7 @@ func (mmUpdateStock *mRepositoryMockUpdateStock) invocationsDone() bool {
 }
 
 // UpdateStock implements mm_stockservice.Repository
-func (mmUpdateStock *RepositoryMock) UpdateStock(ctx context.Context, items []model.Stock) (err error) {
+func (mmUpdateStock *RepositoryMock) UpdateStock(ctx context.Context, items map[model.SKUType]*model.Stock) (err error) {
 	mm_atomic.AddUint64(&mmUpdateStock.beforeUpdateStockCounter, 1)
 	defer mm_atomic.AddUint64(&mmUpdateStock.afterUpdateStockCounter, 1)
 

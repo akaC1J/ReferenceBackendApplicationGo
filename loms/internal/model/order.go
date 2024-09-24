@@ -1,13 +1,13 @@
 package model
 
-type StateType int
+type StateType string
 
 const (
-	NEW StateType = iota + 1
-	AWAITING_PAYMENT
-	FAILED
-	PAYED
-	CANCELLED
+	NEW              StateType = "NEW"
+	AWAITING_PAYMENT           = "AWAITING_PAYMENT"
+	FAILED                     = "FAILED"
+	PAYED                      = "PAYED"
+	CANCELLED                  = "CANCELLED"
 )
 
 type Order struct {

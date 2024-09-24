@@ -10,12 +10,12 @@ import (
 
 type Config struct {
 	StockFilePath string
-	GrpcPort      int
+	GgrpcHostPort string
 	HttpPort      int
 	SwagerUrl     string
 }
 
-const defaultPortGrpc = 50051
+const defaultHostPortGrpc = ":50051"
 const defaultHttpPort = 8081
 
 func LoadDefaultConfig() (*Config, error) {
@@ -29,17 +29,10 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 
 	stockFilePath := os.Getenv("STOCK_FILE_PATH")
 
-	grpcPortStr := os.Getenv("GRPC_PORT")
-	var grpcPort = defaultPortGrpc
-	if grpcPortStr != "" {
-		var err error
-		grpcPort, err = strconv.Atoi(grpcPortStr)
-		if err != nil {
-			log.Printf("[config] failed to parse GRPC_PORT: %v", err)
-			log.Printf("[config] will be using default port: %d", defaultPortGrpc)
-		}
-	} else {
-		log.Printf("[config] will be using default port: %d", defaultPortGrpc)
+	grpcPort := os.Getenv("GRPC_HOST_PORT")
+	if grpcPort == "" {
+		log.Printf("[config] will be using default host port: %s", defaultHostPortGrpc)
+		grpcPort = defaultHostPortGrpc
 	}
 	httpPortStr := os.Getenv("HTTP_PORT")
 	var httpPort = defaultHttpPort
@@ -59,7 +52,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 
 	return &Config{
 		StockFilePath: stockFilePath,
-		GrpcPort:      grpcPort,
+		GgrpcHostPort: grpcPort,
 		HttpPort:      httpPort,
 		SwagerUrl:     swaggerUrl,
 	}, nil

@@ -1,4 +1,4 @@
-package mw
+package grpc
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ var SwaggerUrlForCors string
 
 func WithCorsCheckHttpHandler(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
+		w.Header().Set("Access-Control-Allow-Origin", SwaggerUrlForCors)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 

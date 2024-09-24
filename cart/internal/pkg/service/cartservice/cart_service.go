@@ -23,7 +23,7 @@ type ProductService interface {
 
 type LomsService interface {
 	CreateOrder(ctx context.Context, userId model.UserId, cart map[model.SKU]model.CartItem) (int64, error)
-	GetStockInfo(ctx context.Context, sku model.SKU) (uint64, error)
+	GetStockInfo(ctx context.Context, sku model.SKU) (availableCountStock uint64, err error)
 }
 
 type CartService struct {

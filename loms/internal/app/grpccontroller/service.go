@@ -34,7 +34,7 @@ func NewLomsController(orderService OrderService, stockService StockService) *Lo
 
 func mapErrorToGRPC(err error) error {
 	if errors.Is(err, appErr.ErrStockInsufficient) {
-		return status.Error(codes.ResourceExhausted, err.Error())
+		return status.Error(codes.FailedPrecondition, err.Error())
 	}
 	if errors.Is(err, appErr.ErrNotFound) || errors.Is(err, appErr.ErrOrderState) {
 		return status.Error(codes.NotFound, err.Error())

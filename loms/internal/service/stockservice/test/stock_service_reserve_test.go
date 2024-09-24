@@ -27,17 +27,17 @@ func TestService_Reserve_Success(t *testing.T) {
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(1)).
-		Then(model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 5}, nil)
+		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 5}, nil)
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(2)).
-		Then(model.Stock{SKU: 2, TotalCount: 10, ReservedCount: 2}, nil)
+		Then(&model.Stock{SKU: 2, TotalCount: 10, ReservedCount: 2}, nil)
 
-	expectedUpdateStocks := []model.Stock{
-		{SKU: 1, TotalCount: 20, ReservedCount: 15}, // 5 + 10
-		{SKU: 2, TotalCount: 10, ReservedCount: 7},  // 2 + 5
+	expectedUpdateStocks := map[model.SKUType]*model.Stock{
+		1: {SKU: 1, TotalCount: 20, ReservedCount: 15}, // 5 + 10
+		2: {SKU: 2, TotalCount: 10, ReservedCount: 7},  // 2 + 5
 	}
-	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks []model.Stock) error {
+	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks map[model.SKUType]*model.Stock) error {
 		assert.True(t, compareStocks(expectedUpdateStocks, stocks))
 		return nil
 	})
@@ -64,7 +64,7 @@ func TestService_Reserve_NotEnoughStock(t *testing.T) {
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(1)).
-		Then(model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 0}, nil)
+		Then(&model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 0}, nil)
 
 	service := stockservice.NewService(repoMock)
 
@@ -89,7 +89,7 @@ func TestService_Reserve_GetStockError(t *testing.T) {
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(1)).
-		Then(model.Stock{}, errors.New("database error"))
+		Then(&model.Stock{}, errors.New("database error"))
 
 	service := stockservice.NewService(repoMock)
 
@@ -114,13 +114,13 @@ func TestService_Reserve_UpdateStockError(t *testing.T) {
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(1)).
-		Then(model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 2}, nil)
+		Then(&model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 2}, nil)
 
-	expectedUpdateStocks := []model.Stock{
-		{SKU: 1, TotalCount: 10, ReservedCount: 7}, // 2 + 5
+	expectedUpdateStocks := map[model.SKUType]*model.Stock{
+		1: {SKU: 1, TotalCount: 10, ReservedCount: 7}, // 2 + 5
 	}
 
-	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks []model.Stock) error {
+	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks map[model.SKUType]*model.Stock) error {
 		assert.True(t, compareStocks(expectedUpdateStocks, stocks))
 		return errors.New("update error")
 	})
@@ -148,12 +148,12 @@ func TestService_Reserve_DuplicateSKUs(t *testing.T) {
 
 	repoMock.GetStockMock.
 		When(ctx, model.SKUType(1)).
-		Then(model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 2}, nil)
+		Then(&model.Stock{SKU: 1, TotalCount: 10, ReservedCount: 2}, nil)
 
-	expectedUpdateStocks := []model.Stock{
-		{SKU: 1, TotalCount: 10, ReservedCount: 10}, // 2 + (5 + 3)
+	expectedUpdateStocks := map[model.SKUType]*model.Stock{
+		1: {SKU: 1, TotalCount: 10, ReservedCount: 10}, // 2 + (5 + 3)
 	}
-	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks []model.Stock) error {
+	repoMock.UpdateStockMock.Set(func(ctx context.Context, stocks map[model.SKUType]*model.Stock) error {
 		assert.True(t, compareStocks(expectedUpdateStocks, stocks))
 		return nil
 	})

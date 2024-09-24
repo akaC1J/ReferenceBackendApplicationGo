@@ -24,10 +24,10 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	assert.NoError(t, err, "Не удалось загрузить конфигурацию")
 
 	// Шаг 2: Инициализация и запуск приложения
-	application, err := app.New(config)
+	application, err := app.MustNew(config)
 	assert.NoError(t, err, "Не удалось инициализировать приложение")
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GrpcPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GgrpcHostPort))
 	assert.NoError(t, err, "Не удалось создать слушатель для gRPC сервера")
 
 	go func() {
@@ -41,7 +41,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Шаг 3: Создание gRPC клиента
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err, "Не удалось подключиться к gRPC серверу")
 	defer conn.Close()
 

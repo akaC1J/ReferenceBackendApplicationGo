@@ -6,14 +6,16 @@ import (
 	"log"
 	appErr "route256/loms/internal/errors"
 	"route256/loms/internal/model"
+	"route256/loms/internal/repository/stockrepository"
 	"route256/loms/internal/service/orderservice"
 )
 
 var _ orderservice.StockService = (*Service)(nil)
+var _ Repository = (*stockrepository.Repository)(nil)
 
 type Repository interface {
-	GetStock(ctx context.Context, sku model.SKUType) (model.Stock, error)
-	UpdateStock(ctx context.Context, items []model.Stock) error
+	GetStock(ctx context.Context, sku model.SKUType) (*model.Stock, error)
+	UpdateStock(ctx context.Context, items map[model.SKUType]*model.Stock) error
 }
 
 type Service struct {
@@ -25,24 +27,24 @@ func NewService(repository Repository) *Service {
 }
 
 func (s *Service) Reserve(ctx context.Context, items []*model.Item) error {
-	itemMap := aggregateItem(items)
+	itemMap := makeSkuCountMap(items)
 
-	var updateStocks []model.Stock
+	var updateStocks = make(map[model.SKUType]*model.Stock)
 
-	for sku, totalCount := range itemMap {
+	for sku, needToReserveCount := range itemMap {
 		stock, err := s.repository.GetStock(ctx, sku)
 		if err != nil {
 			log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
 			return err
 		}
 		availableCount := stock.TotalCount - stock.ReservedCount
-		if availableCount < totalCount {
-			log.Printf("[stock_service] Not enough stock for SKU %v: requested %v, available %v", sku, totalCount, availableCount)
+		if availableCount < needToReserveCount {
+			log.Printf("[stock_service] Not enough stock for SKU %v: requested %v, available %v", sku, needToReserveCount, availableCount)
 			return fmt.Errorf("not enough stock for SKU %v: %w", sku, appErr.ErrStockInsufficient)
 		}
 
-		stock.ReservedCount += totalCount
-		updateStocks = append(updateStocks, stock)
+		stock.ReservedCount += needToReserveCount
+		updateStocks[sku] = stock
 	}
 
 	err := s.repository.UpdateStock(ctx, updateStocks)
@@ -55,9 +57,9 @@ func (s *Service) Reserve(ctx context.Context, items []*model.Item) error {
 }
 
 func (s *Service) ReserveRemove(ctx context.Context, items []*model.Item) error {
-	itemMap := aggregateItem(items)
+	itemMap := makeSkuCountMap(items)
 
-	var updateStocks []model.Stock
+	var updateStocks = make(map[model.SKUType]*model.Stock)
 
 	for sku, totalCount := range itemMap {
 		stock, err := s.repository.GetStock(ctx, sku)
@@ -77,7 +79,7 @@ func (s *Service) ReserveRemove(ctx context.Context, items []*model.Item) error 
 		stock.ReservedCount -= totalCount
 		stock.TotalCount -= totalCount
 
-		updateStocks = append(updateStocks, stock)
+		updateStocks[sku] = stock
 	}
 	err := s.repository.UpdateStock(ctx, updateStocks)
 	if err != nil {
@@ -89,9 +91,9 @@ func (s *Service) ReserveRemove(ctx context.Context, items []*model.Item) error 
 }
 
 func (s *Service) ReserveCancel(ctx context.Context, items []*model.Item) error {
-	itemMap := aggregateItem(items)
+	itemMap := makeSkuCountMap(items)
 
-	var updateStocks []model.Stock
+	var updateStocks = make(map[model.SKUType]*model.Stock)
 
 	for sku, totalCount := range itemMap {
 		stock, err := s.repository.GetStock(ctx, sku)
@@ -106,7 +108,7 @@ func (s *Service) ReserveCancel(ctx context.Context, items []*model.Item) error 
 
 		stock.ReservedCount -= totalCount
 
-		updateStocks = append(updateStocks, stock)
+		updateStocks[sku] = stock
 	}
 	err := s.repository.UpdateStock(ctx, updateStocks)
 	if err != nil {
@@ -131,7 +133,7 @@ func (s *Service) GetBySKUAvailableCount(ctx context.Context, sku model.SKUType)
 	return uint64(availableCount), nil
 }
 
-func aggregateItem(items []*model.Item) map[model.SKUType]uint32 {
+func makeSkuCountMap(items []*model.Item) map[model.SKUType]uint32 {
 	itemMap := make(map[model.SKUType]uint32)
 	for _, item := range items {
 		itemMap[item.SKU] += item.Count

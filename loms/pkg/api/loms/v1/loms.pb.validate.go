@@ -59,7 +59,7 @@ func (m *Order) validate(all bool) error {
 	if _, ok := _Order_Status_InLookup[m.GetStatus()]; !ok {
 		err := OrderValidationError{
 			field:  "Status",
-			reason: "value must be in list [ new awaiting payment failed payed cancelled]",
+			reason: "value must be in list [ NEW AWAITING_PAYMENT FAILED PAYED CANCELLED]",
 		}
 		if !all {
 			return err
@@ -202,11 +202,11 @@ var _ interface {
 
 var _Order_Status_InLookup = map[string]struct{}{
 	"":                 {},
-	"new":              {},
-	"awaiting payment": {},
-	"failed":           {},
-	"payed":            {},
-	"cancelled":        {},
+	"NEW":              {},
+	"AWAITING_PAYMENT": {},
+	"FAILED":           {},
+	"PAYED":            {},
+	"CANCELLED":        {},
 }
 
 // Validate checks the field values on Item with the rules defined in the proto

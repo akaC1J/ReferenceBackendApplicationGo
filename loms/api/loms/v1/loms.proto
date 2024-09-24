@@ -57,7 +57,7 @@ service Loms {
 // Сообщение заказа с валидацией
 message Order {
     string status = 1 [
-        (validate.rules).string = {in: ["", "new", "awaiting payment", "failed", "payed", "cancelled"]}
+        (validate.rules).string = {in: ["", "NEW", "AWAITING_PAYMENT", "FAILED", "PAYED", "CANCELLED"]}
     ];
     int64 user = 2 [
         (validate.rules).int64.gt = 0
