@@ -28,8 +28,8 @@ func main() {
 
 	log.Println("[main] Application initialization successful")
 
-	log.Printf("[main] Starting server on %s\n", config.Host_Port)
-	if err := http.ListenAndServe(config.Host_Port, application); err != nil {
+	log.Printf("[main] Starting server on %s\n", config.HostPort)
+	if err := http.ListenAndServe(config.HostPort, application); err != nil {
 		log.Fatalf("[main] Failed to start server: %v", err)
 	}
 }

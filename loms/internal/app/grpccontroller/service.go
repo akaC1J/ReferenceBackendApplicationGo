@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	appErr "route256/loms/internal/errors"
+	lomsGrpc "route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 var _ lomsGrpc.LomsServer = (*LomsController)(nil)
@@ -34,7 +34,7 @@ func NewLomsController(orderService OrderService, stockService StockService) *Lo
 
 func mapErrorToGRPC(err error) error {
 	if errors.Is(err, appErr.ErrStockInsufficient) {
-		return status.Error(codes.ResourceExhausted, err.Error())
+		return status.Error(codes.FailedPrecondition, err.Error())
 	}
 	if errors.Is(err, appErr.ErrNotFound) || errors.Is(err, appErr.ErrOrderState) {
 		return status.Error(codes.NotFound, err.Error())

@@ -9,16 +9,18 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"route256/loms/internal/app/grpccontroller"
+	"route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	"route256/loms/internal/mw"
+	grpcMW "route256/loms/internal/mw/grpc"
+	httpMW "route256/loms/internal/mw/http"
 	"route256/loms/internal/repository/orderrepository"
 	"route256/loms/internal/repository/stockrepository"
 	"route256/loms/internal/service/orderservice"
 	"route256/loms/internal/service/stockservice"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 type App struct {
@@ -30,11 +32,31 @@ type App struct {
 	GwServer        *http.Server
 }
 
-func New(config *Config) (*App, error) {
+func (application *App) Run(config *Config) {
+	lis, err := net.Listen("tcp", config.GgrpcHostPort)
+	if err != nil {
+		log.Fatalf("[main] failed to listen: %v", err)
+	}
+
+	log.Println("[main] Application initialization successful")
+	log.Printf("[main] server listening at %v", lis.Addr())
+
+	go func() {
+		if err = application.GrpcServer.Serve(lis); err != nil {
+			log.Fatalf("[main] failed to serve: %v", err)
+		}
+	}()
+	log.Printf("[main] server listening at %v", application.GwServer.Addr)
+	if err = application.GwServer.ListenAndServe(); err != nil {
+		log.Fatalf("[main] failed to serve: %v", err)
+	}
+}
+
+func MustNew(config *Config) (*App, error) {
 	log.Println("[cart] Starting application initialization")
 
 	orderRepository := orderrepository.NewRepository()
-	stockRepository := initStockRepositoryFromFile(config.StockFilePath)
+	stockRepository := mustNewStockRepositoryFromFile(config.StockFilePath)
 
 	stockService := stockservice.NewService(stockRepository)
 	orderService := orderservice.NewService(orderRepository, stockService)
@@ -46,32 +68,33 @@ func New(config *Config) (*App, error) {
 		orderService:    orderService,
 	}
 
-	mw.SwaggerUrlForCors = config.SwagerUrl
+	grpcMW.SwaggerUrlForCors = config.SwagerUrl
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			mw.Panic,
-			mw.Logger,
-			mw.Validate,
+			grpcMW.PanicUnaryMiddleware,
+			grpcMW.LoggingUnaryMiddleware,
+			grpcMW.ValidateUnaryMiddleware,
 		),
 	)
 	reflection.Register(grpcServer)
-	lomsGrpc.RegisterLomsServer(grpcServer, grpccontroller.NewLomsController(app.orderService, app.stockService))
+	lomsController := grpccontroller.NewLomsController(app.orderService, app.stockService)
+	loms.RegisterLomsServer(grpcServer, lomsController)
 
 	app.GrpcServer = grpcServer
 
-	conn, err := grpc.NewClient(":50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(config.GgrpcHostPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalln("Failed to deal:", err)
 	}
 
 	gwmux := runtime.NewServeMux()
 
-	if err = lomsGrpc.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil {
+	if err = loms.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
 	gwServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.HttpPort),
-		Handler: mw.WithCorsCheckHttpHandler(mw.WithHTTPLoggingMiddleware(gwmux)),
+		Handler: grpcMW.WithCorsCheckHttpHandler(httpMW.WithHTTPLoggingMiddleware(gwmux)),
 	}
 
 	app.GwServer = gwServer
@@ -79,16 +102,20 @@ func New(config *Config) (*App, error) {
 	return app, nil
 }
 
-func initStockRepositoryFromFile(pathToStockDataFile string) *stockrepository.Repository {
+func mustNewStockRepositoryFromFile(pathToStockDataFile string) *stockrepository.Repository {
 	open, err := os.Open(pathToStockDataFile)
 	if err != nil {
 		log.Fatalf("[cart] Error opening stock data file: %v", err)
 	}
 	defer open.Close()
-	var stocks []*model.Stock
-	err = json.NewDecoder(open).Decode(&stocks)
+	var stocksFromFile []*model.Stock
+	err = json.NewDecoder(open).Decode(&stocksFromFile)
+	var mapStock = make(map[model.SKUType]model.Stock)
+	for _, stock := range stocksFromFile {
+		mapStock[stock.SKU] = *stock
+	}
 	if err != nil {
 		log.Fatalf("[cart] Error decoding stock data file: %v", err)
 	}
-	return stockrepository.NewRepository(stocks)
+	return stockrepository.NewRepository(mapStock)
 }

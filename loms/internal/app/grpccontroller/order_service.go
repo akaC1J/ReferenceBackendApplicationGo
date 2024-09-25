@@ -3,8 +3,8 @@ package grpccontroller
 import (
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"
+	lomsGrpc "route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 func (o *LomsController) OrderCreate(ctx context.Context, createRq *lomsGrpc.OrderCreateRequest) (*lomsGrpc.OrderCreateResponse, error) {
@@ -13,19 +13,6 @@ func (o *LomsController) OrderCreate(ctx context.Context, createRq *lomsGrpc.Ord
 		return nil, mapErrorToGRPC(err)
 	}
 	return &lomsGrpc.OrderCreateResponse{OrderId: orderId}, nil
-}
-
-func convertCreateRequestToOrder(createRq *lomsGrpc.OrderCreateRequest) *model.Order {
-	order := model.Order{
-		UserId: createRq.GetOrder().GetUser(),
-	}
-	for _, itemRq := range createRq.GetOrder().GetItems() {
-		order.Items = append(order.Items, &model.Item{
-			SKU:   model.SKUType(itemRq.GetSku()),
-			Count: itemRq.GetCount(),
-		})
-	}
-	return &order
 }
 
 func (o *LomsController) OrderPay(ctx context.Context, request *lomsGrpc.OrderPayRequest) (*emptypb.Empty, error) {
@@ -63,20 +50,20 @@ func convertOrderToResponse(order *model.Order) *lomsGrpc.Order {
 		})
 	}
 
-	switch order.State {
-	case model.NEW:
-		orderRs.Status = "new"
-	case model.PAYED:
-		orderRs.Status = "payed"
-	case model.AWAITING_PAYMENT:
-		orderRs.Status = "awaiting_payment"
-	case model.CANCELLED:
-		orderRs.Status = "cancelled"
-	case model.FAILED:
-		orderRs.Status = "failed"
-	default:
-		orderRs.Status = "unknown"
+	orderRs.Status = string(order.State)
 
-	}
 	return orderRs
+}
+
+func convertCreateRequestToOrder(createRq *lomsGrpc.OrderCreateRequest) *model.Order {
+	order := model.Order{
+		UserId: createRq.GetOrder().GetUser(),
+	}
+	for _, itemRq := range createRq.GetOrder().GetItems() {
+		order.Items = append(order.Items, &model.Item{
+			SKU:   model.SKUType(itemRq.GetSku()),
+			Count: itemRq.GetCount(),
+		})
+	}
+	return &order
 }

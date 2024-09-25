@@ -29,9 +29,6 @@ func (s *Server) CheckoutHandleFunc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	err = json.NewEncoder(w).Encode(PostCheckoutRs{
 		orderId,
 	})
@@ -39,6 +36,6 @@ func (s *Server) CheckoutHandleFunc(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Failed to encode response", "GET /user/<user_id>/cart")
 		return
 	}
-
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 }

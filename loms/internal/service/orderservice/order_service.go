@@ -5,7 +5,10 @@ import (
 	"log"
 	appErr "route256/loms/internal/errors"
 	"route256/loms/internal/model"
+	"route256/loms/internal/repository/orderrepository"
 )
+
+var _ Repository = (*orderrepository.Repository)(nil)
 
 type Repository interface {
 	SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error)

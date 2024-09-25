@@ -2,16 +2,22 @@ package test
 
 import "route256/loms/internal/model"
 
-func compareStocks(a, b []model.Stock) bool {
+func compareStocks(a, b map[model.SKUType]*model.Stock) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	stockMap := make(map[model.SKUType]model.Stock)
-	for _, stock := range a {
-		stockMap[stock.SKU] = stock
-	}
-	for _, stock := range b {
-		if s, ok := stockMap[stock.SKU]; !ok || s != stock {
+	for sku, stock := range a {
+		stock2, ok := b[sku]
+		if !ok {
+			return false
+		}
+		if stock.SKU != stock2.SKU {
+			return false
+		}
+		if stock.TotalCount != stock2.TotalCount {
+			return false
+		}
+		if stock.ReservedCount != stock2.ReservedCount {
 			return false
 		}
 	}

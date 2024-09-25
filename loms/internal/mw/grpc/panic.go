@@ -1,4 +1,4 @@
-package mw
+package grpc
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func Panic(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+func PanicUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			log.Printf("panic: %v\n", e)

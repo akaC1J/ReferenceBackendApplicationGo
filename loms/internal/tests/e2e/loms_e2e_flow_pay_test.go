@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"route256/loms/internal/generated/api/loms/v1"
 	"testing"
 	"time"
 
@@ -15,7 +16,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	app "route256/loms/internal/app/initialization"
-	lomsGrpc "route256/loms/pkg/api/loms/v1" // Путь к сгенерированным gRPC клиентам
 )
 
 func TestE2E_OrderLifecycle(t *testing.T) {
@@ -24,10 +24,10 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	config, err := app.LoadConfig("./.env.test")
 	assert.NoError(t, err, "Не удалось загрузить конфигурацию")
 
-	application, err := app.New(config)
+	application, err := app.MustNew(config)
 	assert.NoError(t, err, "Не удалось инициализировать приложение")
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GrpcPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GgrpcHostPort))
 	assert.NoError(t, err, "Не удалось создать слушатель для gRPC сервера")
 
 	go func() {
@@ -40,19 +40,19 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	// Подождем немного, чтобы сервер успел запуститься
 	time.Sleep(2 * time.Second)
 
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err, "Не удалось подключиться к gRPC серверу")
 	defer conn.Close()
 
-	client := lomsGrpc.NewLomsClient(conn)
+	client := loms.NewLomsClient(conn)
 
 	ctx := context.Background()
 
 	//Выполнение OrderCreate запроса
-	orderCreateReq := &lomsGrpc.OrderCreateRequest{
-		Order: &lomsGrpc.Order{
+	orderCreateReq := &loms.OrderCreateRequest{
+		Order: &loms.Order{
 			User: 12345,
-			Items: []*lomsGrpc.Item{
+			Items: []*loms.Item{
 				{Sku: 1, Count: 5},
 				{Sku: 2, Count: 10},
 			},
@@ -67,7 +67,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	orderID := orderCreateResp.OrderId
 
 	//Выполнение первого OrderInfo запроса
-	orderInfoReq1 := &lomsGrpc.OrderInfoRequest{
+	orderInfoReq1 := &loms.OrderInfoRequest{
 		OrderId: orderID,
 	}
 
@@ -77,7 +77,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	assert.Equal(t, "awaiting_payment", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
 
 	// Шаг 7: Выполнение OrderPay запроса
-	orderPayReq := &lomsGrpc.OrderPayRequest{
+	orderPayReq := &loms.OrderPayRequest{
 		OrderId: orderID,
 	}
 
@@ -85,7 +85,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	assert.NoError(t, err, "OrderPay запрос завершился с ошибкой")
 
 	//Выполнение второго OrderInfo запроса
-	orderInfoReq2 := &lomsGrpc.OrderInfoRequest{
+	orderInfoReq2 := &loms.OrderInfoRequest{
 		OrderId: orderID,
 	}
 
@@ -95,7 +95,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	assert.Equal(t, "payed", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (PAY)")
 
 	//Выполнение StocksInfo запроса
-	stocksInfoReq := &lomsGrpc.StocksInfoRequest{
+	stocksInfoReq := &loms.StocksInfoRequest{
 		Sku: 1,
 	}
 

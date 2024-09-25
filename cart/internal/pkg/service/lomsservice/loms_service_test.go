@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"google.golang.org/grpc"
+	"route256/cart/internal/generated/api/loms/v1"
 	"testing"
 
 	"github.com/gojuno/minimock/v3"
@@ -13,7 +14,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"route256/cart/internal/pkg/model"
-	loms "route256/loms/pkg/api/loms/v1"
 )
 
 type LomsServiceSuite struct {

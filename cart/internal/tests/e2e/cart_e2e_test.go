@@ -31,7 +31,7 @@ func startTestServer(stopChan chan struct{}) {
 	}
 
 	server := &http.Server{
-		Addr:    config.Host_Port,
+		Addr:    config.HostPort,
 		Handler: application,
 	}
 
@@ -43,7 +43,7 @@ func startTestServer(stopChan chan struct{}) {
 		}
 	}()
 
-	log.Printf("[main] Starting server on %s\n", config.Host_Port)
+	log.Printf("[main] Starting server on %s\n", config.HostPort)
 	if err := server.ListenAndServe(); err != http.ErrServerClosed {
 		log.Fatalf("[main] Failed to start server: %v", err)
 	}

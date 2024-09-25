@@ -21,7 +21,7 @@ func TestService_GetBySKUAvailableCount_Success(t *testing.T) {
 	repoMock := NewRepositoryMock(mc)
 	repoMock.GetStockMock.
 		When(ctx, sku).
-		Then(model.Stock{SKU: sku, TotalCount: 20, ReservedCount: 5}, nil)
+		Then(&model.Stock{SKU: sku, TotalCount: 20, ReservedCount: 5}, nil)
 
 	service := stockservice.NewService(repoMock)
 
@@ -39,7 +39,7 @@ func TestService_GetBySKUAvailableCount_GetStockError(t *testing.T) {
 	repoMock := NewRepositoryMock(mc)
 	repoMock.GetStockMock.
 		When(ctx, sku).
-		Then(model.Stock{}, errors.New("database error"))
+		Then(&model.Stock{}, errors.New("database error"))
 
 	service := stockservice.NewService(repoMock)
 
@@ -58,7 +58,7 @@ func TestService_GetBySKUAvailableCount_NegativeAvailableCount(t *testing.T) {
 	repoMock := NewRepositoryMock(mc)
 	repoMock.GetStockMock.
 		When(ctx, sku).
-		Then(model.Stock{SKU: sku, TotalCount: 5, ReservedCount: 10}, nil)
+		Then(&model.Stock{SKU: sku, TotalCount: 5, ReservedCount: 10}, nil)
 
 	service := stockservice.NewService(repoMock)
 

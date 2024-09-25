@@ -13,7 +13,7 @@ type Config struct {
 	Token              string
 	ProductServiceURL  string
 	ProductServicePath string
-	Host_Port          string
+	HostPort           string
 	Port               string
 	LomsBaseUrl        string
 }
@@ -51,8 +51,8 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		return nil, fmt.Errorf("PRODUCT_SERVICE_PATH environment variable is required")
 	}
 
-	host_port := os.Getenv("HOST_PORT")
-	if host_port == "" {
+	hostPort := os.Getenv("HOST_PORT")
+	if hostPort == "" {
 		return nil, fmt.Errorf("HOST environment variable is required")
 	}
 
@@ -67,7 +67,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		Token:              token,
 		ProductServiceURL:  baseUrl,
 		ProductServicePath: path,
-		Host_Port:          host_port,
+		HostPort:           hostPort,
 		LomsBaseUrl:        lomsBaseUrl,
 	}, nil
 }

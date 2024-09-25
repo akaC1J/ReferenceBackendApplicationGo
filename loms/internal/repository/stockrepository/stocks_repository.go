@@ -7,56 +7,42 @@ import (
 
 	appErr "route256/loms/internal/errors"
 	"route256/loms/internal/model"
-	"route256/loms/internal/service/stockservice"
 )
 
-var _ stockservice.Repository = (*Repository)(nil)
-
 type Repository struct {
-	stocks []*model.Stock
+	stocks map[model.SKUType]model.Stock
 	mx     sync.Mutex
 }
 
-func NewEmptyRepository() *Repository {
-	return &Repository{
-		stocks: []*model.Stock{},
-	}
-}
-
-func NewRepository(stocks []*model.Stock) *Repository {
+func NewRepository(stocks map[model.SKUType]model.Stock) *Repository {
 	return &Repository{
 		stocks: stocks,
 	}
 }
 
-func (r *Repository) GetStock(_ context.Context, sku model.SKUType) (model.Stock, error) {
+func (r *Repository) GetStock(_ context.Context, sku model.SKUType) (*model.Stock, error) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	for _, stock := range r.stocks {
-		if stock.SKU == sku {
-			return *stock, nil
-		}
+	stock, found := r.stocks[sku]
+	if !found {
+		return nil, fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
 	}
-	return model.Stock{}, fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
+	return &stock, nil
 }
 
-func (r *Repository) UpdateStock(_ context.Context, stocks []model.Stock) error {
+func (r *Repository) UpdateStock(_ context.Context, stocks map[model.SKUType]*model.Stock) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
-	existingStocks := make(map[model.SKUType]int)
-	for indxStock, stock := range r.stocks {
-		existingStocks[stock.SKU] = indxStock
-	}
-
-	for _, updateStock := range stocks {
-		indxStock, found := existingStocks[updateStock.SKU]
+	for sku, updateStock := range stocks {
+		stock, found := r.stocks[sku]
 		if !found {
-			return fmt.Errorf("stock with SKU %v: %w", updateStock.SKU, appErr.ErrNotFound)
+			return fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
 		}
-		r.stocks[indxStock].TotalCount = updateStock.TotalCount
-		r.stocks[indxStock].ReservedCount = updateStock.ReservedCount
+		stock.TotalCount = updateStock.TotalCount
+		stock.ReservedCount = updateStock.ReservedCount
+		r.stocks[sku] = stock
 	}
 
 	return nil

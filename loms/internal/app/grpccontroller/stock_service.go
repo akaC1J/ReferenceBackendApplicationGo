@@ -2,8 +2,8 @@ package grpccontroller
 
 import (
 	"context"
+	lomsGrpc "route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 func (o *LomsController) StocksInfo(ctx context.Context, request *lomsGrpc.StocksInfoRequest) (*lomsGrpc.StocksInfoResponse, error) {

@@ -26,7 +26,7 @@ type LomsServiceMock struct {
 	beforeCreateOrderCounter uint64
 	CreateOrderMock          mLomsServiceMockCreateOrder
 
-	funcGetStockInfo          func(ctx context.Context, sku model.SKU) (u1 uint64, err error)
+	funcGetStockInfo          func(ctx context.Context, sku model.SKU) (availableCountStock uint64, err error)
 	funcGetStockInfoOrigin    string
 	inspectFuncGetStockInfo   func(ctx context.Context, sku model.SKU)
 	afterGetStockInfoCounter  uint64
@@ -465,8 +465,8 @@ type LomsServiceMockGetStockInfoParamPtrs struct {
 
 // LomsServiceMockGetStockInfoResults contains results of the LomsService.GetStockInfo
 type LomsServiceMockGetStockInfoResults struct {
-	u1  uint64
-	err error
+	availableCountStock uint64
+	err                 error
 }
 
 // LomsServiceMockGetStockInfoOrigins contains origins of expectations of the LomsService.GetStockInfo
@@ -569,7 +569,7 @@ func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Inspect(f func(ctx context.C
 }
 
 // Return sets up results that will be returned by LomsService.GetStockInfo
-func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Return(u1 uint64, err error) *LomsServiceMock {
+func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Return(availableCountStock uint64, err error) *LomsServiceMock {
 	if mmGetStockInfo.mock.funcGetStockInfo != nil {
 		mmGetStockInfo.mock.t.Fatalf("LomsServiceMock.GetStockInfo mock is already set by Set")
 	}
@@ -577,13 +577,13 @@ func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Return(u1 uint64, err error)
 	if mmGetStockInfo.defaultExpectation == nil {
 		mmGetStockInfo.defaultExpectation = &LomsServiceMockGetStockInfoExpectation{mock: mmGetStockInfo.mock}
 	}
-	mmGetStockInfo.defaultExpectation.results = &LomsServiceMockGetStockInfoResults{u1, err}
+	mmGetStockInfo.defaultExpectation.results = &LomsServiceMockGetStockInfoResults{availableCountStock, err}
 	mmGetStockInfo.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
 	return mmGetStockInfo.mock
 }
 
 // Set uses given function f to mock the LomsService.GetStockInfo method
-func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Set(f func(ctx context.Context, sku model.SKU) (u1 uint64, err error)) *LomsServiceMock {
+func (mmGetStockInfo *mLomsServiceMockGetStockInfo) Set(f func(ctx context.Context, sku model.SKU) (availableCountStock uint64, err error)) *LomsServiceMock {
 	if mmGetStockInfo.defaultExpectation != nil {
 		mmGetStockInfo.mock.t.Fatalf("Default expectation is already set for the LomsService.GetStockInfo method")
 	}
@@ -614,8 +614,8 @@ func (mmGetStockInfo *mLomsServiceMockGetStockInfo) When(ctx context.Context, sk
 }
 
 // Then sets up LomsService.GetStockInfo return parameters for the expectation previously defined by the When method
-func (e *LomsServiceMockGetStockInfoExpectation) Then(u1 uint64, err error) *LomsServiceMock {
-	e.results = &LomsServiceMockGetStockInfoResults{u1, err}
+func (e *LomsServiceMockGetStockInfoExpectation) Then(availableCountStock uint64, err error) *LomsServiceMock {
+	e.results = &LomsServiceMockGetStockInfoResults{availableCountStock, err}
 	return e.mock
 }
 
@@ -641,7 +641,7 @@ func (mmGetStockInfo *mLomsServiceMockGetStockInfo) invocationsDone() bool {
 }
 
 // GetStockInfo implements LomsService
-func (mmGetStockInfo *LomsServiceMock) GetStockInfo(ctx context.Context, sku model.SKU) (u1 uint64, err error) {
+func (mmGetStockInfo *LomsServiceMock) GetStockInfo(ctx context.Context, sku model.SKU) (availableCountStock uint64, err error) {
 	mm_atomic.AddUint64(&mmGetStockInfo.beforeGetStockInfoCounter, 1)
 	defer mm_atomic.AddUint64(&mmGetStockInfo.afterGetStockInfoCounter, 1)
 
@@ -661,7 +661,7 @@ func (mmGetStockInfo *LomsServiceMock) GetStockInfo(ctx context.Context, sku mod
 	for _, e := range mmGetStockInfo.GetStockInfoMock.expectations {
 		if minimock.Equal(*e.params, mm_params) {
 			mm_atomic.AddUint64(&e.Counter, 1)
-			return e.results.u1, e.results.err
+			return e.results.availableCountStock, e.results.err
 		}
 	}
 
@@ -693,7 +693,7 @@ func (mmGetStockInfo *LomsServiceMock) GetStockInfo(ctx context.Context, sku mod
 		if mm_results == nil {
 			mmGetStockInfo.t.Fatal("No results are set for the LomsServiceMock.GetStockInfo")
 		}
-		return (*mm_results).u1, (*mm_results).err
+		return (*mm_results).availableCountStock, (*mm_results).err
 	}
 	if mmGetStockInfo.funcGetStockInfo != nil {
 		return mmGetStockInfo.funcGetStockInfo(ctx, sku)
