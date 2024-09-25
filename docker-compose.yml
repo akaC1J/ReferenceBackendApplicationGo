@@ -32,3 +32,18 @@ services:
       - SWAGGER_JSON=/app/swagger.json
     depends_on:
       - loms
+  
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: loms
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  pgdata:
