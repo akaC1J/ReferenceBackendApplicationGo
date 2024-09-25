@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"route256/loms/internal/app/grpccontroller"
+	"route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
 	grpcMW "route256/loms/internal/mw/grpc"
 	httpMW "route256/loms/internal/mw/http"
@@ -20,7 +21,6 @@ import (
 	"route256/loms/internal/repository/stockrepository"
 	"route256/loms/internal/service/orderservice"
 	"route256/loms/internal/service/stockservice"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 type App struct {
@@ -78,7 +78,7 @@ func MustNew(config *Config) (*App, error) {
 	)
 	reflection.Register(grpcServer)
 	lomsController := grpccontroller.NewLomsController(app.orderService, app.stockService)
-	lomsGrpc.RegisterLomsServer(grpcServer, lomsController)
+	loms.RegisterLomsServer(grpcServer, lomsController)
 
 	app.GrpcServer = grpcServer
 
@@ -89,7 +89,7 @@ func MustNew(config *Config) (*App, error) {
 
 	gwmux := runtime.NewServeMux()
 
-	if err = lomsGrpc.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil {
+	if err = loms.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
 	gwServer := &http.Server{

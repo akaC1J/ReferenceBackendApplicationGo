@@ -53,7 +53,7 @@ func (s *CartService) AddCartItem(ctx context.Context, cartItem model.CartItem) 
 		log.Printf("[cartService] Failed get info from stock for SKU %d", cartItem.SKU)
 		return nil, err
 	}
-
+	//unsafe cast uint16 to uint64
 	if uint64(cartItem.Count) > availableCount {
 		log.Printf("[cartService] Failed to add item to cart: Not enough items in stock for SKU %d", cartItem.SKU)
 		return nil, fmt.Errorf("not enough items in stock for SKU %d", cartItem.SKU)
@@ -134,6 +134,7 @@ func (s *CartService) GetCartItem(ctx context.Context, userId model.UserId) (*Ca
 			return nil, err
 		}
 		cartContent.Items = append(cartContent.Items, createEnrichedCartItemDTO(item, *productInfo))
+		//unsafe cast uint16 to uint32
 		cartContent.TotalPrice += productInfo.Price * uint32(item.Count)
 	}
 
@@ -142,7 +143,7 @@ func (s *CartService) GetCartItem(ctx context.Context, userId model.UserId) (*Ca
 	return &cartContent, nil
 }
 
-func (s *CartService) Checkout(ctx context.Context, userId model.UserId) (int64, error) {
+func (s *CartService) Checkout(ctx context.Context, userId model.UserId) (orderId int64, err error) {
 	if errUserId := checkFieldMustPositive(int64(userId), "user_id"); errUserId != nil {
 		log.Printf("[cartService] Failed to retrieve cart: validation failed: for UserID %d", userId)
 		return 0, errUserId
@@ -153,7 +154,7 @@ func (s *CartService) Checkout(ctx context.Context, userId model.UserId) (int64,
 		return 0, err
 	}
 	log.Printf("[cartService] Retrieving cart successed %+v", userCart)
-	orderId, err := s.lomsService.CreateOrder(ctx, userId, userCart)
+	orderId, err = s.lomsService.CreateOrder(ctx, userId, userCart)
 	if err != nil {
 		log.Printf("[cartService] Failed to create order for user %d: %v", userId, err)
 		return 0, err

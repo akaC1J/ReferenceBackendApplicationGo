@@ -2,11 +2,11 @@
 
 package lomsservice
 
-//go:generate minimock -i route256/loms/pkg/api/loms/v1.LomsClient -o loms_client_mock_test.go -n LomsClientMock -p lomsservice
+//go:generate minimock -i route256/cart/internal/generated/api/loms/v1.LomsClient -o loms_client_mock_test.go -n LomsClientMock -p lomsservice
 
 import (
 	context "context"
-	mm_loms "route256/loms/pkg/api/loms/v1"
+	mm_loms "route256/cart/internal/generated/api/loms/v1"
 	"sync"
 	mm_atomic "sync/atomic"
 	mm_time "time"

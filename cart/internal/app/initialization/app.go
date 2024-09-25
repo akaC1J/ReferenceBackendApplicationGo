@@ -5,9 +5,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
+	"route256/cart/internal/generated/api/loms/v1"
 	"route256/cart/internal/http/middleware"
 	"route256/cart/internal/pkg/service/lomsservice"
-	"route256/loms/pkg/api/loms/v1"
 	"time"
 
 	"route256/cart/internal/app/server"

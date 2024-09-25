@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"route256/loms/internal/generated/api/loms/v1"
 	"testing"
 	"time"
 
@@ -15,7 +16,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	app "route256/loms/internal/app/initialization"
-	lomsGrpc "route256/loms/pkg/api/loms/v1" // Путь к сгенерированным gRPC клиентам
 )
 
 func TestE2E_OrderCancellationLifecycle(t *testing.T) {
@@ -45,15 +45,15 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	assert.NoError(t, err, "Не удалось подключиться к gRPC серверу")
 	defer conn.Close()
 
-	client := lomsGrpc.NewLomsClient(conn)
+	client := loms.NewLomsClient(conn)
 
 	ctx := context.Background()
 
 	// Шаг 4: Выполнение OrderCreate запроса
-	orderCreateReq := &lomsGrpc.OrderCreateRequest{
-		Order: &lomsGrpc.Order{
+	orderCreateReq := &loms.OrderCreateRequest{
+		Order: &loms.Order{
 			User: 12345,
-			Items: []*lomsGrpc.Item{
+			Items: []*loms.Item{
 				{Sku: 1, Count: 5},
 				{Sku: 2, Count: 10},
 			},
@@ -68,7 +68,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	orderID := orderCreateResp.OrderId
 
 	// Шаг 5: Выполнение первого OrderInfo запроса
-	orderInfoReq1 := &lomsGrpc.OrderInfoRequest{
+	orderInfoReq1 := &loms.OrderInfoRequest{
 		OrderId: orderID,
 	}
 
@@ -78,7 +78,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	assert.Equal(t, "awaiting_payment", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
 
 	// Шаг 6: Выполнение OrderCancel запроса
-	orderCancelReq := &lomsGrpc.OrderCancelRequest{
+	orderCancelReq := &loms.OrderCancelRequest{
 		OrderId: orderID,
 	}
 
@@ -87,7 +87,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	// Предполагаем, что OrderCancelResponse содержит подтверждение отмены или просто успешный ответ
 
 	// Шаг 7: Выполнение второго OrderInfo запроса
-	orderInfoReq2 := &lomsGrpc.OrderInfoRequest{
+	orderInfoReq2 := &loms.OrderInfoRequest{
 		OrderId: orderID,
 	}
 
@@ -97,7 +97,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	assert.Equal(t, "cancelled", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (CANCELLED)")
 
 	// Шаг 8: Выполнение StocksInfo запроса для SKU 1003
-	stocksInfoReq := &lomsGrpc.StocksInfoRequest{
+	stocksInfoReq := &loms.StocksInfoRequest{
 		Sku: 1,
 	}
 

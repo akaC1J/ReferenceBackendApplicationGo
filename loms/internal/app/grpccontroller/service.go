@@ -6,8 +6,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	appErr "route256/loms/internal/errors"
+	lomsGrpc "route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 var _ lomsGrpc.LomsServer = (*LomsController)(nil)

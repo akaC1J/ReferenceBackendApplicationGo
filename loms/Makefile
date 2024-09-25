@@ -5,7 +5,6 @@ MINIMOCK_URL := github.com/gojuno/minimock/v3/cmd/minimock@latest
 PROTOC_GEN_VALIDATOR_URL := github.com/envoyproxy/protoc-gen-validate@v1.0.4
 PROTOC_GEN_GATEWAY_URL := github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.19.1
 PROTOC_GEN_OPENAPI_URL := github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.19.1
-SWAGGER_URL := github.com/go-swagger/go-swagger/cmd/swagger@v0.30.5
 PROTOC_GEN_GO_URL := google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
 PROTOC_GEN_GO_GRPC_URL := google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
@@ -44,20 +43,20 @@ LOMS_PROTO_PATH:="api/loms/v1"
 	-I ${LOMS_PROTO_PATH} \
 	-I vendor-proto \
 	--plugin=protoc-gen-go=$(BIN_DIR)/protoc-gen-go \
-	--go_out pkg/${LOMS_PROTO_PATH} \
+	--go_out internal/generated/${LOMS_PROTO_PATH} \
 	--go_opt paths=source_relative \
 	--plugin=protoc-gen-go-grpc=$(BIN_DIR)/protoc-gen-go-grpc \
-	--go-grpc_out pkg/${LOMS_PROTO_PATH} \
+	--go-grpc_out internal/generated/${LOMS_PROTO_PATH} \
 	--go-grpc_opt paths=source_relative \
 	--plugin=protoc-gen-validate=$(BIN_DIR)/protoc-gen-validate \
-	--validate_out="lang=go,paths=source_relative:pkg/api/loms/v1" \
+	--validate_out="lang=go,paths=source_relative:internal/generated/api/loms/v1" \
 	--plugin=protoc-gen-grpc-gateway=$(BIN_DIR)/protoc-gen-grpc-gateway \
-	--grpc-gateway_out pkg/${LOMS_PROTO_PATH} \
+	--grpc-gateway_out internal/generated/${LOMS_PROTO_PATH} \
 	--grpc-gateway_opt logtostderr=true --grpc-gateway_opt paths=source_relative --grpc-gateway_opt generate_unbound_methods=true \
 	--plugin=protoc-gen-openapiv2=$(BIN_DIR)/protoc-gen-openapiv2 \
 	--openapiv2_out api/openapiv2 \
 	--openapiv2_opt logtostderr=true \
-	api/loms/v1/loms.proto
+	loms.proto
 	go mod tidy
 
 .vendor-proto: .vendor-rm install-tools  vendor-proto/google/protobuf vendor-proto/validate vendor-proto/google/api vendor-proto/protoc-gen-openapiv2/options

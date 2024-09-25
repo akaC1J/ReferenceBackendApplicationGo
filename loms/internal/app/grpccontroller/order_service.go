@@ -3,8 +3,8 @@ package grpccontroller
 import (
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"
+	lomsGrpc "route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/model"
-	lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 func (o *LomsController) OrderCreate(ctx context.Context, createRq *lomsGrpc.OrderCreateRequest) (*lomsGrpc.OrderCreateResponse, error) {
