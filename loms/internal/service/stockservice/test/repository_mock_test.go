@@ -19,12 +19,12 @@ type RepositoryMock struct {
 	t          minimock.Tester
 	finishOnce sync.Once
 
-	funcGetStock          func(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error)
-	funcGetStockOrigin    string
-	inspectFuncGetStock   func(ctx context.Context, sku model.SKUType)
-	afterGetStockCounter  uint64
-	beforeGetStockCounter uint64
-	GetStockMock          mRepositoryMockGetStock
+	funcGetStocks          func(ctx context.Context, sku []model.SKUType) (spa1 []*model.Stock, err error)
+	funcGetStocksOrigin    string
+	inspectFuncGetStocks   func(ctx context.Context, sku []model.SKUType)
+	afterGetStocksCounter  uint64
+	beforeGetStocksCounter uint64
+	GetStocksMock          mRepositoryMockGetStocks
 
 	funcUpdateStock          func(ctx context.Context, items map[model.SKUType]*model.Stock) (err error)
 	funcUpdateStockOrigin    string
@@ -42,8 +42,8 @@ func NewRepositoryMock(t minimock.Tester) *RepositoryMock {
 		controller.RegisterMocker(m)
 	}
 
-	m.GetStockMock = mRepositoryMockGetStock{mock: m}
-	m.GetStockMock.callArgs = []*RepositoryMockGetStockParams{}
+	m.GetStocksMock = mRepositoryMockGetStocks{mock: m}
+	m.GetStocksMock.callArgs = []*RepositoryMockGetStocksParams{}
 
 	m.UpdateStockMock = mRepositoryMockUpdateStock{mock: m}
 	m.UpdateStockMock.callArgs = []*RepositoryMockUpdateStockParams{}
@@ -53,50 +53,50 @@ func NewRepositoryMock(t minimock.Tester) *RepositoryMock {
 	return m
 }
 
-type mRepositoryMockGetStock struct {
+type mRepositoryMockGetStocks struct {
 	optional           bool
 	mock               *RepositoryMock
-	defaultExpectation *RepositoryMockGetStockExpectation
-	expectations       []*RepositoryMockGetStockExpectation
+	defaultExpectation *RepositoryMockGetStocksExpectation
+	expectations       []*RepositoryMockGetStocksExpectation
 
-	callArgs []*RepositoryMockGetStockParams
+	callArgs []*RepositoryMockGetStocksParams
 	mutex    sync.RWMutex
 
 	expectedInvocations       uint64
 	expectedInvocationsOrigin string
 }
 
-// RepositoryMockGetStockExpectation specifies expectation struct of the Repository.GetStock
-type RepositoryMockGetStockExpectation struct {
+// RepositoryMockGetStocksExpectation specifies expectation struct of the Repository.GetStocks
+type RepositoryMockGetStocksExpectation struct {
 	mock               *RepositoryMock
-	params             *RepositoryMockGetStockParams
-	paramPtrs          *RepositoryMockGetStockParamPtrs
-	expectationOrigins RepositoryMockGetStockExpectationOrigins
-	results            *RepositoryMockGetStockResults
+	params             *RepositoryMockGetStocksParams
+	paramPtrs          *RepositoryMockGetStocksParamPtrs
+	expectationOrigins RepositoryMockGetStocksExpectationOrigins
+	results            *RepositoryMockGetStocksResults
 	returnOrigin       string
 	Counter            uint64
 }
 
-// RepositoryMockGetStockParams contains parameters of the Repository.GetStock
-type RepositoryMockGetStockParams struct {
+// RepositoryMockGetStocksParams contains parameters of the Repository.GetStocks
+type RepositoryMockGetStocksParams struct {
 	ctx context.Context
-	sku model.SKUType
+	sku []model.SKUType
 }
 
-// RepositoryMockGetStockParamPtrs contains pointers to parameters of the Repository.GetStock
-type RepositoryMockGetStockParamPtrs struct {
+// RepositoryMockGetStocksParamPtrs contains pointers to parameters of the Repository.GetStocks
+type RepositoryMockGetStocksParamPtrs struct {
 	ctx *context.Context
-	sku *model.SKUType
+	sku *[]model.SKUType
 }
 
-// RepositoryMockGetStockResults contains results of the Repository.GetStock
-type RepositoryMockGetStockResults struct {
-	sp1 *model.Stock
-	err error
+// RepositoryMockGetStocksResults contains results of the Repository.GetStocks
+type RepositoryMockGetStocksResults struct {
+	spa1 []*model.Stock
+	err  error
 }
 
-// RepositoryMockGetStockOrigins contains origins of expectations of the Repository.GetStock
-type RepositoryMockGetStockExpectationOrigins struct {
+// RepositoryMockGetStocksOrigins contains origins of expectations of the Repository.GetStocks
+type RepositoryMockGetStocksExpectationOrigins struct {
 	origin    string
 	originCtx string
 	originSku string
@@ -107,292 +107,292 @@ type RepositoryMockGetStockExpectationOrigins struct {
 // Optional() makes method check to work in '0 or more' mode.
 // It is NOT RECOMMENDED to use this option unless you really need it, as default behaviour helps to
 // catch the problems when the expected method call is totally skipped during test run.
-func (mmGetStock *mRepositoryMockGetStock) Optional() *mRepositoryMockGetStock {
-	mmGetStock.optional = true
-	return mmGetStock
+func (mmGetStocks *mRepositoryMockGetStocks) Optional() *mRepositoryMockGetStocks {
+	mmGetStocks.optional = true
+	return mmGetStocks
 }
 
-// Expect sets up expected params for Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) Expect(ctx context.Context, sku model.SKUType) *mRepositoryMockGetStock {
-	if mmGetStock.mock.funcGetStock != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
+// Expect sets up expected params for Repository.GetStocks
+func (mmGetStocks *mRepositoryMockGetStocks) Expect(ctx context.Context, sku []model.SKUType) *mRepositoryMockGetStocks {
+	if mmGetStocks.mock.funcGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Set")
 	}
 
-	if mmGetStock.defaultExpectation == nil {
-		mmGetStock.defaultExpectation = &RepositoryMockGetStockExpectation{}
+	if mmGetStocks.defaultExpectation == nil {
+		mmGetStocks.defaultExpectation = &RepositoryMockGetStocksExpectation{}
 	}
 
-	if mmGetStock.defaultExpectation.paramPtrs != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by ExpectParams functions")
+	if mmGetStocks.defaultExpectation.paramPtrs != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by ExpectParams functions")
 	}
 
-	mmGetStock.defaultExpectation.params = &RepositoryMockGetStockParams{ctx, sku}
-	mmGetStock.defaultExpectation.expectationOrigins.origin = minimock.CallerInfo(1)
-	for _, e := range mmGetStock.expectations {
-		if minimock.Equal(e.params, mmGetStock.defaultExpectation.params) {
-			mmGetStock.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetStock.defaultExpectation.params)
+	mmGetStocks.defaultExpectation.params = &RepositoryMockGetStocksParams{ctx, sku}
+	mmGetStocks.defaultExpectation.expectationOrigins.origin = minimock.CallerInfo(1)
+	for _, e := range mmGetStocks.expectations {
+		if minimock.Equal(e.params, mmGetStocks.defaultExpectation.params) {
+			mmGetStocks.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmGetStocks.defaultExpectation.params)
 		}
 	}
 
-	return mmGetStock
+	return mmGetStocks
 }
 
-// ExpectCtxParam1 sets up expected param ctx for Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) ExpectCtxParam1(ctx context.Context) *mRepositoryMockGetStock {
-	if mmGetStock.mock.funcGetStock != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
+// ExpectCtxParam1 sets up expected param ctx for Repository.GetStocks
+func (mmGetStocks *mRepositoryMockGetStocks) ExpectCtxParam1(ctx context.Context) *mRepositoryMockGetStocks {
+	if mmGetStocks.mock.funcGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Set")
 	}
 
-	if mmGetStock.defaultExpectation == nil {
-		mmGetStock.defaultExpectation = &RepositoryMockGetStockExpectation{}
+	if mmGetStocks.defaultExpectation == nil {
+		mmGetStocks.defaultExpectation = &RepositoryMockGetStocksExpectation{}
 	}
 
-	if mmGetStock.defaultExpectation.params != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Expect")
+	if mmGetStocks.defaultExpectation.params != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Expect")
 	}
 
-	if mmGetStock.defaultExpectation.paramPtrs == nil {
-		mmGetStock.defaultExpectation.paramPtrs = &RepositoryMockGetStockParamPtrs{}
+	if mmGetStocks.defaultExpectation.paramPtrs == nil {
+		mmGetStocks.defaultExpectation.paramPtrs = &RepositoryMockGetStocksParamPtrs{}
 	}
-	mmGetStock.defaultExpectation.paramPtrs.ctx = &ctx
-	mmGetStock.defaultExpectation.expectationOrigins.originCtx = minimock.CallerInfo(1)
+	mmGetStocks.defaultExpectation.paramPtrs.ctx = &ctx
+	mmGetStocks.defaultExpectation.expectationOrigins.originCtx = minimock.CallerInfo(1)
 
-	return mmGetStock
+	return mmGetStocks
 }
 
-// ExpectSkuParam2 sets up expected param sku for Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) ExpectSkuParam2(sku model.SKUType) *mRepositoryMockGetStock {
-	if mmGetStock.mock.funcGetStock != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
+// ExpectSkuParam2 sets up expected param sku for Repository.GetStocks
+func (mmGetStocks *mRepositoryMockGetStocks) ExpectSkuParam2(sku []model.SKUType) *mRepositoryMockGetStocks {
+	if mmGetStocks.mock.funcGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Set")
 	}
 
-	if mmGetStock.defaultExpectation == nil {
-		mmGetStock.defaultExpectation = &RepositoryMockGetStockExpectation{}
+	if mmGetStocks.defaultExpectation == nil {
+		mmGetStocks.defaultExpectation = &RepositoryMockGetStocksExpectation{}
 	}
 
-	if mmGetStock.defaultExpectation.params != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Expect")
+	if mmGetStocks.defaultExpectation.params != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Expect")
 	}
 
-	if mmGetStock.defaultExpectation.paramPtrs == nil {
-		mmGetStock.defaultExpectation.paramPtrs = &RepositoryMockGetStockParamPtrs{}
+	if mmGetStocks.defaultExpectation.paramPtrs == nil {
+		mmGetStocks.defaultExpectation.paramPtrs = &RepositoryMockGetStocksParamPtrs{}
 	}
-	mmGetStock.defaultExpectation.paramPtrs.sku = &sku
-	mmGetStock.defaultExpectation.expectationOrigins.originSku = minimock.CallerInfo(1)
+	mmGetStocks.defaultExpectation.paramPtrs.sku = &sku
+	mmGetStocks.defaultExpectation.expectationOrigins.originSku = minimock.CallerInfo(1)
 
-	return mmGetStock
+	return mmGetStocks
 }
 
-// Inspect accepts an inspector function that has same arguments as the Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) Inspect(f func(ctx context.Context, sku model.SKUType)) *mRepositoryMockGetStock {
-	if mmGetStock.mock.inspectFuncGetStock != nil {
-		mmGetStock.mock.t.Fatalf("Inspect function is already set for RepositoryMock.GetStock")
+// Inspect accepts an inspector function that has same arguments as the Repository.GetStocks
+func (mmGetStocks *mRepositoryMockGetStocks) Inspect(f func(ctx context.Context, sku []model.SKUType)) *mRepositoryMockGetStocks {
+	if mmGetStocks.mock.inspectFuncGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("Inspect function is already set for RepositoryMock.GetStocks")
 	}
 
-	mmGetStock.mock.inspectFuncGetStock = f
+	mmGetStocks.mock.inspectFuncGetStocks = f
 
-	return mmGetStock
+	return mmGetStocks
 }
 
-// Return sets up results that will be returned by Repository.GetStock
-func (mmGetStock *mRepositoryMockGetStock) Return(sp1 *model.Stock, err error) *RepositoryMock {
-	if mmGetStock.mock.funcGetStock != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
+// Return sets up results that will be returned by Repository.GetStocks
+func (mmGetStocks *mRepositoryMockGetStocks) Return(spa1 []*model.Stock, err error) *RepositoryMock {
+	if mmGetStocks.mock.funcGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Set")
 	}
 
-	if mmGetStock.defaultExpectation == nil {
-		mmGetStock.defaultExpectation = &RepositoryMockGetStockExpectation{mock: mmGetStock.mock}
+	if mmGetStocks.defaultExpectation == nil {
+		mmGetStocks.defaultExpectation = &RepositoryMockGetStocksExpectation{mock: mmGetStocks.mock}
 	}
-	mmGetStock.defaultExpectation.results = &RepositoryMockGetStockResults{sp1, err}
-	mmGetStock.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
-	return mmGetStock.mock
+	mmGetStocks.defaultExpectation.results = &RepositoryMockGetStocksResults{spa1, err}
+	mmGetStocks.defaultExpectation.returnOrigin = minimock.CallerInfo(1)
+	return mmGetStocks.mock
 }
 
-// Set uses given function f to mock the Repository.GetStock method
-func (mmGetStock *mRepositoryMockGetStock) Set(f func(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error)) *RepositoryMock {
-	if mmGetStock.defaultExpectation != nil {
-		mmGetStock.mock.t.Fatalf("Default expectation is already set for the Repository.GetStock method")
+// Set uses given function f to mock the Repository.GetStocks method
+func (mmGetStocks *mRepositoryMockGetStocks) Set(f func(ctx context.Context, sku []model.SKUType) (spa1 []*model.Stock, err error)) *RepositoryMock {
+	if mmGetStocks.defaultExpectation != nil {
+		mmGetStocks.mock.t.Fatalf("Default expectation is already set for the Repository.GetStocks method")
 	}
 
-	if len(mmGetStock.expectations) > 0 {
-		mmGetStock.mock.t.Fatalf("Some expectations are already set for the Repository.GetStock method")
+	if len(mmGetStocks.expectations) > 0 {
+		mmGetStocks.mock.t.Fatalf("Some expectations are already set for the Repository.GetStocks method")
 	}
 
-	mmGetStock.mock.funcGetStock = f
-	mmGetStock.mock.funcGetStockOrigin = minimock.CallerInfo(1)
-	return mmGetStock.mock
+	mmGetStocks.mock.funcGetStocks = f
+	mmGetStocks.mock.funcGetStocksOrigin = minimock.CallerInfo(1)
+	return mmGetStocks.mock
 }
 
-// When sets expectation for the Repository.GetStock which will trigger the result defined by the following
+// When sets expectation for the Repository.GetStocks which will trigger the result defined by the following
 // Then helper
-func (mmGetStock *mRepositoryMockGetStock) When(ctx context.Context, sku model.SKUType) *RepositoryMockGetStockExpectation {
-	if mmGetStock.mock.funcGetStock != nil {
-		mmGetStock.mock.t.Fatalf("RepositoryMock.GetStock mock is already set by Set")
+func (mmGetStocks *mRepositoryMockGetStocks) When(ctx context.Context, sku []model.SKUType) *RepositoryMockGetStocksExpectation {
+	if mmGetStocks.mock.funcGetStocks != nil {
+		mmGetStocks.mock.t.Fatalf("RepositoryMock.GetStocks mock is already set by Set")
 	}
 
-	expectation := &RepositoryMockGetStockExpectation{
-		mock:               mmGetStock.mock,
-		params:             &RepositoryMockGetStockParams{ctx, sku},
-		expectationOrigins: RepositoryMockGetStockExpectationOrigins{origin: minimock.CallerInfo(1)},
+	expectation := &RepositoryMockGetStocksExpectation{
+		mock:               mmGetStocks.mock,
+		params:             &RepositoryMockGetStocksParams{ctx, sku},
+		expectationOrigins: RepositoryMockGetStocksExpectationOrigins{origin: minimock.CallerInfo(1)},
 	}
-	mmGetStock.expectations = append(mmGetStock.expectations, expectation)
+	mmGetStocks.expectations = append(mmGetStocks.expectations, expectation)
 	return expectation
 }
 
-// Then sets up Repository.GetStock return parameters for the expectation previously defined by the When method
-func (e *RepositoryMockGetStockExpectation) Then(sp1 *model.Stock, err error) *RepositoryMock {
-	e.results = &RepositoryMockGetStockResults{sp1, err}
+// Then sets up Repository.GetStocks return parameters for the expectation previously defined by the When method
+func (e *RepositoryMockGetStocksExpectation) Then(spa1 []*model.Stock, err error) *RepositoryMock {
+	e.results = &RepositoryMockGetStocksResults{spa1, err}
 	return e.mock
 }
 
-// Times sets number of times Repository.GetStock should be invoked
-func (mmGetStock *mRepositoryMockGetStock) Times(n uint64) *mRepositoryMockGetStock {
+// Times sets number of times Repository.GetStocks should be invoked
+func (mmGetStocks *mRepositoryMockGetStocks) Times(n uint64) *mRepositoryMockGetStocks {
 	if n == 0 {
-		mmGetStock.mock.t.Fatalf("Times of RepositoryMock.GetStock mock can not be zero")
+		mmGetStocks.mock.t.Fatalf("Times of RepositoryMock.GetStocks mock can not be zero")
 	}
-	mm_atomic.StoreUint64(&mmGetStock.expectedInvocations, n)
-	mmGetStock.expectedInvocationsOrigin = minimock.CallerInfo(1)
-	return mmGetStock
+	mm_atomic.StoreUint64(&mmGetStocks.expectedInvocations, n)
+	mmGetStocks.expectedInvocationsOrigin = minimock.CallerInfo(1)
+	return mmGetStocks
 }
 
-func (mmGetStock *mRepositoryMockGetStock) invocationsDone() bool {
-	if len(mmGetStock.expectations) == 0 && mmGetStock.defaultExpectation == nil && mmGetStock.mock.funcGetStock == nil {
+func (mmGetStocks *mRepositoryMockGetStocks) invocationsDone() bool {
+	if len(mmGetStocks.expectations) == 0 && mmGetStocks.defaultExpectation == nil && mmGetStocks.mock.funcGetStocks == nil {
 		return true
 	}
 
-	totalInvocations := mm_atomic.LoadUint64(&mmGetStock.mock.afterGetStockCounter)
-	expectedInvocations := mm_atomic.LoadUint64(&mmGetStock.expectedInvocations)
+	totalInvocations := mm_atomic.LoadUint64(&mmGetStocks.mock.afterGetStocksCounter)
+	expectedInvocations := mm_atomic.LoadUint64(&mmGetStocks.expectedInvocations)
 
 	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
 }
 
-// GetStock implements mm_stockservice.Repository
-func (mmGetStock *RepositoryMock) GetStock(ctx context.Context, sku model.SKUType) (sp1 *model.Stock, err error) {
-	mm_atomic.AddUint64(&mmGetStock.beforeGetStockCounter, 1)
-	defer mm_atomic.AddUint64(&mmGetStock.afterGetStockCounter, 1)
+// GetStocks implements mm_stockservice.Repository
+func (mmGetStocks *RepositoryMock) GetStocks(ctx context.Context, sku []model.SKUType) (spa1 []*model.Stock, err error) {
+	mm_atomic.AddUint64(&mmGetStocks.beforeGetStocksCounter, 1)
+	defer mm_atomic.AddUint64(&mmGetStocks.afterGetStocksCounter, 1)
 
-	mmGetStock.t.Helper()
+	mmGetStocks.t.Helper()
 
-	if mmGetStock.inspectFuncGetStock != nil {
-		mmGetStock.inspectFuncGetStock(ctx, sku)
+	if mmGetStocks.inspectFuncGetStocks != nil {
+		mmGetStocks.inspectFuncGetStocks(ctx, sku)
 	}
 
-	mm_params := RepositoryMockGetStockParams{ctx, sku}
+	mm_params := RepositoryMockGetStocksParams{ctx, sku}
 
 	// Record call args
-	mmGetStock.GetStockMock.mutex.Lock()
-	mmGetStock.GetStockMock.callArgs = append(mmGetStock.GetStockMock.callArgs, &mm_params)
-	mmGetStock.GetStockMock.mutex.Unlock()
+	mmGetStocks.GetStocksMock.mutex.Lock()
+	mmGetStocks.GetStocksMock.callArgs = append(mmGetStocks.GetStocksMock.callArgs, &mm_params)
+	mmGetStocks.GetStocksMock.mutex.Unlock()
 
-	for _, e := range mmGetStock.GetStockMock.expectations {
+	for _, e := range mmGetStocks.GetStocksMock.expectations {
 		if minimock.Equal(*e.params, mm_params) {
 			mm_atomic.AddUint64(&e.Counter, 1)
-			return e.results.sp1, e.results.err
+			return e.results.spa1, e.results.err
 		}
 	}
 
-	if mmGetStock.GetStockMock.defaultExpectation != nil {
-		mm_atomic.AddUint64(&mmGetStock.GetStockMock.defaultExpectation.Counter, 1)
-		mm_want := mmGetStock.GetStockMock.defaultExpectation.params
-		mm_want_ptrs := mmGetStock.GetStockMock.defaultExpectation.paramPtrs
+	if mmGetStocks.GetStocksMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmGetStocks.GetStocksMock.defaultExpectation.Counter, 1)
+		mm_want := mmGetStocks.GetStocksMock.defaultExpectation.params
+		mm_want_ptrs := mmGetStocks.GetStocksMock.defaultExpectation.paramPtrs
 
-		mm_got := RepositoryMockGetStockParams{ctx, sku}
+		mm_got := RepositoryMockGetStocksParams{ctx, sku}
 
 		if mm_want_ptrs != nil {
 
 			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
-				mmGetStock.t.Errorf("RepositoryMock.GetStock got unexpected parameter ctx, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
-					mmGetStock.GetStockMock.defaultExpectation.expectationOrigins.originCtx, *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+				mmGetStocks.t.Errorf("RepositoryMock.GetStocks got unexpected parameter ctx, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmGetStocks.GetStocksMock.defaultExpectation.expectationOrigins.originCtx, *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
 			}
 
 			if mm_want_ptrs.sku != nil && !minimock.Equal(*mm_want_ptrs.sku, mm_got.sku) {
-				mmGetStock.t.Errorf("RepositoryMock.GetStock got unexpected parameter sku, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
-					mmGetStock.GetStockMock.defaultExpectation.expectationOrigins.originSku, *mm_want_ptrs.sku, mm_got.sku, minimock.Diff(*mm_want_ptrs.sku, mm_got.sku))
+				mmGetStocks.t.Errorf("RepositoryMock.GetStocks got unexpected parameter sku, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+					mmGetStocks.GetStocksMock.defaultExpectation.expectationOrigins.originSku, *mm_want_ptrs.sku, mm_got.sku, minimock.Diff(*mm_want_ptrs.sku, mm_got.sku))
 			}
 
 		} else if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
-			mmGetStock.t.Errorf("RepositoryMock.GetStock got unexpected parameters, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
-				mmGetStock.GetStockMock.defaultExpectation.expectationOrigins.origin, *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+			mmGetStocks.t.Errorf("RepositoryMock.GetStocks got unexpected parameters, expected at\n%s:\nwant: %#v\n got: %#v%s\n",
+				mmGetStocks.GetStocksMock.defaultExpectation.expectationOrigins.origin, *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
 		}
 
-		mm_results := mmGetStock.GetStockMock.defaultExpectation.results
+		mm_results := mmGetStocks.GetStocksMock.defaultExpectation.results
 		if mm_results == nil {
-			mmGetStock.t.Fatal("No results are set for the RepositoryMock.GetStock")
+			mmGetStocks.t.Fatal("No results are set for the RepositoryMock.GetStocks")
 		}
-		return (*mm_results).sp1, (*mm_results).err
+		return (*mm_results).spa1, (*mm_results).err
 	}
-	if mmGetStock.funcGetStock != nil {
-		return mmGetStock.funcGetStock(ctx, sku)
+	if mmGetStocks.funcGetStocks != nil {
+		return mmGetStocks.funcGetStocks(ctx, sku)
 	}
-	mmGetStock.t.Fatalf("Unexpected call to RepositoryMock.GetStock. %v %v", ctx, sku)
+	mmGetStocks.t.Fatalf("Unexpected call to RepositoryMock.GetStocks. %v %v", ctx, sku)
 	return
 }
 
-// GetStockAfterCounter returns a count of finished RepositoryMock.GetStock invocations
-func (mmGetStock *RepositoryMock) GetStockAfterCounter() uint64 {
-	return mm_atomic.LoadUint64(&mmGetStock.afterGetStockCounter)
+// GetStocksAfterCounter returns a count of finished RepositoryMock.GetStocks invocations
+func (mmGetStocks *RepositoryMock) GetStocksAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetStocks.afterGetStocksCounter)
 }
 
-// GetStockBeforeCounter returns a count of RepositoryMock.GetStock invocations
-func (mmGetStock *RepositoryMock) GetStockBeforeCounter() uint64 {
-	return mm_atomic.LoadUint64(&mmGetStock.beforeGetStockCounter)
+// GetStocksBeforeCounter returns a count of RepositoryMock.GetStocks invocations
+func (mmGetStocks *RepositoryMock) GetStocksBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmGetStocks.beforeGetStocksCounter)
 }
 
-// Calls returns a list of arguments used in each call to RepositoryMock.GetStock.
+// Calls returns a list of arguments used in each call to RepositoryMock.GetStocks.
 // The list is in the same order as the calls were made (i.e. recent calls have a higher index)
-func (mmGetStock *mRepositoryMockGetStock) Calls() []*RepositoryMockGetStockParams {
-	mmGetStock.mutex.RLock()
+func (mmGetStocks *mRepositoryMockGetStocks) Calls() []*RepositoryMockGetStocksParams {
+	mmGetStocks.mutex.RLock()
 
-	argCopy := make([]*RepositoryMockGetStockParams, len(mmGetStock.callArgs))
-	copy(argCopy, mmGetStock.callArgs)
+	argCopy := make([]*RepositoryMockGetStocksParams, len(mmGetStocks.callArgs))
+	copy(argCopy, mmGetStocks.callArgs)
 
-	mmGetStock.mutex.RUnlock()
+	mmGetStocks.mutex.RUnlock()
 
 	return argCopy
 }
 
-// MinimockGetStockDone returns true if the count of the GetStock invocations corresponds
+// MinimockGetStocksDone returns true if the count of the GetStocks invocations corresponds
 // the number of defined expectations
-func (m *RepositoryMock) MinimockGetStockDone() bool {
-	if m.GetStockMock.optional {
+func (m *RepositoryMock) MinimockGetStocksDone() bool {
+	if m.GetStocksMock.optional {
 		// Optional methods provide '0 or more' call count restriction.
 		return true
 	}
 
-	for _, e := range m.GetStockMock.expectations {
+	for _, e := range m.GetStocksMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
 			return false
 		}
 	}
 
-	return m.GetStockMock.invocationsDone()
+	return m.GetStocksMock.invocationsDone()
 }
 
-// MinimockGetStockInspect logs each unmet expectation
-func (m *RepositoryMock) MinimockGetStockInspect() {
-	for _, e := range m.GetStockMock.expectations {
+// MinimockGetStocksInspect logs each unmet expectation
+func (m *RepositoryMock) MinimockGetStocksInspect() {
+	for _, e := range m.GetStocksMock.expectations {
 		if mm_atomic.LoadUint64(&e.Counter) < 1 {
-			m.t.Errorf("Expected call to RepositoryMock.GetStock at\n%s with params: %#v", e.expectationOrigins.origin, *e.params)
+			m.t.Errorf("Expected call to RepositoryMock.GetStocks at\n%s with params: %#v", e.expectationOrigins.origin, *e.params)
 		}
 	}
 
-	afterGetStockCounter := mm_atomic.LoadUint64(&m.afterGetStockCounter)
+	afterGetStocksCounter := mm_atomic.LoadUint64(&m.afterGetStocksCounter)
 	// if default expectation was set then invocations count should be greater than zero
-	if m.GetStockMock.defaultExpectation != nil && afterGetStockCounter < 1 {
-		if m.GetStockMock.defaultExpectation.params == nil {
-			m.t.Errorf("Expected call to RepositoryMock.GetStock at\n%s", m.GetStockMock.defaultExpectation.returnOrigin)
+	if m.GetStocksMock.defaultExpectation != nil && afterGetStocksCounter < 1 {
+		if m.GetStocksMock.defaultExpectation.params == nil {
+			m.t.Errorf("Expected call to RepositoryMock.GetStocks at\n%s", m.GetStocksMock.defaultExpectation.returnOrigin)
 		} else {
-			m.t.Errorf("Expected call to RepositoryMock.GetStock at\n%s with params: %#v", m.GetStockMock.defaultExpectation.expectationOrigins.origin, *m.GetStockMock.defaultExpectation.params)
+			m.t.Errorf("Expected call to RepositoryMock.GetStocks at\n%s with params: %#v", m.GetStocksMock.defaultExpectation.expectationOrigins.origin, *m.GetStocksMock.defaultExpectation.params)
 		}
 	}
 	// if func was set then invocations count should be greater than zero
-	if m.funcGetStock != nil && afterGetStockCounter < 1 {
-		m.t.Errorf("Expected call to RepositoryMock.GetStock at\n%s", m.funcGetStockOrigin)
+	if m.funcGetStocks != nil && afterGetStocksCounter < 1 {
+		m.t.Errorf("Expected call to RepositoryMock.GetStocks at\n%s", m.funcGetStocksOrigin)
 	}
 
-	if !m.GetStockMock.invocationsDone() && afterGetStockCounter > 0 {
-		m.t.Errorf("Expected %d calls to RepositoryMock.GetStock at\n%s but found %d calls",
-			mm_atomic.LoadUint64(&m.GetStockMock.expectedInvocations), m.GetStockMock.expectedInvocationsOrigin, afterGetStockCounter)
+	if !m.GetStocksMock.invocationsDone() && afterGetStocksCounter > 0 {
+		m.t.Errorf("Expected %d calls to RepositoryMock.GetStocks at\n%s but found %d calls",
+			mm_atomic.LoadUint64(&m.GetStocksMock.expectedInvocations), m.GetStocksMock.expectedInvocationsOrigin, afterGetStocksCounter)
 	}
 }
 
@@ -742,7 +742,7 @@ func (m *RepositoryMock) MinimockUpdateStockInspect() {
 func (m *RepositoryMock) MinimockFinish() {
 	m.finishOnce.Do(func() {
 		if !m.minimockDone() {
-			m.MinimockGetStockInspect()
+			m.MinimockGetStocksInspect()
 
 			m.MinimockUpdateStockInspect()
 		}
@@ -768,6 +768,6 @@ func (m *RepositoryMock) MinimockWait(timeout mm_time.Duration) {
 func (m *RepositoryMock) minimockDone() bool {
 	done := true
 	return done &&
-		m.MinimockGetStockDone() &&
+		m.MinimockGetStocksDone() &&
 		m.MinimockUpdateStockDone()
 }

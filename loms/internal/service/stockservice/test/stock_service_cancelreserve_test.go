@@ -24,14 +24,10 @@ func TestService_ReserveCancel_Success(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
-
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(2)).
-		Then(&model.Stock{SKU: 2, TotalCount: 15, ReservedCount: 5}, nil)
-
+	repoMock.GetStocksMock.Set(func(ctx context.Context, skus []model.SKUType) ([]*model.Stock, error) {
+		assert.ElementsMatch(t, []model.SKUType{1, 2}, skus)
+		return []*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}, {SKU: 2, TotalCount: 15, ReservedCount: 5}}, nil
+	})
 	expectedUpdateStocks := map[model.SKUType]*model.Stock{
 		1: {SKU: 1, TotalCount: 20, ReservedCount: 5}, // 10 - 5
 		2: {SKU: 2, TotalCount: 15, ReservedCount: 2}, // 5 - 3
@@ -58,9 +54,9 @@ func TestService_ReserveCancel_GetStockError(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{}, errors.New("database error"))
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then(nil, errors.New("database error"))
 
 	service := stockservice.NewService(repoMock)
 
@@ -80,9 +76,9 @@ func TestService_ReserveCancel_NegativeReservedCount(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}}, nil)
 
 	service := stockservice.NewService(repoMock)
 
@@ -102,9 +98,9 @@ func TestService_ReserveCancel_UpdateStockError(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}}, nil)
 
 	expectedUpdateStocks := map[model.SKUType]*model.Stock{
 		1: {SKU: 1, TotalCount: 20, ReservedCount: 5}, // 10 - 5

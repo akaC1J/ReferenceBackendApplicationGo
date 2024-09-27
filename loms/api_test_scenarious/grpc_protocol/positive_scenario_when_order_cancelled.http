@@ -4,7 +4,7 @@ GRPC localhost:50051/Loms/StocksInfo
 {
   "sku": 1003
 }
-### Expected {count: int} Status OK, must be return count of items with sku 1002
+### Expected {count: int} Status OK, must be return count of items with sku 1003
 
 
 ### OrderCreate Request

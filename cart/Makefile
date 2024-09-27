@@ -17,7 +17,7 @@ export GOBIN := $(BIN_DIR)
 .PHONY: build test test-coverage install-tools cyclo cognit lint generate_mocks help
 
 # Цель для сборки
-build: .protoc-generate ## Собрать проект
+build:  .vendor-proto .protoc-generate  ## Собрать проект
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/cart ./cmd/cart
 
 #Цель для быстрого запуска

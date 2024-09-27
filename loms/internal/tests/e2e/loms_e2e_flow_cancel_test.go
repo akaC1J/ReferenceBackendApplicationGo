@@ -19,6 +19,7 @@ import (
 )
 
 func TestE2E_OrderCancellationLifecycle(t *testing.T) {
+	setupTest(t)
 	// Шаг 1: Загрузка конфигурации
 	config, err := app.LoadConfig("./.env.test")
 	assert.NoError(t, err, "Не удалось загрузить конфигурацию")
@@ -26,8 +27,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	// Шаг 2: Инициализация и запуск приложения
 	application, err := app.MustNew(config)
 	assert.NoError(t, err, "Не удалось инициализировать приложение")
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GgrpcHostPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s", config.GgrpcHostPort))
 	assert.NoError(t, err, "Не удалось создать слушатель для gRPC сервера")
 
 	go func() {
@@ -41,7 +41,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Шаг 3: Создание gRPC клиента
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%s", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err, "Не удалось подключиться к gRPC серверу")
 	defer conn.Close()
 
@@ -75,7 +75,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	orderInfoResp1, err := client.OrderInfo(ctx, orderInfoReq1)
 	assert.NoError(t, err, "OrderInfo запрос (1) завершился с ошибкой")
 	assert.NotNil(t, orderInfoResp1, "OrderInfo ответ (1) пустой")
-	assert.Equal(t, "awaiting_payment", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
+	assert.Equal(t, "AWAITING_PAYMENT", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
 
 	// Шаг 6: Выполнение OrderCancel запроса
 	orderCancelReq := &loms.OrderCancelRequest{
@@ -94,7 +94,7 @@ func TestE2E_OrderCancellationLifecycle(t *testing.T) {
 	orderInfoResp2, err := client.OrderInfo(ctx, orderInfoReq2)
 	assert.NoError(t, err, "OrderInfo запрос (2) завершился с ошибкой")
 	assert.NotNil(t, orderInfoResp2, "OrderInfo ответ (2) пустой")
-	assert.Equal(t, "cancelled", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (CANCELLED)")
+	assert.Equal(t, "CANCELLED", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (CANCELLED)")
 
 	// Шаг 8: Выполнение StocksInfo запроса для SKU 1003
 	stocksInfoReq := &loms.StocksInfoRequest{

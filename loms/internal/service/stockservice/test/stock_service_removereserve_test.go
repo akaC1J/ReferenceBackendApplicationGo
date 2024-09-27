@@ -24,13 +24,9 @@ func TestService_ReserveRemove_Success(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
-
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(2)).
-		Then(&model.Stock{SKU: 2, TotalCount: 15, ReservedCount: 5}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1, 2}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}, {SKU: 2, TotalCount: 15, ReservedCount: 5}}, nil)
 
 	expectedUpdateStocks := map[model.SKUType]*model.Stock{
 		1: {SKU: 1, TotalCount: 15, ReservedCount: 5}, // 10 - 5
@@ -59,9 +55,9 @@ func TestService_ReserveRemove_GetStockError(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{}, errors.New("database error"))
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then(nil, errors.New("database error"))
 
 	service := stockservice.NewService(repoMock)
 
@@ -81,9 +77,9 @@ func TestService_ReserveRemove_NegativeReservedCount(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}}, nil)
 
 	service := stockservice.NewService(repoMock)
 
@@ -103,9 +99,9 @@ func TestService_ReserveRemove_NegativeTotalCount(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}}, nil)
 
 	service := stockservice.NewService(repoMock)
 
@@ -125,9 +121,9 @@ func TestService_ReserveRemove_UpdateStockError(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStockMock.
-		When(ctx, model.SKUType(1)).
-		Then(&model.Stock{SKU: 1, TotalCount: 20, ReservedCount: 10}, nil)
+	repoMock.GetStocksMock.
+		When(ctx, []model.SKUType{1}).
+		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}}, nil)
 
 	expectedUpdateStocks := map[model.SKUType]*model.Stock{
 		1: {SKU: 1, TotalCount: 15, ReservedCount: 5}, // 10 - 5

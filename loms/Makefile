@@ -7,36 +7,44 @@ PROTOC_GEN_GATEWAY_URL := github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-g
 PROTOC_GEN_OPENAPI_URL := github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.19.1
 PROTOC_GEN_GO_URL := google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
 PROTOC_GEN_GO_GRPC_URL := google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
-
-.PHONY: build test install-tools generate_mocks help .vendor-proto protoc-generate
+GOOSE_URL := github.com/pressly/goose/v3/cmd/goose@v3.22.1
+SQLC_URL := github.com/sqlc-dev/sqlc/cmd/sqlc@v1.27.0
 
 export GOBIN := $(BIN_DIR)
 
+.PHONY: build
 # Цель для сборки
-build: install-tools .protoc-generate ## Собрать проект
+
+build: .install-tools .protoc-generate .sqlc-generate ### Собрать проект
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o  $(BIN_DIR)/loms cmd/loms/main.go
 
+.PHONY: fast-run
 #Цель для локального запуска
 fast-run: ## Запустить проект
 	go run cmd/loms/main.go
 
+.PHONY: test
 # Команды для тестирования
-test: generate_mocks ## Запустить тесты с покрытием
+test: .generate_mocks ## Запустить тесты с покрытием
 	@mkdir -p $(REPORTS_DIR)
 	go test -coverprofile=$(REPORTS_DIR)/coverage.out ./... && \
 	go tool cover -html=$(REPORTS_DIR)/coverage.out -o $(REPORTS_DIR)/coverage.html
 
-generate_mocks: install-tools ## Генерация моков
+.PHONY: .generate_mocks
+.generate_mocks: .install-tools ## Генерация моков
 	@echo "Generating mocks for all packages"
 	$(BIN_DIR)/minimock -i route256/loms/internal/service/orderservice.StockService -o internal/service/orderservice/test
 	$(BIN_DIR)/minimock -i route256/loms/internal/service/orderservice.Repository -o internal/service/orderservice/test
 	$(BIN_DIR)/minimock -i route256/loms/internal/service/stockService.Repository -o internal/service/stockservice/test
 
+.PHONY: help
 # Документация
 help: ## Показать этот справочник
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
-
+	@echo "Usage: make [target]"
+	@echo "Targets:"
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 LOMS_PROTO_PATH:="api/loms/v1"
+.PHONY: .protoc-generate
 .protoc-generate: ## Генерация кода из proto-файлов
 	@mkdir -p ./api/openapiv2
 	protoc \
@@ -59,8 +67,68 @@ LOMS_PROTO_PATH:="api/loms/v1"
 	loms.proto
 	go mod tidy
 
-.vendor-proto: .vendor-rm install-tools  vendor-proto/google/protobuf vendor-proto/validate vendor-proto/google/api vendor-proto/protoc-gen-openapiv2/options
 
+.PHONY: .sqlc-generate
+.sqlc-generate: ## Генерация кода из sql-файлов
+	@echo "Generating sqlc code"
+	$(BIN_DIR)/sqlc generate
+
+ifneq (,$(wildcard ../.env))
+    include ../.env
+    export
+endif
+.PHONY: apply-migrations
+apply-migrations: ## Применить миграции goose
+	bin/goose -dir migrations postgres \
+	"postgresql://$(POSTGRES_MASTER_USER):${POSTGRES_MASTER_PASSWORD}@$(POSTGRES_MASTER_HOST_PORT)/loms?sslmode=disable" up
+
+.PHONY: add_migrations
+add_migrations: .install-tools ### Создать новый файл миграции, обязателен параметр MIGR_NAME
+ifeq ($(MIGR_NAME),)
+	$(error Необходимо указать имя файла через параметр MIGR_NAME)
+endif
+	@echo "Создание файла: $(MIGR_NAME)"
+	@mkdir -p migrations
+	@cd migrations && $(BIN_DIR)/goose create $(MIGR_NAME) sql
+
+.PHONY: .install-tools
+# Цель для установки инструментов
+.install-tools:
+	@mkdir -p $(BIN_DIR)
+	@[ -f $(BIN_DIR)/minimock ] || { \
+		echo >&2 "Installing minimock..."; \
+		go install $(MINIMOCK_URL); \
+	};
+	@[ -f $(BIN_DIR)/protoc-gen-validate ] || { \
+    		echo >&2 "Installing protoc-gen-validator..."; \
+    		go install $(PROTOC_GEN_VALIDATOR_URL); \
+    }
+	@[ -f $(BIN_DIR)/protoc-gen-go ] || { \
+    		echo >&2 "Installing protoc-gen-go..."; \
+    		go install $(PROTOC_GEN_GO_URL); \
+    }
+	@[ -f $(BIN_DIR)/protoc-gen-go-grpc ] || { \
+    		echo >&2 "Installing protoc-gen-go_grpc..."; \
+    		go install $(PROTOC_GEN_GO_GRPC_URL); \
+    }
+	@[ -f $(BIN_DIR)/protoc-gen-grpc-gateway ] || { \
+    		echo >&2 "Installing protoc-gen-grpc-gateway..."; \
+    		go install $(PROTOC_GEN_GATEWAY_URL); \
+    }
+	@[ -f $(BIN_DIR)/protoc-gen-openapiv2 ] || { \
+    		echo >&2 "Installing protoc-gen-openapi..."; \
+    		go install $(PROTOC_GEN_OPENAPI_URL); \
+    }
+	@[ -f $(BIN_DIR)/goose ] || { \
+    		echo >&2 "Installing goose..."; \
+    		go install $(GOOSE_URL); \
+    }
+	@[ -f $(BIN_DIR)/sqlc ] || { \
+    		echo >&2 "Installing sqlc..."; \
+    		go install $(SQLC_URL); \
+    }
+
+.PHONY: .vendor-rm
 .vendor-rm:
 	rm -rf vendor-proto
 
@@ -108,32 +176,3 @@ vendor-proto/google/protobuf:
 	mkdir -p vendor-proto/google
 	mv vendor-proto/protobuf/src/google/protobuf vendor-proto/google
 	rm -rf vendor-proto/protobuf
-
-
-# Цель для установки инструментов
-install-tools:
-	@mkdir -p $(BIN_DIR)
-	@[ -f $(BIN_DIR)/minimock ] || { \
-		echo >&2 "Installing minimock..."; \
-		go install $(MINIMOCK_URL); \
-	};
-	@[ -f $(BIN_DIR)/protoc-gen-validate ] || { \
-    		echo >&2 "Installing protoc-gen-validator..."; \
-    		go install $(PROTOC_GEN_VALIDATOR_URL); \
-    }
-	@[ -f $(BIN_DIR)/protoc-gen-go ] || { \
-    		echo >&2 "Installing protoc-gen-go..."; \
-    		go install $(PROTOC_GEN_GO_URL); \
-    }
-	@[ -f $(BIN_DIR)/protoc-gen-go-grpc ] || { \
-    		echo >&2 "Installing protoc-gen-go_grpc..."; \
-    		go install $(PROTOC_GEN_GO_GRPC_URL); \
-    }
-	@[ -f $(BIN_DIR)/protoc-gen-grpc-gateway ] || { \
-    		echo >&2 "Installing protoc-gen-grpc-gateway..."; \
-    		go install $(PROTOC_GEN_GATEWAY_URL); \
-    }
-	@[ -f $(BIN_DIR)/protoc-gen-openapiv2 ] || { \
-    		echo >&2 "Installing protoc-gen-openapi..."; \
-    		go install $(PROTOC_GEN_OPENAPI_URL); \
-    }

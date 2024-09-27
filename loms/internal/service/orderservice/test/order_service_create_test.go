@@ -27,7 +27,7 @@ func TestService_Create_Success(t *testing.T) {
 	}
 	repoMock.SaveOrderMock.Expect(ctx, order).Return(savedOrder, nil)
 	stockServiceMock.ReserveMock.Expect(ctx, order.Items).Return(nil)
-	savedOrder.State = model.AWAITING_PAYMENT
+	_ = savedOrder.SetState(model.AWAITING_PAYMENT)
 	repoMock.UpdateOrderMock.Expect(ctx, savedOrder).Return(nil)
 
 	service := orderservice.NewService(repoMock, stockServiceMock)
@@ -76,7 +76,8 @@ func TestService_Create_ReserveError(t *testing.T) {
 
 	repoMock.SaveOrderMock.Expect(ctx, order).Return(savedOrder, nil)
 	stockServiceMock.ReserveMock.Expect(ctx, order.Items).Return(errors.New("reserve error"))
-	savedOrder.State = model.FAILED
+	_ = savedOrder.SetState(model.FAILED)
+
 	repoMock.UpdateOrderMock.Expect(ctx, savedOrder).Return(nil)
 
 	service := orderservice.NewService(repoMock, stockServiceMock)
@@ -105,7 +106,8 @@ func TestService_Create_UpdateOrderError(t *testing.T) {
 
 	repoMock.SaveOrderMock.Expect(ctx, order).Return(savedOrder, nil)
 	stockServiceMock.ReserveMock.Expect(ctx, order.Items).Return(nil)
-	savedOrder.State = model.AWAITING_PAYMENT
+	_ = savedOrder.SetState(model.AWAITING_PAYMENT)
+
 	repoMock.UpdateOrderMock.Expect(ctx, savedOrder).Return(errors.New("update error"))
 
 	service := orderservice.NewService(repoMock, stockServiceMock)

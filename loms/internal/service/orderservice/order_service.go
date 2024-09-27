@@ -32,7 +32,7 @@ func NewService(repository Repository, stockService StockService) *Service {
 }
 
 func (s *Service) Create(ctx context.Context, order *model.Order) (orderID int64, err error) {
-	order.State = model.NEW
+	_ = order.SetState(model.NEW)
 
 	order, err = s.repository.SaveOrder(ctx, order)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *Service) Create(ctx context.Context, order *model.Order) (orderID int64
 
 	err = s.stockService.Reserve(ctx, order.Items)
 	if err != nil {
-		order.State = model.FAILED
+		_ = order.SetState(model.FAILED)
 		if updateErr := s.repository.UpdateOrder(ctx, order); updateErr != nil {
 			log.Printf("[order_service] Error updating order state: %v", updateErr)
 			return 0, updateErr
@@ -51,7 +51,7 @@ func (s *Service) Create(ctx context.Context, order *model.Order) (orderID int64
 		return 0, err
 	}
 
-	order.State = model.AWAITING_PAYMENT
+	_ = order.SetState(model.AWAITING_PAYMENT)
 	err = s.repository.UpdateOrder(ctx, order)
 	if err != nil {
 		log.Printf("[order_service] Error updating order state: %v", err)
@@ -77,8 +77,8 @@ func (s *Service) OrderPay(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	if order.State != model.AWAITING_PAYMENT {
-		log.Printf("[order_service] Invalid order state: %v", order.State)
+	if order.State() != model.AWAITING_PAYMENT {
+		log.Printf("[order_service] Invalid order state: %v", order.State())
 		return appErr.ErrOrderState
 	}
 
@@ -88,7 +88,7 @@ func (s *Service) OrderPay(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	order.State = model.PAYED
+	_ = order.SetState(model.PAYED)
 	err = s.repository.UpdateOrder(ctx, order)
 	if err != nil {
 		log.Printf("[order_service] Error updating order state: %v", err)
@@ -105,8 +105,8 @@ func (s *Service) OrderCancel(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	if order.State != model.AWAITING_PAYMENT {
-		log.Printf("[order_service] Invalid order state: %v", order.State)
+	if order.State() != model.AWAITING_PAYMENT {
+		log.Printf("[order_service] Invalid order state: %v", order.State())
 		return appErr.ErrOrderState
 	}
 
@@ -116,7 +116,7 @@ func (s *Service) OrderCancel(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	order.State = model.CANCELLED
+	_ = order.SetState(model.CANCELLED)
 	err = s.repository.UpdateOrder(ctx, order)
 	if err != nil {
 		log.Printf("[order_service] Error updating order state: %v", err)

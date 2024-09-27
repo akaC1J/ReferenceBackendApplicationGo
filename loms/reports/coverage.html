@@ -63,41 +63,59 @@
 				
 				<option value="file3">route256/loms/internal/app/grpccontroller/stock_service.go (0.0%)</option>
 				
-				<option value="file4">route256/loms/internal/app/initialization/app.go (65.9%)</option>
+				<option value="file4">route256/loms/internal/app/initialization/app.go (62.8%)</option>
 				
-				<option value="file5">route256/loms/internal/app/initialization/config.go (68.2%)</option>
+				<option value="file5">route256/loms/internal/app/initialization/config.go (62.1%)</option>
 				
-				<option value="file6">route256/loms/internal/mw/grpc/cors.go (22.2%)</option>
+				<option value="file6">route256/loms/internal/generated/api/loms/v1/loms.pb.go (3.6%)</option>
 				
-				<option value="file7">route256/loms/internal/mw/grpc/logger.go (0.0%)</option>
+				<option value="file7">route256/loms/internal/generated/api/loms/v1/loms.pb.gw.go (2.3%)</option>
 				
-				<option value="file8">route256/loms/internal/mw/grpc/panic.go (0.0%)</option>
+				<option value="file8">route256/loms/internal/generated/api/loms/v1/loms.pb.validate.go (0.0%)</option>
 				
-				<option value="file9">route256/loms/internal/mw/grpc/validate.go (0.0%)</option>
+				<option value="file9">route256/loms/internal/generated/api/loms/v1/loms_grpc.pb.go (2.6%)</option>
 				
-				<option value="file10">route256/loms/internal/mw/http/logger.go (50.0%)</option>
+				<option value="file10">route256/loms/internal/model/order.go (85.7%)</option>
 				
-				<option value="file11">route256/loms/internal/repository/orderrepository/order_repository.go (6.2%)</option>
+				<option value="file11">route256/loms/internal/mw/grpc/cors.go (22.2%)</option>
 				
-				<option value="file12">route256/loms/internal/repository/stockrepository/stocks_repository.go (5.9%)</option>
+				<option value="file12">route256/loms/internal/mw/grpc/logger.go (0.0%)</option>
 				
-				<option value="file13">route256/loms/internal/service/orderservice/order_service.go (89.8%)</option>
+				<option value="file13">route256/loms/internal/mw/grpc/panic.go (0.0%)</option>
 				
-				<option value="file14">route256/loms/internal/service/stockservice/stock_service.go (97.1%)</option>
+				<option value="file14">route256/loms/internal/mw/grpc/validate.go (0.0%)</option>
 				
-				<option value="file15">route256/loms/pkg/api/loms/v1/loms.pb.go (3.6%)</option>
+				<option value="file15">route256/loms/internal/mw/http/logger.go (50.0%)</option>
 				
-				<option value="file16">route256/loms/pkg/api/loms/v1/loms.pb.gw.go (2.3%)</option>
+				<option value="file16">route256/loms/internal/repository/orderrepository/db.go (50.0%)</option>
 				
-				<option value="file17">route256/loms/pkg/api/loms/v1/loms.pb.validate.go (0.0%)</option>
+				<option value="file17">route256/loms/internal/repository/orderrepository/models.go (0.0%)</option>
 				
-				<option value="file18">route256/loms/pkg/api/loms/v1/loms_grpc.pb.go (2.6%)</option>
+				<option value="file18">route256/loms/internal/repository/orderrepository/order_repository.go (1.6%)</option>
 				
-				<option value="file19">route256/loms/vendor-proto/protoc-gen-openapiv2/options/annotations.pb.go (0.0%)</option>
+				<option value="file19">route256/loms/internal/repository/orderrepository/query.sql.go (0.0%)</option>
 				
-				<option value="file20">route256/loms/vendor-proto/protoc-gen-openapiv2/options/openapiv2.pb.go (0.0%)</option>
+				<option value="file20">route256/loms/internal/repository/stockrepository/db.go (50.0%)</option>
 				
-				<option value="file21">route256/loms/vendor-proto/validate/validate.pb.go (0.0%)</option>
+				<option value="file21">route256/loms/internal/repository/stockrepository/query.sql.go (0.0%)</option>
+				
+				<option value="file22">route256/loms/internal/repository/stockrepository/stocks_repository.go (1.7%)</option>
+				
+				<option value="file23">route256/loms/internal/repository/utils.go (0.0%)</option>
+				
+				<option value="file24">route256/loms/internal/repository_inmemory/orderrepository/order_repository.go (0.0%)</option>
+				
+				<option value="file25">route256/loms/internal/repository_inmemory/stockrepository/stocks_repository.go (0.0%)</option>
+				
+				<option value="file26">route256/loms/internal/service/orderservice/order_service.go (89.8%)</option>
+				
+				<option value="file27">route256/loms/internal/service/stockservice/stock_service.go (98.0%)</option>
+				
+				<option value="file28">route256/loms/vendor-proto/protoc-gen-openapiv2/options/annotations.pb.go (0.0%)</option>
+				
+				<option value="file29">route256/loms/vendor-proto/protoc-gen-openapiv2/options/openapiv2.pb.go (0.0%)</option>
+				
+				<option value="file30">route256/loms/vendor-proto/validate/validate.pb.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -146,8 +164,8 @@ func main() <span class="cov0" title="0">{
 import (
         "context"
         "google.golang.org/protobuf/types/known/emptypb"
+        lomsGrpc "route256/loms/internal/generated/api/loms/v1"
         "route256/loms/internal/model"
-        lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 func (o *LomsController) OrderCreate(ctx context.Context, createRq *lomsGrpc.OrderCreateRequest) (*lomsGrpc.OrderCreateResponse, error) <span class="cov0" title="0">{
@@ -193,7 +211,7 @@ func convertOrderToResponse(order *model.Order) *lomsGrpc.Order <span class="cov
                 })
         }</span>
 
-        <span class="cov0" title="0">orderRs.Status = string(order.State)
+        <span class="cov0" title="0">orderRs.Status = string(order.State())
 
         return orderRs</span>
 }
@@ -220,8 +238,8 @@ import (
         "google.golang.org/grpc/codes"
         "google.golang.org/grpc/status"
         appErr "route256/loms/internal/errors"
+        lomsGrpc "route256/loms/internal/generated/api/loms/v1"
         "route256/loms/internal/model"
-        lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 var _ lomsGrpc.LomsServer = (*LomsController)(nil)
@@ -264,8 +282,8 @@ func mapErrorToGRPC(err error) error <span class="cov0" title="0">{
 
 import (
         "context"
+        lomsGrpc "route256/loms/internal/generated/api/loms/v1"
         "route256/loms/internal/model"
-        lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 func (o *LomsController) StocksInfo(ctx context.Context, request *lomsGrpc.StocksInfoRequest) (*lomsGrpc.StocksInfoResponse, error) <span class="cov0" title="0">{
@@ -281,25 +299,23 @@ func (o *LomsController) StocksInfo(ctx context.Context, request *lomsGrpc.Stock
 
 import (
         "context"
-        "encoding/json"
         "fmt"
         "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+        "github.com/jackc/pgx/v5/pgxpool"
         "google.golang.org/grpc"
         "google.golang.org/grpc/credentials/insecure"
         "google.golang.org/grpc/reflection"
         "log"
         "net"
         "net/http"
-        "os"
         "route256/loms/internal/app/grpccontroller"
-        "route256/loms/internal/model"
+        "route256/loms/internal/generated/api/loms/v1"
         grpcMW "route256/loms/internal/mw/grpc"
         httpMW "route256/loms/internal/mw/http"
         "route256/loms/internal/repository/orderrepository"
         "route256/loms/internal/repository/stockrepository"
         "route256/loms/internal/service/orderservice"
         "route256/loms/internal/service/stockservice"
-        lomsGrpc "route256/loms/pkg/api/loms/v1"
 )
 
 type App struct {
@@ -333,9 +349,12 @@ func (application *App) Run(config *Config) <span class="cov0" title="0">{
 
 func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
         log.Println("[cart] Starting application initialization")
-
-        orderRepository := orderrepository.NewRepository()
-        stockRepository := mustNewStockRepositoryFromFile(config.StockFilePath)
+        dbpool, err := initDbPool(config)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Unable to create connection pool: %v", err)
+        }</span>
+        <span class="cov8" title="1">orderRepository := orderrepository.NewRepository(dbpool)
+        stockRepository := stockrepository.NewRepository(dbpool)
 
         stockService := stockservice.NewService(stockRepository)
         orderService := orderservice.NewService(orderRepository, stockService)
@@ -357,7 +376,7 @@ func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
         )
         reflection.Register(grpcServer)
         lomsController := grpccontroller.NewLomsController(app.orderService, app.stockService)
-        lomsGrpc.RegisterLomsServer(grpcServer, lomsController)
+        loms.RegisterLomsServer(grpcServer, lomsController)
 
         app.GrpcServer = grpcServer
 
@@ -368,7 +387,7 @@ func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
 
         <span class="cov8" title="1">gwmux := runtime.NewServeMux()
 
-        if err = lomsGrpc.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil </span><span class="cov0" title="0">{
+        if err = loms.RegisterLomsHandler(context.Background(), gwmux, conn); err != nil </span><span class="cov0" title="0">{
                 log.Fatalln("Failed to register gateway:", err)
         }</span>
         <span class="cov8" title="1">gwServer := &amp;http.Server{
@@ -381,22 +400,19 @@ func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
         return app, nil</span>
 }
 
-func mustNewStockRepositoryFromFile(pathToStockDataFile string) *stockrepository.Repository <span class="cov8" title="1">{
-        open, err := os.Open(pathToStockDataFile)
+func initDbPool(config *Config) (*pgxpool.Pool, error) <span class="cov8" title="1">{
+        dsn := fmt.Sprintf("postgres://%s:%s@%s/%s",
+                config.DBConfig.DBUser, config.DBConfig.DBPassword, config.DBConfig.DBHostPort, config.DBConfig.DBName)
+        poolConfig, err := pgxpool.ParseConfig(dsn)
+
         if err != nil </span><span class="cov0" title="0">{
-                log.Fatalf("[cart] Error opening stock data file: %v", err)
+                return nil, fmt.Errorf("unable to parse configuration: %w", err)
         }</span>
-        <span class="cov8" title="1">defer open.Close()
-        var stocksFromFile []*model.Stock
-        err = json.NewDecoder(open).Decode(&amp;stocksFromFile)
-        var mapStock = make(map[model.SKUType]model.Stock)
-        for _, stock := range stocksFromFile </span><span class="cov8" title="1">{
-                mapStock[stock.SKU] = *stock
+        <span class="cov8" title="1">pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to create pool: %w", err)
         }</span>
-        <span class="cov8" title="1">if err != nil </span><span class="cov0" title="0">{
-                log.Fatalf("[cart] Error decoding stock data file: %v", err)
-        }</span>
-        <span class="cov8" title="1">return stockrepository.NewRepository(mapStock)</span>
+        <span class="cov8" title="1">return pool, nil</span>
 }
 </pre>
 		
@@ -415,6 +431,14 @@ type Config struct {
         GgrpcHostPort string
         HttpPort      int
         SwagerUrl     string
+        DBConfig      DBConfig
+}
+
+type DBConfig struct {
+        DBUser     string
+        DBPassword string
+        DBHostPort string
+        DBName     string
 }
 
 const defaultHostPortGrpc = ":50051"
@@ -457,7 +481,28 @@ func LoadConfig(pathToEnv string) (*Config, error) <span class="cov8" title="1">
                 GgrpcHostPort: grpcPort,
                 HttpPort:      httpPort,
                 SwagerUrl:     swaggerUrl,
+                DBConfig:      MustLoadDBConfig(),
         }, nil</span>
+}
+
+func MustLoadDBConfig() DBConfig <span class="cov8" title="1">{
+        dbConfig := DBConfig{
+                DBUser:     os.Getenv("DATABASE_USER"),
+                DBPassword: os.Getenv("DATABASE_PASSWORD"),
+                DBHostPort: os.Getenv("DATABASE_HOST_PORT"),
+                DBName:     os.Getenv("DATABASE_NAME"),
+        }
+        switch "" </span>{
+        case dbConfig.DBUser:<span class="cov0" title="0">
+                log.Fatalf("DB_USER is not set")</span>
+        case dbConfig.DBPassword:<span class="cov0" title="0">
+                log.Fatalf("DB_PASSWORD is not set")</span>
+        case dbConfig.DBHostPort:<span class="cov0" title="0">
+                log.Fatalf("DB_HOST_PORT is not set")</span>
+        case dbConfig.DBName:<span class="cov0" title="0">
+                log.Fatalf("DB_NAME is not set")</span>
+        }
+        <span class="cov8" title="1">return dbConfig</span>
 }
 
 func loadEnv(pathToEnv string) error <span class="cov8" title="1">{
@@ -468,490 +513,7 @@ func loadEnv(pathToEnv string) error <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package grpc
-
-import (
-        "net/http"
-)
-
-var SwaggerUrlForCors string
-
-func WithCorsCheckHttpHandler(next http.Handler) http.Handler <span class="cov8" title="1">{
-        fn := func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
-                w.Header().Set("Access-Control-Allow-Origin", SwaggerUrlForCors)
-                w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-                w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
-                if r.Method == "OPTIONS" </span><span class="cov0" title="0">{
-                        w.WriteHeader(http.StatusOK)
-                        return
-                }</span>
-
-                <span class="cov0" title="0">next.ServeHTTP(w, r)</span>
-        }
-
-        <span class="cov8" title="1">return http.HandlerFunc(fn)</span>
-}
-</pre>
-		
-		<pre class="file" id="file7" style="display: none">package grpc
-
-import (
-        "context"
-        "google.golang.org/grpc"
-        "google.golang.org/protobuf/encoding/protojson"
-        "google.golang.org/protobuf/proto"
-        "log"
-)
-
-func LoggingUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) <span class="cov0" title="0">{
-        raw, _ := protojson.Marshal((req).(proto.Message)) // для превращения protbuf структур в json используем google.golang.org/protobuf/encoding/protojson пакет а не encoding/json
-        log.Printf("request: method: %v, req: %v\n", info.FullMethod, string(raw))
-
-        if resp, err = handler(ctx, req); err != nil </span><span class="cov0" title="0">{
-                log.Printf("response: method: %v, err: %v\n", info.FullMethod, err)
-                return
-        }</span>
-
-        <span class="cov0" title="0">rawResp, _ := protojson.Marshal((resp).(proto.Message))
-        log.Printf("response: method: %v, resp: %v\n", info.FullMethod, string(rawResp))
-
-        return</span>
-}
-</pre>
-		
-		<pre class="file" id="file8" style="display: none">package grpc
-
-import (
-        "context"
-        "google.golang.org/grpc"
-        "google.golang.org/grpc/codes"
-        "google.golang.org/grpc/status"
-        "log"
-)
-
-func PanicUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) <span class="cov0" title="0">{
-        defer func() </span><span class="cov0" title="0">{
-                if e := recover(); e != nil </span><span class="cov0" title="0">{
-                        log.Printf("panic: %v\n", e)
-                        err = status.Errorf(codes.Internal, "panic: %v", e)
-                }</span>
-        }()
-        <span class="cov0" title="0">resp, err = handler(ctx, req)
-        return resp, err</span>
-}
-</pre>
-		
-		<pre class="file" id="file9" style="display: none">package grpc
-
-import (
-        "context"
-        "google.golang.org/grpc"
-        "google.golang.org/grpc/codes"
-        "google.golang.org/grpc/status"
-)
-
-func ValidateUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) <span class="cov0" title="0">{
-        if v, ok := req.(interface{ Validate() error }); ok </span><span class="cov0" title="0">{
-                if err := v.Validate(); err != nil </span><span class="cov0" title="0">{
-                        return nil, status.Error(codes.InvalidArgument, err.Error())
-                }</span>
-        }
-        <span class="cov0" title="0">return handler(ctx, req)</span>
-}
-</pre>
-		
-		<pre class="file" id="file10" style="display: none">package http
-
-import (
-        "log"
-        "net/http"
-)
-
-func WithHTTPLoggingMiddleware(next http.Handler) http.Handler <span class="cov8" title="1">{
-        fn := func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
-                log.Println(r.Method)
-                next.ServeHTTP(w, r)
-        }</span>
-
-        <span class="cov8" title="1">return http.HandlerFunc(fn)</span>
-}
-</pre>
-		
-		<pre class="file" id="file11" style="display: none">package orderrepository
-
-import (
-        "context"
-        "fmt"
-        "sync"
-
-        appErr "route256/loms/internal/errors"
-        "route256/loms/internal/model"
-)
-
-type Repository struct {
-        orders map[int64]model.Order
-        mx     sync.Mutex
-}
-
-func NewRepository() *Repository <span class="cov8" title="1">{
-        return &amp;Repository{orders: make(map[int64]model.Order)}
-}</span>
-
-func (r *Repository) SaveOrder(_ context.Context, order *model.Order) (*model.Order, error) <span class="cov0" title="0">{
-        r.mx.Lock()
-        defer r.mx.Unlock()
-
-        order.ID = int64(len(r.orders) + 1)
-        r.orders[order.ID] = *order
-        return order, nil
-}</span>
-
-func (r *Repository) UpdateOrder(_ context.Context, order *model.Order) error <span class="cov0" title="0">{
-        r.mx.Lock()
-        defer r.mx.Unlock()
-
-        r.orders[order.ID] = *order
-        return fmt.Errorf("order with ID %v: %w", order.ID, appErr.ErrNotFound)
-}</span>
-
-func (r *Repository) GetById(_ context.Context, orderID int64) (*model.Order, error) <span class="cov0" title="0">{
-        r.mx.Lock()
-        defer r.mx.Unlock()
-
-        order, ok := r.orders[orderID]
-        if ok </span><span class="cov0" title="0">{
-                return &amp;order, nil
-        }</span>
-        <span class="cov0" title="0">return nil, fmt.Errorf("order with ID %v: %w", orderID, appErr.ErrNotFound)</span>
-}
-</pre>
-		
-		<pre class="file" id="file12" style="display: none">package stockrepository
-
-import (
-        "context"
-        "fmt"
-        "sync"
-
-        appErr "route256/loms/internal/errors"
-        "route256/loms/internal/model"
-)
-
-type Repository struct {
-        stocks map[model.SKUType]model.Stock
-        mx     sync.Mutex
-}
-
-func NewRepository(stocks map[model.SKUType]model.Stock) *Repository <span class="cov8" title="1">{
-        return &amp;Repository{
-                stocks: stocks,
-        }
-}</span>
-
-func (r *Repository) GetStock(_ context.Context, sku model.SKUType) (*model.Stock, error) <span class="cov0" title="0">{
-        r.mx.Lock()
-        defer r.mx.Unlock()
-
-        stock, found := r.stocks[sku]
-        if !found </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
-        }</span>
-        <span class="cov0" title="0">return &amp;stock, nil</span>
-}
-
-func (r *Repository) UpdateStock(_ context.Context, stocks map[model.SKUType]*model.Stock) error <span class="cov0" title="0">{
-        r.mx.Lock()
-        defer r.mx.Unlock()
-
-        for sku, updateStock := range stocks </span><span class="cov0" title="0">{
-                stock, found := r.stocks[sku]
-                if !found </span><span class="cov0" title="0">{
-                        return fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
-                }</span>
-                <span class="cov0" title="0">stock.TotalCount = updateStock.TotalCount
-                stock.ReservedCount = updateStock.ReservedCount
-                r.stocks[sku] = stock</span>
-        }
-
-        <span class="cov0" title="0">return nil</span>
-}
-</pre>
-		
-		<pre class="file" id="file13" style="display: none">package orderservice
-
-import (
-        "context"
-        "log"
-        appErr "route256/loms/internal/errors"
-        "route256/loms/internal/model"
-        "route256/loms/internal/repository/orderrepository"
-)
-
-var _ Repository = (*orderrepository.Repository)(nil)
-
-type Repository interface {
-        SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error)
-        UpdateOrder(ctx context.Context, order *model.Order) error
-        GetById(ctx context.Context, orderID int64) (*model.Order, error)
-}
-
-type StockService interface {
-        Reserve(ctx context.Context, items []*model.Item) error
-        ReserveRemove(ctx context.Context, items []*model.Item) error
-        ReserveCancel(ctx context.Context, items []*model.Item) error
-}
-
-type Service struct {
-        repository   Repository
-        stockService StockService
-}
-
-func NewService(repository Repository, stockService StockService) *Service <span class="cov8" title="1">{
-        return &amp;Service{repository: repository, stockService: stockService}
-}</span>
-
-func (s *Service) Create(ctx context.Context, order *model.Order) (orderID int64, err error) <span class="cov8" title="1">{
-        order.State = model.NEW
-
-        order, err = s.repository.SaveOrder(ctx, order)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error saving order: %v", err)
-                return 0, err
-        }</span>
-
-        <span class="cov8" title="1">err = s.stockService.Reserve(ctx, order.Items)
-        if err != nil </span><span class="cov8" title="1">{
-                order.State = model.FAILED
-                if updateErr := s.repository.UpdateOrder(ctx, order); updateErr != nil </span><span class="cov0" title="0">{
-                        log.Printf("[order_service] Error updating order state: %v", updateErr)
-                        return 0, updateErr
-                }</span>
-                <span class="cov8" title="1">log.Printf("[order_service] Error reserving stock: %v", err)
-                return 0, err</span>
-        }
-
-        <span class="cov8" title="1">order.State = model.AWAITING_PAYMENT
-        err = s.repository.UpdateOrder(ctx, order)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error updating order state: %v", err)
-                return 0, err
-        }</span>
-
-        <span class="cov8" title="1">return order.ID, nil</span>
-}
-
-func (s *Service) GetById(ctx context.Context, orderID int64) (*model.Order, error) <span class="cov8" title="1">{
-        order, err := s.repository.GetById(ctx, orderID)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error getting order: %v", err)
-                return nil, err
-        }</span>
-        <span class="cov8" title="1">return order, nil</span>
-}
-
-func (s *Service) OrderPay(ctx context.Context, orderID int64) error <span class="cov8" title="1">{
-        order, err := s.repository.GetById(ctx, orderID)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error getting order: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">if order.State != model.AWAITING_PAYMENT </span><span class="cov0" title="0">{
-                log.Printf("[order_service] Invalid order state: %v", order.State)
-                return appErr.ErrOrderState
-        }</span>
-
-        <span class="cov8" title="1">err = s.stockService.ReserveRemove(ctx, order.Items)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error removing stock reservation: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">order.State = model.PAYED
-        err = s.repository.UpdateOrder(ctx, order)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error updating order state: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">return nil</span>
-}
-
-func (s *Service) OrderCancel(ctx context.Context, orderID int64) error <span class="cov8" title="1">{
-        order, err := s.repository.GetById(ctx, orderID)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error getting order: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">if order.State != model.AWAITING_PAYMENT </span><span class="cov0" title="0">{
-                log.Printf("[order_service] Invalid order state: %v", order.State)
-                return appErr.ErrOrderState
-        }</span>
-
-        <span class="cov8" title="1">err = s.stockService.ReserveCancel(ctx, order.Items)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error cancelling stock reservation: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">order.State = model.CANCELLED
-        err = s.repository.UpdateOrder(ctx, order)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[order_service] Error updating order state: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">return nil</span>
-}
-</pre>
-		
-		<pre class="file" id="file14" style="display: none">package stockservice
-
-import (
-        "context"
-        "fmt"
-        "log"
-        appErr "route256/loms/internal/errors"
-        "route256/loms/internal/model"
-        "route256/loms/internal/repository/stockrepository"
-        "route256/loms/internal/service/orderservice"
-)
-
-var _ orderservice.StockService = (*Service)(nil)
-var _ Repository = (*stockrepository.Repository)(nil)
-
-type Repository interface {
-        GetStock(ctx context.Context, sku model.SKUType) (*model.Stock, error)
-        UpdateStock(ctx context.Context, items map[model.SKUType]*model.Stock) error
-}
-
-type Service struct {
-        repository Repository
-}
-
-func NewService(repository Repository) *Service <span class="cov8" title="1">{
-        return &amp;Service{repository: repository}
-}</span>
-
-func (s *Service) Reserve(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
-        itemMap := makeSkuCountMap(items)
-
-        var updateStocks = make(map[model.SKUType]*model.Stock)
-
-        for sku, needToReserveCount := range itemMap </span><span class="cov8" title="1">{
-                stock, err := s.repository.GetStock(ctx, sku)
-                if err != nil </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
-                        return err
-                }</span>
-                <span class="cov8" title="1">availableCount := stock.TotalCount - stock.ReservedCount
-                if availableCount &lt; needToReserveCount </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Not enough stock for SKU %v: requested %v, available %v", sku, needToReserveCount, availableCount)
-                        return fmt.Errorf("not enough stock for SKU %v: %w", sku, appErr.ErrStockInsufficient)
-                }</span>
-
-                <span class="cov8" title="1">stock.ReservedCount += needToReserveCount
-                updateStocks[sku] = stock</span>
-        }
-
-        <span class="cov8" title="1">err := s.repository.UpdateStock(ctx, updateStocks)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[stock_service] Error updating stock: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">return nil</span>
-}
-
-func (s *Service) ReserveRemove(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
-        itemMap := makeSkuCountMap(items)
-
-        var updateStocks = make(map[model.SKUType]*model.Stock)
-
-        for sku, totalCount := range itemMap </span><span class="cov8" title="1">{
-                stock, err := s.repository.GetStock(ctx, sku)
-                if err != nil </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
-                        return err
-                }</span>
-                <span class="cov8" title="1">if stock.ReservedCount &lt; totalCount </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Reserved count less than requested for SKU %v: requested %v, reserved %v", sku, totalCount, stock.ReservedCount)
-                        return appErr.ErrNegativeReserved
-                }</span>
-                <span class="cov8" title="1">if stock.TotalCount &lt; totalCount </span><span class="cov0" title="0">{
-                        log.Printf("[stock_service] Total count less than requested for SKU %v: requested %v, total %v", sku, totalCount, stock.TotalCount)
-                        return appErr.ErrStockInsufficient
-                }</span>
-
-                <span class="cov8" title="1">stock.ReservedCount -= totalCount
-                stock.TotalCount -= totalCount
-
-                updateStocks[sku] = stock</span>
-        }
-        <span class="cov8" title="1">err := s.repository.UpdateStock(ctx, updateStocks)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[stock_service] Error updating stock: %v", err)
-                return err
-        }</span>
-
-        <span class="cov8" title="1">return nil</span>
-}
-
-func (s *Service) ReserveCancel(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
-        itemMap := makeSkuCountMap(items)
-
-        var updateStocks = make(map[model.SKUType]*model.Stock)
-
-        for sku, totalCount := range itemMap </span><span class="cov8" title="1">{
-                stock, err := s.repository.GetStock(ctx, sku)
-                if err != nil </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
-                        return err
-                }</span>
-                <span class="cov8" title="1">if stock.ReservedCount &lt; totalCount </span><span class="cov8" title="1">{
-                        log.Printf("[stock_service] Reserved count less than requested for SKU %v: requested %v, reserved %v", sku, totalCount, stock.ReservedCount)
-                        return appErr.ErrNegativeReserved
-                }</span>
-
-                <span class="cov8" title="1">stock.ReservedCount -= totalCount
-
-                updateStocks[sku] = stock</span>
-        }
-        <span class="cov8" title="1">err := s.repository.UpdateStock(ctx, updateStocks)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[stock_service] Error updating stock: %v", err)
-                return err
-        }</span>
-        <span class="cov8" title="1">return nil</span>
-}
-
-func (s *Service) GetBySKUAvailableCount(ctx context.Context, sku model.SKUType) (uint64, error) <span class="cov8" title="1">{
-        stock, err := s.repository.GetStock(ctx, sku)
-        if err != nil </span><span class="cov8" title="1">{
-                log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
-                return 0, err
-        }</span>
-        <span class="cov8" title="1">if stock.TotalCount &lt; stock.ReservedCount </span><span class="cov8" title="1">{
-                log.Printf("[stock_service] Total count less than reserved for SKU %v: total %v, reserved %v", sku, stock.TotalCount, stock.ReservedCount)
-                return 0, appErr.ErrNegativeAvailable
-        }</span>
-        <span class="cov8" title="1">availableCount := stock.TotalCount - stock.ReservedCount
-
-        return uint64(availableCount), nil</span>
-}
-
-func makeSkuCountMap(items []*model.Item) map[model.SKUType]uint32 <span class="cov8" title="1">{
-        itemMap := make(map[model.SKUType]uint32)
-        for _, item := range items </span><span class="cov8" title="1">{
-                itemMap[item.SKU] += item.Count
-        }</span>
-        <span class="cov8" title="1">return itemMap</span>
-}
-</pre>
-		
-		<pre class="file" id="file15" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file6" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.28.1
 //         protoc        v3.14.0
@@ -1495,10 +1057,10 @@ var file_loms_proto_rawDesc = []byte{
         0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
         0x22, 0x9d, 0x01, 0x0a, 0x05, 0x4f, 0x72, 0x64, 0x65, 0x72, 0x12, 0x50, 0x0a, 0x06, 0x73, 0x74,
         0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x38, 0xfa, 0x42, 0x35, 0x72,
-        0x33, 0x52, 0x00, 0x52, 0x03, 0x6e, 0x65, 0x77, 0x52, 0x10, 0x61, 0x77, 0x61, 0x69, 0x74, 0x69,
-        0x6e, 0x67, 0x20, 0x70, 0x61, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x06, 0x66, 0x61, 0x69, 0x6c,
-        0x65, 0x64, 0x52, 0x05, 0x70, 0x61, 0x79, 0x65, 0x64, 0x52, 0x09, 0x63, 0x61, 0x6e, 0x63, 0x65,
-        0x6c, 0x6c, 0x65, 0x64, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x1b, 0x0a, 0x04,
+        0x33, 0x52, 0x00, 0x52, 0x03, 0x4e, 0x45, 0x57, 0x52, 0x10, 0x41, 0x57, 0x41, 0x49, 0x54, 0x49,
+        0x4e, 0x47, 0x5f, 0x50, 0x41, 0x59, 0x4d, 0x45, 0x4e, 0x54, 0x52, 0x06, 0x46, 0x41, 0x49, 0x4c,
+        0x45, 0x44, 0x52, 0x05, 0x50, 0x41, 0x59, 0x45, 0x44, 0x52, 0x09, 0x43, 0x41, 0x4e, 0x43, 0x45,
+        0x4c, 0x4c, 0x45, 0x44, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x1b, 0x0a, 0x04,
         0x75, 0x73, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x42, 0x07, 0xfa, 0x42, 0x04, 0x22,
         0x02, 0x20, 0x00, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x25, 0x0a, 0x05, 0x69, 0x74, 0x65,
         0x6d, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x05, 0x2e, 0x49, 0x74, 0x65, 0x6d, 0x42,
@@ -1764,7 +1326,7 @@ func file_loms_proto_init() <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">// Code generated by protoc-gen-grpc-gateway. DO NOT EDIT.
+		<pre class="file" id="file7" style="display: none">// Code generated by protoc-gen-grpc-gateway. DO NOT EDIT.
 // source: loms.proto
 
 /*
@@ -2357,7 +1919,7 @@ var (
 )
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">// Code generated by protoc-gen-validate. DO NOT EDIT.
+		<pre class="file" id="file8" style="display: none">// Code generated by protoc-gen-validate. DO NOT EDIT.
 // source: loms.proto
 
 package loms
@@ -2418,7 +1980,7 @@ func (m *Order) validate(all bool) error <span class="cov0" title="0">{
         if _, ok := _Order_Status_InLookup[m.GetStatus()]; !ok </span><span class="cov0" title="0">{
                 err := OrderValidationError{
                         field:  "Status",
-                        reason: "value must be in list [ new awaiting payment failed payed cancelled]",
+                        reason: "value must be in list [ NEW AWAITING_PAYMENT FAILED PAYED CANCELLED]",
                 }
                 if !all </span><span class="cov0" title="0">{
                         return err
@@ -2561,11 +2123,11 @@ var _ interface {
 
 var _Order_Status_InLookup = map[string]struct{}{
         "":                 {},
-        "new":              {},
-        "awaiting payment": {},
-        "failed":           {},
-        "payed":            {},
-        "cancelled":        {},
+        "NEW":              {},
+        "AWAITING_PAYMENT": {},
+        "FAILED":           {},
+        "PAYED":            {},
+        "CANCELLED":        {},
 }
 
 // Validate checks the field values on Item with the rules defined in the proto
@@ -3607,7 +3169,7 @@ var _ interface {
 } = StocksInfoResponseValidationError{}
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">// Code generated by protoc-gen-go-grpc. DO NOT EDIT.
+		<pre class="file" id="file9" style="display: none">// Code generated by protoc-gen-go-grpc. DO NOT EDIT.
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.14.0
@@ -3869,7 +3431,1088 @@ var Loms_ServiceDesc = grpc.ServiceDesc{
 }
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file10" style="display: none">package model
+
+import (
+        "fmt"
+        "strings"
+)
+
+type StateType string
+
+const (
+        NEW              StateType = "NEW"
+        AWAITING_PAYMENT           = "AWAITING_PAYMENT"
+        FAILED                     = "FAILED"
+        PAYED                      = "PAYED"
+        CANCELLED                  = "CANCELLED"
+)
+
+type Order struct {
+        ID     int64
+        state  StateType
+        Items  []*Item
+        UserId int64
+}
+
+func (order *Order) SetState(state StateType) error <span class="cov8" title="1">{
+        availableStates := map[StateType]struct{}{
+                NEW:              {},
+                AWAITING_PAYMENT: {},
+                FAILED:           {},
+                PAYED:            {},
+                CANCELLED:        {},
+        }
+        state = StateType(strings.ToUpper(string(state)))
+        if _, ok := availableStates[state]; !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid state: %s", state)
+        }</span>
+        <span class="cov8" title="1">order.state = state
+        return nil</span>
+}
+
+func (order *Order) State() StateType <span class="cov8" title="1">{
+        return order.state
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package grpc
+
+import (
+        "net/http"
+)
+
+var SwaggerUrlForCors string
+
+func WithCorsCheckHttpHandler(next http.Handler) http.Handler <span class="cov8" title="1">{
+        fn := func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                w.Header().Set("Access-Control-Allow-Origin", SwaggerUrlForCors)
+                w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+                w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+                if r.Method == "OPTIONS" </span><span class="cov0" title="0">{
+                        w.WriteHeader(http.StatusOK)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">next.ServeHTTP(w, r)</span>
+        }
+
+        <span class="cov8" title="1">return http.HandlerFunc(fn)</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package grpc
+
+import (
+        "context"
+        "google.golang.org/grpc"
+        "google.golang.org/protobuf/encoding/protojson"
+        "google.golang.org/protobuf/proto"
+        "log"
+)
+
+func LoggingUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) <span class="cov0" title="0">{
+        raw, _ := protojson.Marshal((req).(proto.Message)) // для превращения protbuf структур в json используем google.golang.org/protobuf/encoding/protojson пакет а не encoding/json
+        log.Printf("request: method: %v, req: %v\n", info.FullMethod, string(raw))
+
+        if resp, err = handler(ctx, req); err != nil </span><span class="cov0" title="0">{
+                log.Printf("response: method: %v, err: %v\n", info.FullMethod, err)
+                return
+        }</span>
+
+        <span class="cov0" title="0">rawResp, _ := protojson.Marshal((resp).(proto.Message))
+        log.Printf("response: method: %v, resp: %v\n", info.FullMethod, string(rawResp))
+
+        return</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package grpc
+
+import (
+        "context"
+        "google.golang.org/grpc"
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+        "log"
+)
+
+func PanicUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) <span class="cov0" title="0">{
+        defer func() </span><span class="cov0" title="0">{
+                if e := recover(); e != nil </span><span class="cov0" title="0">{
+                        log.Printf("panic: %v\n", e)
+                        err = status.Errorf(codes.Internal, "panic: %v", e)
+                }</span>
+        }()
+        <span class="cov0" title="0">resp, err = handler(ctx, req)
+        return resp, err</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package grpc
+
+import (
+        "context"
+        "google.golang.org/grpc"
+        "google.golang.org/grpc/codes"
+        "google.golang.org/grpc/status"
+)
+
+func ValidateUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) <span class="cov0" title="0">{
+        if v, ok := req.(interface{ Validate() error }); ok </span><span class="cov0" title="0">{
+                if err := v.Validate(); err != nil </span><span class="cov0" title="0">{
+                        return nil, status.Error(codes.InvalidArgument, err.Error())
+                }</span>
+        }
+        <span class="cov0" title="0">return handler(ctx, req)</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package http
+
+import (
+        "log"
+        "net/http"
+)
+
+func WithHTTPLoggingMiddleware(next http.Handler) http.Handler <span class="cov8" title="1">{
+        fn := func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                log.Println(r.Method)
+                next.ServeHTTP(w, r)
+        }</span>
+
+        <span class="cov8" title="1">return http.HandlerFunc(fn)</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.27.0
+
+package orderrepository
+
+import (
+        "context"
+
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgconn"
+)
+
+type DBTX interface {
+        Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
+        Query(context.Context, string, ...interface{}) (pgx.Rows, error)
+        QueryRow(context.Context, string, ...interface{}) pgx.Row
+}
+
+func New(db DBTX) *Queries <span class="cov8" title="1">{
+        return &amp;Queries{db: db}
+}</span>
+
+type Queries struct {
+        db DBTX
+}
+
+func (q *Queries) WithTx(tx pgx.Tx) *Queries <span class="cov0" title="0">{
+        return &amp;Queries{
+                db: tx,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.27.0
+
+package orderrepository
+
+import (
+        "database/sql/driver"
+        "fmt"
+)
+
+type OrderStatus string
+
+const (
+        OrderStatusNEW             OrderStatus = "NEW"
+        OrderStatusAWAITINGPAYMENT OrderStatus = "AWAITING PAYMENT"
+        OrderStatusFAILED          OrderStatus = "FAILED"
+        OrderStatusPAYED           OrderStatus = "PAYED"
+        OrderStatusCANCELLED       OrderStatus = "CANCELLED"
+)
+
+func (e *OrderStatus) Scan(src interface{}) error <span class="cov0" title="0">{
+        switch s := src.(type) </span>{
+        case []byte:<span class="cov0" title="0">
+                *e = OrderStatus(s)</span>
+        case string:<span class="cov0" title="0">
+                *e = OrderStatus(s)</span>
+        default:<span class="cov0" title="0">
+                return fmt.Errorf("unsupported scan type for OrderStatus: %T", src)</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+type NullOrderStatus struct {
+        OrderStatus OrderStatus
+        Valid       bool // Valid is true if OrderStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullOrderStatus) Scan(value interface{}) error <span class="cov0" title="0">{
+        if value == nil </span><span class="cov0" title="0">{
+                ns.OrderStatus, ns.Valid = "", false
+                return nil
+        }</span>
+        <span class="cov0" title="0">ns.Valid = true
+        return ns.OrderStatus.Scan(value)</span>
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullOrderStatus) Value() (driver.Value, error) <span class="cov0" title="0">{
+        if !ns.Valid </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov0" title="0">return string(ns.OrderStatus), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package orderrepository
+
+import (
+        "context"
+        "errors"
+        "fmt"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "go.uber.org/multierr"
+        appErr "route256/loms/internal/errors"
+        "route256/loms/internal/model"
+        "route256/loms/internal/repository"
+)
+
+type Repository struct {
+        q    *Queries
+        pool *pgxpool.Pool
+}
+
+func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">{
+        return &amp;Repository{
+                q:    New(pool),
+                pool: pool,
+        }
+}</span>
+
+func (r *Repository) SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error) <span class="cov0" title="0">{
+        conn, err := r.pool.Acquire(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to acquire a connection: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer conn.Release()
+        err = pgx.BeginFunc(ctx, conn, func(tx pgx.Tx) error </span><span class="cov0" title="0">{
+                orderID, err := r.q.SaveOrder(ctx, &amp;SaveOrderParams{
+                        State:  OrderStatus(order.State()),
+                        UserID: order.UserId,
+                })
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">err = r.q.SaveItems(ctx, repackItemsToSaveItemParams(order.Items, orderID))
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">order.ID = orderID
+                return nil</span>
+        })
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to save order: %w", err)
+        }</span>
+        <span class="cov0" title="0">return order, nil</span>
+}
+
+func (r *Repository) UpdateOrder(ctx context.Context, order *model.Order) error <span class="cov0" title="0">{
+        conn, err := r.pool.Acquire(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("unable to acquire a connection: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer conn.Release()
+        _, err = r.q.UpdateOrder(ctx, &amp;UpdateOrderParams{
+                UserID:  order.UserId,
+                State:   OrderStatus(order.State()),
+                OrderID: order.ID,
+        })
+        if err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, pgx.ErrNoRows) </span><span class="cov0" title="0">{
+                        return fmt.Errorf("order with ID %v: %w", order.ID, appErr.ErrNotFound)
+                }</span>
+                <span class="cov0" title="0">return fmt.Errorf("unable to update order: %w", err)</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (r *Repository) GetById(_ context.Context, orderID int64) (*model.Order, error) <span class="cov0" title="0">{
+        conn, err := r.pool.Acquire(context.Background())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to acquire a connection: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer conn.Release()
+        orderFromDB, err := r.q.GetOrderById(context.Background(), orderID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to get order by ID: %w", err)
+        }</span>
+        <span class="cov0" title="0">order, err := repackOrderFromDBToOrder(orderFromDB)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to repack order from DB: %w", err)
+        }</span>
+        <span class="cov0" title="0">return order, nil</span>
+}
+
+func repackOrderFromDBToOrder(orderFromDB []*GetOrderByIdRow) (*model.Order, error) <span class="cov0" title="0">{
+        if len(orderFromDB) == 0 </span><span class="cov0" title="0">{
+                return nil, appErr.ErrNotFound
+        }</span>
+
+        <span class="cov0" title="0">order := &amp;model.Order{
+                ID:     orderFromDB[0].ID,
+                UserId: orderFromDB[0].UserID,
+        }
+        err := order.SetState(model.StateType(orderFromDB[0].State))
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">items := make([]*model.Item, 0, len(orderFromDB))
+        for _, item := range orderFromDB </span><span class="cov0" title="0">{
+                var resultError error
+                safeSku, err := repository.SafeInt64ToUint32(item.Sku)
+                resultError = multierr.Append(resultError, err)
+                safeCount, err := repository.SafeInt64ToUint32(item.Count)
+                resultError = multierr.Append(resultError, err)
+                if resultError != nil </span><span class="cov0" title="0">{
+                        return nil, resultError
+                }</span>
+                <span class="cov0" title="0">items = append(items, &amp;model.Item{
+                        SKU:   model.SKUType(safeSku),
+                        Count: safeCount,
+                })</span>
+        }
+        <span class="cov0" title="0">order.Items = items
+        return order, nil</span>
+}
+
+func repackItemsToSaveItemParams(items []*model.Item, orderID int64) *SaveItemsParams <span class="cov0" title="0">{
+        skus := make([]int64, 0, len(items))
+        counts := make([]int64, 0, len(items))
+        for _, item := range items </span><span class="cov0" title="0">{
+                //unsafe conversion
+                skus = append(skus, int64(item.SKU))
+                counts = append(counts, int64(item.Count))
+        }</span>
+        <span class="cov0" title="0">return &amp;SaveItemsParams{
+                Skus:    skus,
+                Counts:  counts,
+                OrderID: orderID,
+        }</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.27.0
+// source: query.sql
+
+package orderrepository
+
+import (
+        "context"
+)
+
+const getOrderById = `-- name: GetOrderById :many
+SELECT orders.id,
+       orders.state,
+       orders.user_id,
+       i.sku,
+       i.count
+FROM orders
+JOIN items i on orders.id = i.order_id
+WHERE orders.id = $1
+`
+
+type GetOrderByIdRow struct {
+        ID     int64
+        State  OrderStatus
+        UserID int64
+        Sku    int64
+        Count  int64
+}
+
+func (q *Queries) GetOrderById(ctx context.Context, orderID int64) ([]*GetOrderByIdRow, error) <span class="cov0" title="0">{
+        rows, err := q.db.Query(ctx, getOrderById, orderID)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+        var items []*GetOrderByIdRow
+        for rows.Next() </span><span class="cov0" title="0">{
+                var i GetOrderByIdRow
+                if err := rows.Scan(
+                        &amp;i.ID,
+                        &amp;i.State,
+                        &amp;i.UserID,
+                        &amp;i.Sku,
+                        &amp;i.Count,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">items = append(items, &amp;i)</span>
+        }
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return items, nil</span>
+}
+
+const saveItems = `-- name: SaveItems :exec
+INSERT INTO items (sku, count, order_id)
+SELECT unnest($1::bigint[]), unnest($2::bigint[]), $3
+`
+
+type SaveItemsParams struct {
+        Skus    []int64
+        Counts  []int64
+        OrderID int64
+}
+
+func (q *Queries) SaveItems(ctx context.Context, arg *SaveItemsParams) error <span class="cov0" title="0">{
+        _, err := q.db.Exec(ctx, saveItems, arg.Skus, arg.Counts, arg.OrderID)
+        return err
+}</span>
+
+const saveOrder = `-- name: SaveOrder :one
+INSERT INTO orders (state, user_id)
+VALUES ($1, $2)
+RETURNING id
+`
+
+type SaveOrderParams struct {
+        State  OrderStatus
+        UserID int64
+}
+
+func (q *Queries) SaveOrder(ctx context.Context, arg *SaveOrderParams) (int64, error) <span class="cov0" title="0">{
+        row := q.db.QueryRow(ctx, saveOrder, arg.State, arg.UserID)
+        var id int64
+        err := row.Scan(&amp;id)
+        return id, err
+}</span>
+
+const updateOrder = `-- name: UpdateOrder :one
+UPDATE orders
+SET state   = $1,
+    user_id = $2
+WHERE id = $3
+RETURNING id
+`
+
+type UpdateOrderParams struct {
+        State   OrderStatus
+        UserID  int64
+        OrderID int64
+}
+
+func (q *Queries) UpdateOrder(ctx context.Context, arg *UpdateOrderParams) (int64, error) <span class="cov0" title="0">{
+        row := q.db.QueryRow(ctx, updateOrder, arg.State, arg.UserID, arg.OrderID)
+        var id int64
+        err := row.Scan(&amp;id)
+        return id, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.27.0
+
+package stockrepository
+
+import (
+        "context"
+
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgconn"
+)
+
+type DBTX interface {
+        Exec(context.Context, string, ...interface{}) (pgconn.CommandTag, error)
+        Query(context.Context, string, ...interface{}) (pgx.Rows, error)
+        QueryRow(context.Context, string, ...interface{}) pgx.Row
+}
+
+func New(db DBTX) *Queries <span class="cov8" title="1">{
+        return &amp;Queries{db: db}
+}</span>
+
+type Queries struct {
+        db DBTX
+}
+
+func (q *Queries) WithTx(tx pgx.Tx) *Queries <span class="cov0" title="0">{
+        return &amp;Queries{
+                db: tx,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.27.0
+// source: query.sql
+
+package stockrepository
+
+import (
+        "context"
+)
+
+const getStockBySkus = `-- name: GetStockBySkus :many
+SELECT sku,
+       total_count,
+       reserved_count
+FROM stock
+WHERE sku IN ($1 :: bigint[])
+`
+
+func (q *Queries) GetStockBySkus(ctx context.Context, skus []int64) ([]*Stock, error) <span class="cov0" title="0">{
+        rows, err := q.db.Query(ctx, getStockBySkus, skus)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+        var items []*Stock
+        for rows.Next() </span><span class="cov0" title="0">{
+                var i Stock
+                if err := rows.Scan(&amp;i.Sku, &amp;i.TotalCount, &amp;i.ReservedCount); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">items = append(items, &amp;i)</span>
+        }
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return items, nil</span>
+}
+
+const updateStockInfo = `-- name: UpdateStockInfo :exec
+UPDATE stock
+SET total_count    = data.total_count,
+    reserved_count = data.reserved_count
+FROM (SELECT unnest($1::bigint[])             AS sku,
+             unnest($2::bigint[])     AS total_count,
+             unnest($3:: bigint[]) AS reserved_count) AS data
+WHERE stock.sku = data.sku
+`
+
+type UpdateStockInfoParams struct {
+        Skus           []int64
+        TotalCounts    []int64
+        ReservedCounts []int64
+}
+
+func (q *Queries) UpdateStockInfo(ctx context.Context, arg *UpdateStockInfoParams) error <span class="cov0" title="0">{
+        _, err := q.db.Exec(ctx, updateStockInfo, arg.Skus, arg.TotalCounts, arg.ReservedCounts)
+        return err
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package stockrepository
+
+import (
+        "context"
+        "fmt"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgxpool"
+        "go.uber.org/multierr"
+        "route256/loms/internal/model"
+        "route256/loms/internal/repository"
+)
+
+type Repository struct {
+        q    *Queries
+        pool *pgxpool.Pool
+}
+
+func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">{
+        return &amp;Repository{
+                q:    New(pool),
+                pool: pool,
+        }
+}</span>
+
+func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks []*model.Stock, err error) <span class="cov0" title="0">{
+        conn, err := r.pool.Acquire(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("unable to acquire a connection: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer conn.Release()
+        intSku := make([]int64, 0, len(sku))
+        for _, s := range sku </span><span class="cov0" title="0">{
+                intSku = append(intSku, int64(s))
+        }</span>
+        <span class="cov0" title="0">repositoryStocks, err := r.q.GetStockBySkus(ctx, intSku)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">if len(repositoryStocks) != len(sku) </span><span class="cov0" title="0">{
+                unfindedSku := make([]model.SKUType, 0)
+                for _, s := range sku </span><span class="cov0" title="0">{
+                        find := false
+                        for _, rs := range repositoryStocks </span><span class="cov0" title="0">{
+                                if int64(s) == rs.Sku </span><span class="cov0" title="0">{
+                                        find = true
+                                        break</span>
+                                }
+                        }
+                        <span class="cov0" title="0">if !find </span><span class="cov0" title="0">{
+                                unfindedSku = append(unfindedSku, s)
+                        }</span>
+                }
+                <span class="cov0" title="0">return nil, fmt.Errorf("sku %v in database not found", unfindedSku)</span>
+        }
+        <span class="cov0" title="0">stocks, err = repackRepositoryStockToModelStock(repositoryStocks)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return stocks, nil</span>
+}
+
+func (r *Repository) UpdateStock(ctx context.Context, stocks map[model.SKUType]*model.Stock) error <span class="cov0" title="0">{
+        conn, err := r.pool.Acquire(ctx)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("unable to acquire a connection: %w", err)
+        }</span>
+        <span class="cov0" title="0">defer conn.Release()
+        err = pgx.BeginFunc(ctx, conn, func(tx pgx.Tx) (err error) </span><span class="cov0" title="0">{
+                updateParamStock := repackStocksMapToUpdateStockParam(stocks)
+                result, err := r.q.db.Exec(ctx, updateStockInfo, updateParamStock.Skus,
+                        updateParamStock.TotalCounts,
+                        updateParamStock.ReservedCounts)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">if result.RowsAffected() != int64(len(stocks)) </span><span class="cov0" title="0">{
+                        return fmt.Errorf("expected %v rows affected, got %v", len(stocks), result.RowsAffected())
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        })
+        <span class="cov0" title="0">return err</span>
+}
+
+func repackStocksMapToUpdateStockParam(stocks map[model.SKUType]*model.Stock) *UpdateStockInfoParams <span class="cov0" title="0">{
+        skus := make([]int64, 0, len(stocks))
+        totalCounts := make([]int64, 0, len(stocks))
+        reservedCounts := make([]int64, 0, len(stocks))
+        //safe cast uint32 to int64
+        for _, stock := range stocks </span><span class="cov0" title="0">{
+                skus = append(skus, int64(stock.SKU))
+                totalCounts = append(totalCounts, int64(stock.TotalCount))
+                reservedCounts = append(reservedCounts, int64(stock.ReservedCount))
+        }</span>
+        <span class="cov0" title="0">return &amp;UpdateStockInfoParams{
+                Skus:           skus,
+                TotalCounts:    totalCounts,
+                ReservedCounts: reservedCounts,
+        }</span>
+
+}
+func repackRepositoryStockToModelStock(stocksFromDB []*Stock) ([]*model.Stock, error) <span class="cov0" title="0">{
+        var stocks []*model.Stock
+        for _, s := range stocksFromDB </span><span class="cov0" title="0">{
+                var resultErr error
+                safeSku, err := repository.SafeInt64ToUint32(s.Sku)
+                resultErr = multierr.Append(resultErr, err)
+                safeTotalCount, err := repository.SafeInt64ToUint32(s.TotalCount)
+                resultErr = multierr.Append(resultErr, err)
+                safeReservedCount, err := repository.SafeInt64ToUint32(s.ReservedCount)
+                resultErr = multierr.Append(resultErr, err)
+                if resultErr != nil </span><span class="cov0" title="0">{
+                        return nil, resultErr
+                }</span>
+                <span class="cov0" title="0">stocks = append(stocks, &amp;model.Stock{
+                        SKU:           model.SKUType(safeSku),
+                        TotalCount:    safeTotalCount,
+                        ReservedCount: safeReservedCount,
+                })</span>
+        }
+        <span class="cov0" title="0">return stocks, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package repository
+
+import (
+        "fmt"
+        "math"
+)
+
+func SafeInt64ToUint32(value int64) (uint32, error) <span class="cov0" title="0">{
+        if value &lt; 0 || value &gt; math.MaxUint32 </span><span class="cov0" title="0">{
+                return 0, fmt.Errorf("value %d is out of uint32 range", value)
+        }</span>
+        <span class="cov0" title="0">return uint32(value), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package orderrepository
+
+import (
+        "context"
+        "fmt"
+        "sync"
+
+        appErr "route256/loms/internal/errors"
+        "route256/loms/internal/model"
+)
+
+type Repository struct {
+        orders map[int64]model.Order
+        mx     sync.Mutex
+}
+
+func NewRepository() *Repository <span class="cov0" title="0">{
+        return &amp;Repository{orders: make(map[int64]model.Order)}
+}</span>
+
+func (r *Repository) SaveOrder(_ context.Context, order *model.Order) (*model.Order, error) <span class="cov0" title="0">{
+        r.mx.Lock()
+        defer r.mx.Unlock()
+
+        order.ID = int64(len(r.orders) + 1)
+        r.orders[order.ID] = *order
+        return order, nil
+}</span>
+
+func (r *Repository) UpdateOrder(_ context.Context, order *model.Order) error <span class="cov0" title="0">{
+        r.mx.Lock()
+        defer r.mx.Unlock()
+
+        _, ok := r.orders[order.ID]
+        if !ok </span><span class="cov0" title="0">{
+                return fmt.Errorf("order with ID %v: %w", order.ID, appErr.ErrNotFound)
+        }</span>
+        <span class="cov0" title="0">r.orders[order.ID] = *order
+        return nil</span>
+}
+
+func (r *Repository) GetById(_ context.Context, orderID int64) (*model.Order, error) <span class="cov0" title="0">{
+        r.mx.Lock()
+        defer r.mx.Unlock()
+
+        order, ok := r.orders[orderID]
+        if ok </span><span class="cov0" title="0">{
+                return &amp;order, nil
+        }</span>
+        <span class="cov0" title="0">return nil, fmt.Errorf("order with ID %v: %w", orderID, appErr.ErrNotFound)</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package stockrepository
+
+import (
+        "context"
+        "fmt"
+        "sync"
+
+        appErr "route256/loms/internal/errors"
+        "route256/loms/internal/model"
+)
+
+type Repository struct {
+        stocks map[model.SKUType]model.Stock
+        mx     sync.Mutex
+}
+
+func NewRepository(stocks map[model.SKUType]model.Stock) *Repository <span class="cov0" title="0">{
+        return &amp;Repository{
+                stocks: stocks,
+        }
+}</span>
+
+func (r *Repository) GetStocks(_ context.Context, sku model.SKUType) (*model.Stock, error) <span class="cov0" title="0">{
+        r.mx.Lock()
+        defer r.mx.Unlock()
+
+        stock, found := r.stocks[sku]
+        if !found </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
+        }</span>
+        <span class="cov0" title="0">return &amp;stock, nil</span>
+}
+
+func (r *Repository) UpdateStock(_ context.Context, stocks map[model.SKUType]*model.Stock) error <span class="cov0" title="0">{
+        r.mx.Lock()
+        defer r.mx.Unlock()
+
+        for sku, updateStock := range stocks </span><span class="cov0" title="0">{
+                stock, found := r.stocks[sku]
+                if !found </span><span class="cov0" title="0">{
+                        return fmt.Errorf("stock with SKU %v: %w", sku, appErr.ErrNotFound)
+                }</span>
+                <span class="cov0" title="0">stock.TotalCount = updateStock.TotalCount
+                stock.ReservedCount = updateStock.ReservedCount
+                r.stocks[sku] = stock</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package orderservice
+
+import (
+        "context"
+        "log"
+        appErr "route256/loms/internal/errors"
+        "route256/loms/internal/model"
+        "route256/loms/internal/repository/orderrepository"
+)
+
+var _ Repository = (*orderrepository.Repository)(nil)
+
+type Repository interface {
+        SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error)
+        UpdateOrder(ctx context.Context, order *model.Order) error
+        GetById(ctx context.Context, orderID int64) (*model.Order, error)
+}
+
+type StockService interface {
+        Reserve(ctx context.Context, items []*model.Item) error
+        ReserveRemove(ctx context.Context, items []*model.Item) error
+        ReserveCancel(ctx context.Context, items []*model.Item) error
+}
+
+type Service struct {
+        repository   Repository
+        stockService StockService
+}
+
+func NewService(repository Repository, stockService StockService) *Service <span class="cov8" title="1">{
+        return &amp;Service{repository: repository, stockService: stockService}
+}</span>
+
+func (s *Service) Create(ctx context.Context, order *model.Order) (orderID int64, err error) <span class="cov8" title="1">{
+        _ = order.SetState(model.NEW)
+
+        order, err = s.repository.SaveOrder(ctx, order)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error saving order: %v", err)
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">err = s.stockService.Reserve(ctx, order.Items)
+        if err != nil </span><span class="cov8" title="1">{
+                _ = order.SetState(model.FAILED)
+                if updateErr := s.repository.UpdateOrder(ctx, order); updateErr != nil </span><span class="cov0" title="0">{
+                        log.Printf("[order_service] Error updating order state: %v", updateErr)
+                        return 0, updateErr
+                }</span>
+                <span class="cov8" title="1">log.Printf("[order_service] Error reserving stock: %v", err)
+                return 0, err</span>
+        }
+
+        <span class="cov8" title="1">_ = order.SetState(model.AWAITING_PAYMENT)
+        err = s.repository.UpdateOrder(ctx, order)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error updating order state: %v", err)
+                return 0, err
+        }</span>
+
+        <span class="cov8" title="1">return order.ID, nil</span>
+}
+
+func (s *Service) GetById(ctx context.Context, orderID int64) (*model.Order, error) <span class="cov8" title="1">{
+        order, err := s.repository.GetById(ctx, orderID)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error getting order: %v", err)
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return order, nil</span>
+}
+
+func (s *Service) OrderPay(ctx context.Context, orderID int64) error <span class="cov8" title="1">{
+        order, err := s.repository.GetById(ctx, orderID)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error getting order: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if order.State() != model.AWAITING_PAYMENT </span><span class="cov0" title="0">{
+                log.Printf("[order_service] Invalid order state: %v", order.State())
+                return appErr.ErrOrderState
+        }</span>
+
+        <span class="cov8" title="1">err = s.stockService.ReserveRemove(ctx, order.Items)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error removing stock reservation: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">_ = order.SetState(model.PAYED)
+        err = s.repository.UpdateOrder(ctx, order)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error updating order state: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (s *Service) OrderCancel(ctx context.Context, orderID int64) error <span class="cov8" title="1">{
+        order, err := s.repository.GetById(ctx, orderID)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error getting order: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if order.State() != model.AWAITING_PAYMENT </span><span class="cov0" title="0">{
+                log.Printf("[order_service] Invalid order state: %v", order.State())
+                return appErr.ErrOrderState
+        }</span>
+
+        <span class="cov8" title="1">err = s.stockService.ReserveCancel(ctx, order.Items)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error cancelling stock reservation: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">_ = order.SetState(model.CANCELLED)
+        err = s.repository.UpdateOrder(ctx, order)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[order_service] Error updating order state: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file27" style="display: none">package stockservice
+
+import (
+        "context"
+        "fmt"
+        "log"
+        appErr "route256/loms/internal/errors"
+        "route256/loms/internal/model"
+        "route256/loms/internal/repository/stockrepository"
+        "route256/loms/internal/service/orderservice"
+)
+
+var _ orderservice.StockService = (*Service)(nil)
+var _ Repository = (*stockrepository.Repository)(nil)
+
+type Repository interface {
+        GetStocks(ctx context.Context, sku []model.SKUType) ([]*model.Stock, error)
+        UpdateStock(ctx context.Context, items map[model.SKUType]*model.Stock) error
+}
+
+type Service struct {
+        repository Repository
+}
+
+func NewService(repository Repository) *Service <span class="cov8" title="1">{
+        return &amp;Service{repository: repository}
+}</span>
+
+func (s *Service) Reserve(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
+        return s.processItems(ctx, items, func(stock *model.Stock, neededCount uint32) error </span><span class="cov8" title="1">{
+                availableCount := stock.TotalCount - stock.ReservedCount
+                if availableCount &lt; neededCount </span><span class="cov8" title="1">{
+                        return fmt.Errorf("not enough stock for SKU %v: %w", stock.SKU, appErr.ErrStockInsufficient)
+                }</span>
+                <span class="cov8" title="1">stock.ReservedCount += neededCount
+                return nil</span>
+        })
+}
+
+func (s *Service) ReserveRemove(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
+        return s.processItems(ctx, items, func(stock *model.Stock, neededCount uint32) error </span><span class="cov8" title="1">{
+                if stock.ReservedCount &lt; neededCount </span><span class="cov8" title="1">{
+                        return appErr.ErrNegativeReserved
+                }</span>
+                <span class="cov8" title="1">if stock.TotalCount &lt; neededCount </span><span class="cov0" title="0">{
+                        return appErr.ErrStockInsufficient
+                }</span>
+                <span class="cov8" title="1">stock.ReservedCount -= neededCount
+                stock.TotalCount -= neededCount
+                return nil</span>
+        })
+}
+
+func (s *Service) ReserveCancel(ctx context.Context, items []*model.Item) error <span class="cov8" title="1">{
+        return s.processItems(ctx, items, func(stock *model.Stock, neededCount uint32) error </span><span class="cov8" title="1">{
+                if stock.ReservedCount &lt; neededCount </span><span class="cov8" title="1">{
+                        return appErr.ErrNegativeReserved
+                }</span>
+                <span class="cov8" title="1">stock.ReservedCount -= neededCount
+                return nil</span>
+        })
+}
+
+func (s *Service) GetBySKUAvailableCount(ctx context.Context, sku model.SKUType) (uint64, error) <span class="cov8" title="1">{
+        stocks, err := s.repository.GetStocks(ctx, []model.SKUType{sku})
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[stock_service] Error getting stock for SKU %v: %v", sku, err)
+                return 0, err
+        }</span>
+        <span class="cov8" title="1">stock := stocks[0]
+        if stock.TotalCount &lt; stock.ReservedCount </span><span class="cov8" title="1">{
+                return 0, appErr.ErrNegativeAvailable
+        }</span>
+        <span class="cov8" title="1">return uint64(stock.TotalCount - stock.ReservedCount), nil</span>
+}
+
+func (s *Service) processItems(ctx context.Context, items []*model.Item, processFunc func(*model.Stock, uint32) error) error <span class="cov8" title="1">{
+        itemMap := makeSkuCountMap(items)
+        skus := getSKUList(itemMap)
+
+        stocks, err := s.repository.GetStocks(ctx, skus)
+        if err != nil </span><span class="cov8" title="1">{
+                log.Printf("[stock_service] Error getting stocks: %v", err)
+                return err
+        }</span>
+
+        <span class="cov8" title="1">updateStocks := make(map[model.SKUType]*model.Stock)
+        for _, stock := range stocks </span><span class="cov8" title="1">{
+                neededCount := itemMap[stock.SKU]
+                err = processFunc(stock, neededCount)
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Printf("[stock_service] Error processing SKU %v: %v", stock.SKU, err)
+                        return err
+                }</span>
+                <span class="cov8" title="1">updateStocks[stock.SKU] = stock</span>
+        }
+
+        <span class="cov8" title="1">return s.repository.UpdateStock(ctx, updateStocks)</span>
+}
+
+func getSKUList(itemMap map[model.SKUType]uint32) []model.SKUType <span class="cov8" title="1">{
+        skus := make([]model.SKUType, 0, len(itemMap))
+        for sku := range itemMap </span><span class="cov8" title="1">{
+                skus = append(skus, sku)
+        }</span>
+        <span class="cov8" title="1">return skus</span>
+}
+
+func makeSkuCountMap(items []*model.Item) map[model.SKUType]uint32 <span class="cov8" title="1">{
+        itemMap := make(map[model.SKUType]uint32)
+        for _, item := range items </span><span class="cov8" title="1">{
+                itemMap[item.SKU] += item.Count
+        }</span>
+        <span class="cov8" title="1">return itemMap</span>
+}
+</pre>
+		
+		<pre class="file" id="file28" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.28.1
 //         protoc        (unknown)
@@ -4107,7 +4750,7 @@ func file_protoc_gen_openapiv2_options_annotations_proto_init() <span class="cov
 }
 </pre>
 		
-		<pre class="file" id="file20" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file29" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.28.1
 //         protoc        (unknown)
@@ -7335,7 +7978,7 @@ func file_protoc_gen_openapiv2_options_openapiv2_proto_init() <span class="cov0"
 }
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file30" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.30.0
 //         protoc        v3.21.12

@@ -18,4 +18,4 @@ Content-Type: application/json
 ### OrderInfo Request
 GET http://localhost:8081/v1/orders/1
 Accept: application/json
-### Expected ERROR, not found order with id 1
+### Expected SUCCESS, order with status failed

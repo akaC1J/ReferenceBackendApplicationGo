@@ -19,15 +19,14 @@ import (
 )
 
 func TestE2E_OrderLifecycle(t *testing.T) {
-
+	setupTest(t)
 	//Инициализация и запуск сервера
 	config, err := app.LoadConfig("./.env.test")
 	assert.NoError(t, err, "Не удалось загрузить конфигурацию")
-
 	application, err := app.MustNew(config)
 	assert.NoError(t, err, "Не удалось инициализировать приложение")
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GgrpcHostPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s", config.GgrpcHostPort))
 	assert.NoError(t, err, "Не удалось создать слушатель для gRPC сервера")
 
 	go func() {
@@ -38,9 +37,9 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	defer application.GrpcServer.GracefulStop()
 
 	// Подождем немного, чтобы сервер успел запуститься
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 
-	conn, err := grpc.NewClient(fmt.Sprintf("localhost:%d", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%s", config.GgrpcHostPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err, "Не удалось подключиться к gRPC серверу")
 	defer conn.Close()
 
@@ -74,7 +73,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	orderInfoResp1, err := client.OrderInfo(ctx, orderInfoReq1)
 	assert.NoError(t, err, "OrderInfo запрос (1) завершился с ошибкой")
 	assert.NotNil(t, orderInfoResp1, "OrderInfo ответ (1) пустой")
-	assert.Equal(t, "awaiting_payment", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
+	assert.Equal(t, "AWAITING_PAYMENT", orderInfoResp1.Order.Status, "Статус заказа не соответствует ожидаемому (AWAITING_PAY)")
 
 	// Шаг 7: Выполнение OrderPay запроса
 	orderPayReq := &loms.OrderPayRequest{
@@ -92,7 +91,7 @@ func TestE2E_OrderLifecycle(t *testing.T) {
 	orderInfoResp2, err := client.OrderInfo(ctx, orderInfoReq2)
 	assert.NoError(t, err, "OrderInfo запрос (2) завершился с ошибкой")
 	assert.NotNil(t, orderInfoResp2, "OrderInfo ответ (2) пустой")
-	assert.Equal(t, "payed", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (PAY)")
+	assert.Equal(t, "PAYED", orderInfoResp2.Order.Status, "Статус заказа не соответствует ожидаемому (PAY)")
 
 	//Выполнение StocksInfo запроса
 	stocksInfoReq := &loms.StocksInfoRequest{

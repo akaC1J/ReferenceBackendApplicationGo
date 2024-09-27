@@ -1,17 +1,25 @@
--- orders.sql
-
 -- name: SaveOrder :one
 INSERT INTO orders (state, user_id)
-VALUES ($1, $2)
-RETURNING id, state, user_id;
+VALUES (@state, @user_id)
+RETURNING id;
+
+-- name: SaveItems :exec
+INSERT INTO items (sku, count, order_id)
+SELECT unnest(@skus::bigint[]), unnest(@counts::bigint[]), @order_id;
 
 -- name: UpdateOrder :one
 UPDATE orders
-SET state = $1
-WHERE id = $2
-RETURNING id, state, user_id;
+SET state   = @state,
+    user_id = @user_id
+WHERE id = @order_id
+RETURNING id;
 
--- name: GetOrderById :one
-SELECT id, state, user_id
+-- name: GetOrderById :many
+SELECT orders.id,
+       orders.state,
+       orders.user_id,
+       i.sku,
+       i.count
 FROM orders
-WHERE id = $1;
+JOIN items i on orders.id = i.order_id
+WHERE orders.id = @order_id;

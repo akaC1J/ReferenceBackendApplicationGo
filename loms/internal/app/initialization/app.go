@@ -2,19 +2,18 @@ package initialization
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"route256/loms/internal/app/grpccontroller"
 	"route256/loms/internal/generated/api/loms/v1"
-	"route256/loms/internal/model"
+	"route256/loms/internal/infra"
 	grpcMW "route256/loms/internal/mw/grpc"
 	httpMW "route256/loms/internal/mw/http"
 	"route256/loms/internal/repository/orderrepository"
@@ -54,9 +53,17 @@ func (application *App) Run(config *Config) {
 
 func MustNew(config *Config) (*App, error) {
 	log.Println("[cart] Starting application initialization")
+	dbpoolMaster, err := initDbPool(config.DBConfigMaster)
+	if err != nil {
+		log.Fatalf("Unable to create connection pool: %v", err)
+	}
 
-	orderRepository := orderrepository.NewRepository()
-	stockRepository := mustNewStockRepositoryFromFile(config.StockFilePath)
+	// либо мы успешно инициализировали пул метрик, либо мы считаем что она отсутствует
+	dbpoolReplica, _ := initDbPool(config.DBConfigReplica)
+	dbRouter := infra.NewDBRouter(dbpoolMaster, dbpoolReplica)
+
+	orderRepository := orderrepository.NewRepository(dbRouter)
+	stockRepository := stockrepository.NewRepository(dbRouter)
 
 	stockService := stockservice.NewService(stockRepository)
 	orderService := orderservice.NewService(orderRepository, stockService)
@@ -102,20 +109,20 @@ func MustNew(config *Config) (*App, error) {
 	return app, nil
 }
 
-func mustNewStockRepositoryFromFile(pathToStockDataFile string) *stockrepository.Repository {
-	open, err := os.Open(pathToStockDataFile)
+func initDbPool(dbConfig *DBConfig) (*pgxpool.Pool, error) {
+	if dbConfig == nil {
+		return nil, fmt.Errorf("dbConfig is nil")
+	}
+	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s",
+		dbConfig.DBUser, dbConfig.DBPassword, dbConfig.DBHostPort, dbConfig.DBName)
+	poolConfig, err := pgxpool.ParseConfig(dsn)
+
 	if err != nil {
-		log.Fatalf("[cart] Error opening stock data file: %v", err)
+		return nil, fmt.Errorf("unable to parse configuration for master: %w", err)
 	}
-	defer open.Close()
-	var stocksFromFile []*model.Stock
-	err = json.NewDecoder(open).Decode(&stocksFromFile)
-	var mapStock = make(map[model.SKUType]model.Stock)
-	for _, stock := range stocksFromFile {
-		mapStock[stock.SKU] = *stock
-	}
+	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
-		log.Fatalf("[cart] Error decoding stock data file: %v", err)
+		return nil, fmt.Errorf("unable to create master-pool: %w", err)
 	}
-	return stockrepository.NewRepository(mapStock)
+	return pool, nil
 }
