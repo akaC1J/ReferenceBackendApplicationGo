@@ -16,13 +16,13 @@ import (
 type ProductService struct {
 	// решил здесь принебречь интерфейсом, потому что считаю, что http клиент это что-то конкретное,
 	// а не абстракцию
-	client  *http.Client
+	client  http.RoundTripper
 	token   string
 	baseUrl string
 	path    string
 }
 
-func NewProductService(client *http.Client, token string, baseUrl string, path string) *ProductService {
+func NewProductService(client http.RoundTripper, token string, baseUrl string, path string) *ProductService {
 	return &ProductService{client: client, token: token, baseUrl: baseUrl, path: path}
 }
 
@@ -46,7 +46,7 @@ func (p *ProductService) GetProductInfo(ctx context.Context, sku model.SKU) (*mo
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := p.client.Do(req)
+	resp, err := p.client.RoundTrip(req)
 	if err != nil {
 		log.Printf("[productservice] Error sending request: %v", err)
 		return nil, fmt.Errorf("failed to send request: %w", err)
@@ -78,12 +78,20 @@ func (p *ProductService) GetProductInfo(ctx context.Context, sku model.SKU) (*mo
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	err = ctx.Err()
+	if err != nil {
+		return nil, err
+	}
 	var productDto productGetProductResponse
 	if err := json.Unmarshal(content, &productDto); err != nil {
 		log.Printf("[productservice] Error unmarshalling response for SKU %d: %v", sku, err)
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
+	err = ctx.Err()
+	if err != nil {
+		return nil, err
+	}
 	if validationErr := validationservice.Validate(productDto); validationErr != nil {
 		log.Printf("[productservice] Product validation failed for SKU %d: %v", sku, validationErr)
 		return nil, fmt.Errorf("validation failed for SKU %d: %w", sku, validationErr)

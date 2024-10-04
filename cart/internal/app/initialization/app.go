@@ -37,6 +37,8 @@ func New(config *Config) (*App, error) {
 		time.Duration(config.RetryDelayMs)*time.Millisecond,
 	)
 
+	limitTripper := client.NewLimiterRoundTripper(httpClient.Transport, config.RequestsPerSecond)
+
 	grpcClient := newGRPCClient(config)
 
 	// Инициализация сервиса заказов
@@ -44,7 +46,7 @@ func New(config *Config) (*App, error) {
 
 	// Инициализация сервиса продуктов
 	productService := productservice.NewProductService(
-		httpClient,
+		limitTripper,
 		config.Token,
 		config.ProductServiceURL,
 		config.ProductServicePath,

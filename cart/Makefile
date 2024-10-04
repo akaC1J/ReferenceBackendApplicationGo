@@ -27,7 +27,7 @@ fast-run:
 # Цель для запуска тестов
 test: generate_mocks ## Запустить тесты с покрытием
 	@mkdir -p $(REPORTS_DIR)
-	go test -coverprofile=$(REPORTS_DIR)/coverage.out ./... && \
+	go test -race -coverprofile=$(REPORTS_DIR)/coverage.out ./... && \
 	go tool cover -html=$(REPORTS_DIR)/coverage.out -o $(REPORTS_DIR)/coverage.html
 
 # Цель для анализа цикломатической сложности

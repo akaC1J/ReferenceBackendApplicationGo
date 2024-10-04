@@ -16,6 +16,7 @@ type Config struct {
 	HostPort           string
 	Port               string
 	LomsBaseUrl        string
+	RequestsPerSecond  uint
 }
 
 func LoadDefaultConfig() (*Config, error) {
@@ -34,6 +35,11 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 	retryMs, err := strconv.Atoi(os.Getenv("RETRY_DELAY_MS"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse RETRY_DELAY_MS: %w", err)
+	}
+
+	requestsPerSecond, err := strconv.ParseUint(os.Getenv("REQUESTS_PER_SECOND"), 0, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse REQUESTS_PER_SECOND: %w", err)
 	}
 
 	token := os.Getenv("TOKEN")
@@ -69,6 +75,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		ProductServicePath: path,
 		HostPort:           hostPort,
 		LomsBaseUrl:        lomsBaseUrl,
+		RequestsPerSecond:  uint(requestsPerSecond),
 	}, nil
 }
 

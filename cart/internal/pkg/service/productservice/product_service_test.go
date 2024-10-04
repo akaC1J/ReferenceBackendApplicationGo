@@ -22,6 +22,8 @@ const (
 )
 
 // TestMain запускает все тесты из структуры ProductServiceSuite
+// оставим этот suite последовательным, потому что многие тесты конкурирует за объект сервиса, и некоторые
+// тесты могут быть не стабильными, так как изменяют поведения общего ресурса
 func TestProductServiceSuite(t *testing.T) {
 	suite.Run(t, new(ProductServiceSuite))
 }
@@ -39,7 +41,7 @@ func (suite *ProductServiceSuite) SetupTest() {
 		}
 	}))
 
-	client := suite.server.Client()
+	client := suite.server.Client().Transport
 	suite.productSvc = NewProductService(client, "test-token", suite.server.URL, defaultOkStatusPath)
 }
 
@@ -72,7 +74,7 @@ func (suite *ProductServiceSuite) TestGetProductInfo_NotFound() {
 // TestGetProductInfo_RequestError проверяет ошибку при создании запроса
 func (suite *ProductServiceSuite) TestGetProductInfo_RequestError() {
 	// Настраиваем продуктовый сервис с некорректным URL, который вызовет ошибку создания запроса
-	productSvc := NewProductService(&http.Client{}, "test-token", "http://::invalid-url", "/test-path")
+	productSvc := NewProductService(http.DefaultTransport, "test-token", "http://::invalid-url", "/test-path")
 
 	_, err := productSvc.GetProductInfo(context.Background(), model.SKU(123))
 

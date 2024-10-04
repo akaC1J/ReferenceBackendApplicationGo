@@ -7,6 +7,7 @@ import (
 	"github.com/gojuno/minimock/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/goleak"
 	"route256/cart/internal/pkg/model"
 	"testing"
 )
@@ -204,7 +205,10 @@ func TestCartService_AddCartItem(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			//безопасный параллельный запуск, тесты не используют общий контекст или данные
+			t.Parallel()
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
 			lomsServiceMock := tt.mockLomsSvc()
@@ -330,7 +334,10 @@ func TestCartService_DeleteCartItem(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			//безопасный параллельный запуск, тесты не используют общий контекст или данные
+			t.Parallel()
 			repoMock := tt.mockRepo()
 			s := NewService(repoMock, nil, nil)
 			err := s.DeleteCartItem(tt.args.ctx, tt.args.userId, tt.args.sku)
@@ -422,8 +429,11 @@ func TestCartService_CleanUpCart(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
+		//безопасный параллельный запуск, тесты не используют общий контекст или данные
 		t.Run(tt.name, func(t *testing.T) {
 			repoMock := tt.mockRepo()
+			t.Parallel()
 
 			s := NewService(repoMock, nil, nil)
 
@@ -578,7 +588,16 @@ func TestCartService_GetCartItem(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			//безопасный параллельный запуск, тесты не используют общий контекст или данные
+			t.Parallel()
+
+			// Проверка на утечку горутин, исключая текущую горутину, так как эксперименты показали, что она может отображаться как утечка.
+			//Это связано с тем, что эта горутина, вероятно, управляет параллельными тестами.
+			//Проверено: реальная утечка горутин корректно обнаруживается кодом ниже.
+			//Для проверки можно добавить в тестируемый метод намеренно утекшую горутину и убедиться, что она будет выявлена.
+			defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 			repoMock := tt.mockRepo()
 			productServiceMock := tt.mockProductSvc()
 

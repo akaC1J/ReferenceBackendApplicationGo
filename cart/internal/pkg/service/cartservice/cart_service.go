@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"route256/cart/internal/infra/errgroup"
 	"route256/cart/internal/pkg/model"
+	"sync"
 )
 
 type CartRepository interface {
@@ -127,17 +129,28 @@ func (s *CartService) GetCartItem(ctx context.Context, userId model.UserId) (*Ca
 
 	// Обогащение данных о товарах
 	var cartContent CartContent
+	errGroup, cancelCtx := errgroup.NewErrGroup(ctx)
+	var mx sync.Mutex
 	for keySku, item := range userCart {
-		productInfo, err := s.productService.GetProductInfo(ctx, keySku)
-		if err != nil {
-			log.Printf("[cartService] Failed to retrieve product info for SKU %d while retrieving cart for user %d", keySku, userId)
-			return nil, err
-		}
-		cartContent.Items = append(cartContent.Items, createEnrichedCartItemDTO(item, *productInfo))
-		//unsafe cast uint16 to uint32
-		cartContent.TotalPrice += productInfo.Price * uint32(item.Count)
+		keySku := keySku
+		item := item
+		errGroup.Go(func() error {
+			productInfo, err := s.productService.GetProductInfo(cancelCtx, keySku)
+			if err != nil {
+				log.Printf("[cartService] Failed to retrieve product info for SKU %d while retrieving cart for user %d", keySku, userId)
+				return err
+			}
+			mx.Lock()
+			defer mx.Unlock()
+			cartContent.Items = append(cartContent.Items, createEnrichedCartItemDTO(item, *productInfo))
+			cartContent.TotalPrice += productInfo.Price * uint32(item.Count)
+			return nil
+		})
 	}
 
+	if err := errGroup.Wait(); err != nil {
+		return nil, err
+	}
 	log.Printf("[cartService] Cart for user %d successfully retrieved with %d items, total price: %d", userId, len(cartContent.Items), cartContent.TotalPrice)
 
 	return &cartContent, nil

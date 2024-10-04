@@ -63,9 +63,9 @@
 				
 				<option value="file3">route256/loms/internal/app/grpccontroller/stock_service.go (0.0%)</option>
 				
-				<option value="file4">route256/loms/internal/app/initialization/app.go (62.8%)</option>
+				<option value="file4">route256/loms/internal/app/initialization/app.go (46.2%)</option>
 				
-				<option value="file5">route256/loms/internal/app/initialization/config.go (62.1%)</option>
+				<option value="file5">route256/loms/internal/app/initialization/config.go (58.3%)</option>
 				
 				<option value="file6">route256/loms/internal/generated/api/loms/v1/loms.pb.go (3.6%)</option>
 				
@@ -75,47 +75,49 @@
 				
 				<option value="file9">route256/loms/internal/generated/api/loms/v1/loms_grpc.pb.go (2.6%)</option>
 				
-				<option value="file10">route256/loms/internal/model/order.go (85.7%)</option>
+				<option value="file10">route256/loms/internal/infra/db_router.go (3.2%)</option>
 				
-				<option value="file11">route256/loms/internal/mw/grpc/cors.go (22.2%)</option>
+				<option value="file11">route256/loms/internal/model/order.go (85.7%)</option>
 				
-				<option value="file12">route256/loms/internal/mw/grpc/logger.go (0.0%)</option>
+				<option value="file12">route256/loms/internal/mw/grpc/cors.go (22.2%)</option>
 				
-				<option value="file13">route256/loms/internal/mw/grpc/panic.go (0.0%)</option>
+				<option value="file13">route256/loms/internal/mw/grpc/logger.go (0.0%)</option>
 				
-				<option value="file14">route256/loms/internal/mw/grpc/validate.go (0.0%)</option>
+				<option value="file14">route256/loms/internal/mw/grpc/panic.go (0.0%)</option>
 				
-				<option value="file15">route256/loms/internal/mw/http/logger.go (50.0%)</option>
+				<option value="file15">route256/loms/internal/mw/grpc/validate.go (0.0%)</option>
 				
-				<option value="file16">route256/loms/internal/repository/orderrepository/db.go (50.0%)</option>
+				<option value="file16">route256/loms/internal/mw/http/logger.go (50.0%)</option>
 				
-				<option value="file17">route256/loms/internal/repository/orderrepository/models.go (0.0%)</option>
+				<option value="file17">route256/loms/internal/repository/orderrepository/db.go (50.0%)</option>
 				
-				<option value="file18">route256/loms/internal/repository/orderrepository/order_repository.go (1.6%)</option>
+				<option value="file18">route256/loms/internal/repository/orderrepository/models.go (0.0%)</option>
 				
-				<option value="file19">route256/loms/internal/repository/orderrepository/query.sql.go (0.0%)</option>
+				<option value="file19">route256/loms/internal/repository/orderrepository/order_repository.go (1.7%)</option>
 				
-				<option value="file20">route256/loms/internal/repository/stockrepository/db.go (50.0%)</option>
+				<option value="file20">route256/loms/internal/repository/orderrepository/query.sql.go (0.0%)</option>
 				
-				<option value="file21">route256/loms/internal/repository/stockrepository/query.sql.go (0.0%)</option>
+				<option value="file21">route256/loms/internal/repository/stockrepository/db.go (50.0%)</option>
 				
-				<option value="file22">route256/loms/internal/repository/stockrepository/stocks_repository.go (1.7%)</option>
+				<option value="file22">route256/loms/internal/repository/stockrepository/query.sql.go (0.0%)</option>
 				
-				<option value="file23">route256/loms/internal/repository/utils.go (0.0%)</option>
+				<option value="file23">route256/loms/internal/repository/stockrepository/stocks_repository.go (1.7%)</option>
 				
-				<option value="file24">route256/loms/internal/repository_inmemory/orderrepository/order_repository.go (0.0%)</option>
+				<option value="file24">route256/loms/internal/repository/utils.go (0.0%)</option>
 				
-				<option value="file25">route256/loms/internal/repository_inmemory/stockrepository/stocks_repository.go (0.0%)</option>
+				<option value="file25">route256/loms/internal/repository_inmemory/orderrepository/order_repository.go (0.0%)</option>
 				
-				<option value="file26">route256/loms/internal/service/orderservice/order_service.go (89.8%)</option>
+				<option value="file26">route256/loms/internal/repository_inmemory/stockrepository/stocks_repository.go (0.0%)</option>
 				
-				<option value="file27">route256/loms/internal/service/stockservice/stock_service.go (98.0%)</option>
+				<option value="file27">route256/loms/internal/service/orderservice/order_service.go (89.8%)</option>
 				
-				<option value="file28">route256/loms/vendor-proto/protoc-gen-openapiv2/options/annotations.pb.go (0.0%)</option>
+				<option value="file28">route256/loms/internal/service/stockservice/stock_service.go (98.0%)</option>
 				
-				<option value="file29">route256/loms/vendor-proto/protoc-gen-openapiv2/options/openapiv2.pb.go (0.0%)</option>
+				<option value="file29">route256/loms/vendor-proto/protoc-gen-openapiv2/options/annotations.pb.go (0.0%)</option>
 				
-				<option value="file30">route256/loms/vendor-proto/validate/validate.pb.go (0.0%)</option>
+				<option value="file30">route256/loms/vendor-proto/protoc-gen-openapiv2/options/openapiv2.pb.go (0.0%)</option>
+				
+				<option value="file31">route256/loms/vendor-proto/validate/validate.pb.go (0.0%)</option>
 				
 				</select>
 			</div>
@@ -308,14 +310,19 @@ import (
         "log"
         "net"
         "net/http"
+        "os"
+        "os/signal"
         "route256/loms/internal/app/grpccontroller"
         "route256/loms/internal/generated/api/loms/v1"
+        "route256/loms/internal/infra"
         grpcMW "route256/loms/internal/mw/grpc"
         httpMW "route256/loms/internal/mw/http"
         "route256/loms/internal/repository/orderrepository"
         "route256/loms/internal/repository/stockrepository"
         "route256/loms/internal/service/orderservice"
         "route256/loms/internal/service/stockservice"
+        "syscall"
+        "time"
 )
 
 type App struct {
@@ -334,27 +341,66 @@ func (application *App) Run(config *Config) <span class="cov0" title="0">{
         }</span>
 
         <span class="cov0" title="0">log.Println("[main] Application initialization successful")
-        log.Printf("[main] server listening at %v", lis.Addr())
+        log.Printf("[main] gRPC server listening at %v", lis.Addr())
+
+        quit := make(chan os.Signal, 1)
+        signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+        serverErrors := make(chan error, 2)
 
         go func() </span><span class="cov0" title="0">{
-                if err = application.GrpcServer.Serve(lis); err != nil </span><span class="cov0" title="0">{
-                        log.Fatalf("[main] failed to serve: %v", err)
+                if err := application.GrpcServer.Serve(lis); err != nil &amp;&amp; err != grpc.ErrServerStopped </span><span class="cov0" title="0">{
+                        log.Printf("[main] gRPC server error: %v", err)
+                        serverErrors &lt;- err
                 }</span>
         }()
-        <span class="cov0" title="0">log.Printf("[main] server listening at %v", application.GwServer.Addr)
-        if err = application.GwServer.ListenAndServe(); err != nil </span><span class="cov0" title="0">{
-                log.Fatalf("[main] failed to serve: %v", err)
+
+        <span class="cov0" title="0">log.Printf("[main] HTTP server listening at %v", application.GwServer.Addr)
+
+        go func() </span><span class="cov0" title="0">{
+                if err := application.GwServer.ListenAndServe(); err != nil &amp;&amp; err != http.ErrServerClosed </span><span class="cov0" title="0">{
+                        log.Printf("[main] HTTP server error: %v", err)
+                        serverErrors &lt;- err
+                }</span>
+        }()
+
+        <span class="cov0" title="0">select </span>{
+        case sig := &lt;-quit:<span class="cov0" title="0">
+                log.Printf("[main] Caught signal %v. Shutting down gracefully...", sig)</span>
+        case err := &lt;-serverErrors:<span class="cov0" title="0">
+                log.Printf("[main] Received server error: %v", err)</span>
+        }
+
+        <span class="cov0" title="0">ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+        defer cancel()
+
+        go func() </span><span class="cov0" title="0">{
+                application.GrpcServer.GracefulStop()
+                log.Println("[main] gRPC server stopped")
+        }</span>()
+
+        <span class="cov0" title="0">if err := application.GwServer.Shutdown(ctx); err != nil </span><span class="cov0" title="0">{
+                log.Printf("[main] HTTP server forced to shutdown: %v", err)
+        }</span> else<span class="cov0" title="0"> {
+                log.Println("[main] HTTP server stopped")
         }</span>
+
+        <span class="cov0" title="0">log.Println("[main] Application gracefully stopped")</span>
 }
 
 func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
         log.Println("[cart] Starting application initialization")
-        dbpool, err := initDbPool(config)
+        dbpoolMaster, err := initDbPool(config.DBConfigMaster)
         if err != nil </span><span class="cov0" title="0">{
                 log.Fatalf("Unable to create connection pool: %v", err)
         }</span>
-        <span class="cov8" title="1">orderRepository := orderrepository.NewRepository(dbpool)
-        stockRepository := stockrepository.NewRepository(dbpool)
+
+        // либо мы успешно инициализировали пул метрик, либо мы считаем что она отсутствует
+        <span class="cov8" title="1">dbpoolReplica, _ := initDbPool(config.DBConfigReplica)
+        dbRouter := infra.NewDBRouter(dbpoolMaster, dbpoolReplica)
+
+        orderRepository := orderrepository.NewRepository(dbRouter)
+        stockRepository := stockrepository.NewRepository(dbRouter)
 
         stockService := stockservice.NewService(stockRepository)
         orderService := orderservice.NewService(orderRepository, stockService)
@@ -400,17 +446,20 @@ func MustNew(config *Config) (*App, error) <span class="cov8" title="1">{
         return app, nil</span>
 }
 
-func initDbPool(config *Config) (*pgxpool.Pool, error) <span class="cov8" title="1">{
-        dsn := fmt.Sprintf("postgres://%s:%s@%s/%s",
-                config.DBConfig.DBUser, config.DBConfig.DBPassword, config.DBConfig.DBHostPort, config.DBConfig.DBName)
+func initDbPool(dbConfig *DBConfig) (*pgxpool.Pool, error) <span class="cov8" title="1">{
+        if dbConfig == nil </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("dbConfig is nil")
+        }</span>
+        <span class="cov8" title="1">dsn := fmt.Sprintf("postgres://%s:%s@%s/%s",
+                dbConfig.DBUser, dbConfig.DBPassword, dbConfig.DBHostPort, dbConfig.DBName)
         poolConfig, err := pgxpool.ParseConfig(dsn)
 
         if err != nil </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("unable to parse configuration: %w", err)
+                return nil, fmt.Errorf("unable to parse configuration for master: %w", err)
         }</span>
         <span class="cov8" title="1">pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
         if err != nil </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("unable to create pool: %w", err)
+                return nil, fmt.Errorf("unable to create master-pool: %w", err)
         }</span>
         <span class="cov8" title="1">return pool, nil</span>
 }
@@ -427,11 +476,12 @@ import (
 )
 
 type Config struct {
-        StockFilePath string
-        GgrpcHostPort string
-        HttpPort      int
-        SwagerUrl     string
-        DBConfig      DBConfig
+        StockFilePath   string
+        GgrpcHostPort   string
+        HttpPort        int
+        SwagerUrl       string
+        DBConfigMaster  *DBConfig
+        DBConfigReplica *DBConfig
 }
 
 type DBConfig struct {
@@ -475,34 +525,55 @@ func LoadConfig(pathToEnv string) (*Config, error) <span class="cov8" title="1">
         }</span>
 
         <span class="cov8" title="1">swaggerUrl := os.Getenv("SWAGGER_FOR_CORS_ALLOWED_URL")
-
+        configMaster, configReplica := MustLoadDBConfig()
         return &amp;Config{
-                StockFilePath: stockFilePath,
-                GgrpcHostPort: grpcPort,
-                HttpPort:      httpPort,
-                SwagerUrl:     swaggerUrl,
-                DBConfig:      MustLoadDBConfig(),
+                StockFilePath:   stockFilePath,
+                GgrpcHostPort:   grpcPort,
+                HttpPort:        httpPort,
+                SwagerUrl:       swaggerUrl,
+                DBConfigMaster:  configMaster,
+                DBConfigReplica: configReplica,
         }, nil</span>
 }
 
-func MustLoadDBConfig() DBConfig <span class="cov8" title="1">{
-        dbConfig := DBConfig{
-                DBUser:     os.Getenv("DATABASE_USER"),
-                DBPassword: os.Getenv("DATABASE_PASSWORD"),
-                DBHostPort: os.Getenv("DATABASE_HOST_PORT"),
-                DBName:     os.Getenv("DATABASE_NAME"),
+func MustLoadDBConfig() (masterConfig, replicaConfig *DBConfig) <span class="cov8" title="1">{
+        masterConfig = &amp;DBConfig{
+                DBUser:     os.Getenv("DATABASE_MASTER_USER"),
+                DBPassword: os.Getenv("DATABASE_MASTER_PASSWORD"),
+                DBHostPort: os.Getenv("DATABASE_MASTER_HOST_PORT"),
+                DBName:     os.Getenv("DATABASE_MASTER_NAME"),
         }
         switch "" </span>{
-        case dbConfig.DBUser:<span class="cov0" title="0">
-                log.Fatalf("DB_USER is not set")</span>
-        case dbConfig.DBPassword:<span class="cov0" title="0">
-                log.Fatalf("DB_PASSWORD is not set")</span>
-        case dbConfig.DBHostPort:<span class="cov0" title="0">
-                log.Fatalf("DB_HOST_PORT is not set")</span>
-        case dbConfig.DBName:<span class="cov0" title="0">
-                log.Fatalf("DB_NAME is not set")</span>
+        case masterConfig.DBUser:<span class="cov0" title="0">
+                log.Fatalf("DATABASE_MASTER_USER is not set")</span>
+        case masterConfig.DBPassword:<span class="cov0" title="0">
+                log.Fatalf("DATABASE_MASTER_PASSWORD is not set")</span>
+        case masterConfig.DBHostPort:<span class="cov0" title="0">
+                log.Fatalf("DATABASE_MASTER_HOST_PORT is not set")</span>
+        case masterConfig.DBName:<span class="cov0" title="0">
+                log.Fatalf("DATABASE_MASTER_NAME is not set")</span>
         }
-        <span class="cov8" title="1">return dbConfig</span>
+
+        <span class="cov8" title="1">replicaConfig = &amp;DBConfig{
+                DBUser:     os.Getenv("DATABASE_REPLICA_USER"),
+                DBPassword: os.Getenv("DATABASE_REPLICA_PASSWORD"),
+                DBHostPort: os.Getenv("DATABASE_REPLICA_HOST_PORT"),
+                DBName:     os.Getenv("DATABASE_REPLICA_NAME"),
+        }
+
+        //если чего-то не хватает делаем nil, значит реплики у нас не будет
+        switch "" </span>{
+        case masterConfig.DBUser:<span class="cov0" title="0">
+                fallthrough</span>
+        case masterConfig.DBPassword:<span class="cov0" title="0">
+                fallthrough</span>
+        case masterConfig.DBHostPort:<span class="cov0" title="0">
+                fallthrough</span>
+        case masterConfig.DBName:<span class="cov0" title="0">
+                replicaConfig = nil</span>
+        }
+
+        <span class="cov8" title="1">return</span>
 }
 
 func loadEnv(pathToEnv string) error <span class="cov8" title="1">{
@@ -3431,7 +3502,120 @@ var Loms_ServiceDesc = grpc.ServiceDesc{
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package model
+		<pre class="file" id="file10" style="display: none">package infra
+
+import (
+        "context"
+        "fmt"
+        "github.com/jackc/pgx/v5"
+        "github.com/jackc/pgx/v5/pgconn"
+        "github.com/jackc/pgx/v5/pgxpool"
+)
+
+const ReadOnlyKey = "READ_ONLY"
+
+/*
+Структура которая может поддерживать работу с двумя базами данных, реализует метод для извлечения пула а так же
+методы для выполнения запросов к базе данных, то что нужно моему приложению в будущем можно расширить либо переходит на
+внешнюю балансировку
+*/
+type DBRouter struct {
+        masterDB  *pgxpool.Pool
+        replicaDB *pgxpool.Pool
+}
+
+func (db *DBRouter) Acquire(ctx context.Context) (c *pgxpool.Conn, err error) <span class="cov0" title="0">{
+        dbInstance := db.chooseDBTXInstanceByContext(ctx)
+        return dbInstance.Acquire(ctx)
+}</span>
+
+// NewDBRouter masterDB mustn't nil, and replicaDB can be nil
+func NewDBRouter(masterDB *pgxpool.Pool, replicaDB *pgxpool.Pool) *DBRouter <span class="cov8" title="1">{
+        return &amp;DBRouter{masterDB: masterDB, replicaDB: replicaDB}
+}</span>
+
+/*
+также хочу реализовать примитивно fallback поведение
+при ошибке на реплике, попробуем выполнить запрос на мастере
+проблема в том что любая ошибка будет расценена как ошибка на реплике и запроску к master
+может быть стоить различать ошибки бд и ошибки соединения, но пока хочу сделать по-простому
+*/
+
+func (db *DBRouter) Exec(ctx context.Context, query string, args ...interface{}) (pgconn.CommandTag, error) <span class="cov0" title="0">{
+        dbInstance := db.chooseDBTXInstanceByContext(ctx)
+        tag, err := dbInstance.Exec(ctx, query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("[infra] Detected connection error")
+                // Выполнить фоллбэк, если ошибка подключения
+                if dbInstance != db.masterDB </span><span class="cov0" title="0">{
+                        return db.masterDB.Exec(ctx, query, args...)
+                }</span>
+        }
+        <span class="cov0" title="0">return tag, err</span>
+}
+
+func (db *DBRouter) Query(ctx context.Context, query string, args ...interface{}) (pgx.Rows, error) <span class="cov0" title="0">{
+        dbInstance := db.chooseDBTXInstanceByContext(ctx)
+        rows, err := dbInstance.Query(ctx, query, args...)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("[infra] Detected connection error")
+                if dbInstance != db.masterDB </span><span class="cov0" title="0">{
+                        return db.masterDB.Query(ctx, query, args...)
+                }</span>
+        }
+        <span class="cov0" title="0">return rows, err</span>
+}
+
+func (db *DBRouter) QueryRow(ctx context.Context, query string, args ...interface{}) pgx.Row <span class="cov0" title="0">{
+        dbInstance := db.chooseDBTXInstanceByContext(ctx)
+        return &amp;fallbackRow{
+                primaryRow: dbInstance.QueryRow(ctx, query, args...),
+                primaryDB:  dbInstance,
+                masterDB:   db.masterDB,
+                ctx:        ctx,
+                query:      query,
+                args:       args,
+        }
+}</span>
+
+// fallbackRow структура обертки для Row с fallback
+type fallbackRow struct {
+        primaryRow pgx.Row
+        primaryDB  *pgxpool.Pool
+        masterDB   *pgxpool.Pool
+        ctx        context.Context
+        query      string
+        args       []interface{}
+}
+
+// Scan метод для сканирования данных с fallback
+func (f *fallbackRow) Scan(dest ...interface{}) error <span class="cov0" title="0">{
+        // Выполняем первичное сканирование
+        err := f.primaryRow.Scan(dest...)
+        if err != nil </span><span class="cov0" title="0">{
+                if f.primaryDB != f.masterDB </span><span class="cov0" title="0">{
+                        fmt.Println("[infra] Fallback to master database")
+                        masterRow := f.masterDB.QueryRow(f.ctx, f.query, f.args...)
+                        return masterRow.Scan(dest...)
+                }</span>
+        }
+        <span class="cov0" title="0">return err</span>
+}
+
+// выбирать будем на основе ключа контекста(учитываем что replicapool can be nil)
+// может быть достаточно примитивная реализация, но свои задачи должна выполнять
+func (db *DBRouter) chooseDBTXInstanceByContext(ctx context.Context) *pgxpool.Pool <span class="cov0" title="0">{
+        if db.replicaDB == nil </span><span class="cov0" title="0">{
+                return db.masterDB
+        }</span>
+        <span class="cov0" title="0">if readOnly, ok := ctx.Value(ReadOnlyKey).(bool); ok &amp;&amp; readOnly </span><span class="cov0" title="0">{
+                return db.replicaDB
+        }</span>
+        <span class="cov0" title="0">return db.masterDB</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package model
 
 import (
         "fmt"
@@ -3476,7 +3660,7 @@ func (order *Order) State() StateType <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file11" style="display: none">package grpc
+		<pre class="file" id="file12" style="display: none">package grpc
 
 import (
         "net/http"
@@ -3502,7 +3686,7 @@ func WithCorsCheckHttpHandler(next http.Handler) http.Handler <span class="cov8"
 }
 </pre>
 		
-		<pre class="file" id="file12" style="display: none">package grpc
+		<pre class="file" id="file13" style="display: none">package grpc
 
 import (
         "context"
@@ -3528,7 +3712,7 @@ func LoggingUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.Una
 }
 </pre>
 		
-		<pre class="file" id="file13" style="display: none">package grpc
+		<pre class="file" id="file14" style="display: none">package grpc
 
 import (
         "context"
@@ -3550,7 +3734,7 @@ func PanicUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.Unary
 }
 </pre>
 		
-		<pre class="file" id="file14" style="display: none">package grpc
+		<pre class="file" id="file15" style="display: none">package grpc
 
 import (
         "context"
@@ -3569,7 +3753,7 @@ func ValidateUnaryMiddleware(ctx context.Context, req interface{}, info *grpc.Un
 }
 </pre>
 		
-		<pre class="file" id="file15" style="display: none">package http
+		<pre class="file" id="file16" style="display: none">package http
 
 import (
         "log"
@@ -3586,7 +3770,7 @@ func WithHTTPLoggingMiddleware(next http.Handler) http.Handler <span class="cov8
 }
 </pre>
 		
-		<pre class="file" id="file16" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+		<pre class="file" id="file17" style="display: none">// Code generated by sqlc. DO NOT EDIT.
 // versions:
 //   sqlc v1.27.0
 
@@ -3620,7 +3804,7 @@ func (q *Queries) WithTx(tx pgx.Tx) *Queries <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file17" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+		<pre class="file" id="file18" style="display: none">// Code generated by sqlc. DO NOT EDIT.
 // versions:
 //   sqlc v1.27.0
 
@@ -3635,7 +3819,7 @@ type OrderStatus string
 
 const (
         OrderStatusNEW             OrderStatus = "NEW"
-        OrderStatusAWAITINGPAYMENT OrderStatus = "AWAITING PAYMENT"
+        OrderStatusAWAITINGPAYMENT OrderStatus = "AWAITING_PAYMENT"
         OrderStatusFAILED          OrderStatus = "FAILED"
         OrderStatusPAYED           OrderStatus = "PAYED"
         OrderStatusCANCELLED       OrderStatus = "CANCELLED"
@@ -3677,7 +3861,7 @@ func (ns NullOrderStatus) Value() (driver.Value, error) <span class="cov0" title
 }
 </pre>
 		
-		<pre class="file" id="file18" style="display: none">package orderrepository
+		<pre class="file" id="file19" style="display: none">package orderrepository
 
 import (
         "context"
@@ -3687,16 +3871,22 @@ import (
         "github.com/jackc/pgx/v5/pgxpool"
         "go.uber.org/multierr"
         appErr "route256/loms/internal/errors"
+        "route256/loms/internal/infra"
         "route256/loms/internal/model"
         "route256/loms/internal/repository"
 )
 
 type Repository struct {
         q    *Queries
-        pool *pgxpool.Pool
+        pool ConnectionPooler
 }
 
-func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">{
+type ConnectionPooler interface {
+        DBTX
+        Acquire(ctx context.Context) (*pgxpool.Conn, error)
+}
+
+func NewRepository(pool ConnectionPooler) *Repository <span class="cov8" title="1">{
         return &amp;Repository{
                 q:    New(pool),
                 pool: pool,
@@ -3704,20 +3894,22 @@ func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">
 }</span>
 
 func (r *Repository) SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error) <span class="cov0" title="0">{
-        conn, err := r.pool.Acquire(context.Background())
+        ctx = context.WithValue(ctx, infra.ReadOnlyKey, false)
+        conn, err := r.pool.Acquire(ctx)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, fmt.Errorf("unable to acquire a connection: %w", err)
         }</span>
         <span class="cov0" title="0">defer conn.Release()
         err = pgx.BeginFunc(ctx, conn, func(tx pgx.Tx) error </span><span class="cov0" title="0">{
-                orderID, err := r.q.SaveOrder(ctx, &amp;SaveOrderParams{
+                repTx := New(tx)
+                orderID, err := repTx.SaveOrder(ctx, &amp;SaveOrderParams{
                         State:  OrderStatus(order.State()),
                         UserID: order.UserId,
                 })
                 if err != nil </span><span class="cov0" title="0">{
                         return err
                 }</span>
-                <span class="cov0" title="0">err = r.q.SaveItems(ctx, repackItemsToSaveItemParams(order.Items, orderID))
+                <span class="cov0" title="0">err = repTx.SaveItems(ctx, repackItemsToSaveItemParams(order.Items, orderID))
                 if err != nil </span><span class="cov0" title="0">{
                         return err
                 }</span>
@@ -3731,12 +3923,8 @@ func (r *Repository) SaveOrder(ctx context.Context, order *model.Order) (*model.
 }
 
 func (r *Repository) UpdateOrder(ctx context.Context, order *model.Order) error <span class="cov0" title="0">{
-        conn, err := r.pool.Acquire(context.Background())
-        if err != nil </span><span class="cov0" title="0">{
-                return fmt.Errorf("unable to acquire a connection: %w", err)
-        }</span>
-        <span class="cov0" title="0">defer conn.Release()
-        _, err = r.q.UpdateOrder(ctx, &amp;UpdateOrderParams{
+        ctx = context.WithValue(ctx, infra.ReadOnlyKey, false)
+        _, err := r.q.UpdateOrder(ctx, &amp;UpdateOrderParams{
                 UserID:  order.UserId,
                 State:   OrderStatus(order.State()),
                 OrderID: order.ID,
@@ -3750,13 +3938,9 @@ func (r *Repository) UpdateOrder(ctx context.Context, order *model.Order) error 
         <span class="cov0" title="0">return nil</span>
 }
 
-func (r *Repository) GetById(_ context.Context, orderID int64) (*model.Order, error) <span class="cov0" title="0">{
-        conn, err := r.pool.Acquire(context.Background())
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("unable to acquire a connection: %w", err)
-        }</span>
-        <span class="cov0" title="0">defer conn.Release()
-        orderFromDB, err := r.q.GetOrderById(context.Background(), orderID)
+func (r *Repository) GetById(ctx context.Context, orderID int64) (*model.Order, error) <span class="cov0" title="0">{
+        ctx = context.WithValue(ctx, infra.ReadOnlyKey, true)
+        orderFromDB, err := r.q.GetOrderById(ctx, orderID)
         if err != nil </span><span class="cov0" title="0">{
                 return nil, fmt.Errorf("unable to get order by ID: %w", err)
         }</span>
@@ -3817,7 +4001,7 @@ func repackItemsToSaveItemParams(items []*model.Item, orderID int64) *SaveItemsP
 }
 </pre>
 		
-		<pre class="file" id="file19" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+		<pre class="file" id="file20" style="display: none">// Code generated by sqlc. DO NOT EDIT.
 // versions:
 //   sqlc v1.27.0
 // source: query.sql
@@ -3929,7 +4113,7 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg *UpdateOrderParams) (int6
 }</span>
 </pre>
 		
-		<pre class="file" id="file20" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+		<pre class="file" id="file21" style="display: none">// Code generated by sqlc. DO NOT EDIT.
 // versions:
 //   sqlc v1.27.0
 
@@ -3963,7 +4147,7 @@ func (q *Queries) WithTx(tx pgx.Tx) *Queries <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file21" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+		<pre class="file" id="file22" style="display: none">// Code generated by sqlc. DO NOT EDIT.
 // versions:
 //   sqlc v1.27.0
 // source: query.sql
@@ -3979,7 +4163,7 @@ SELECT sku,
        total_count,
        reserved_count
 FROM stock
-WHERE sku IN ($1 :: bigint[])
+WHERE sku = ANY($1 :: bigint[])
 `
 
 func (q *Queries) GetStockBySkus(ctx context.Context, skus []int64) ([]*Stock, error) <span class="cov0" title="0">{
@@ -4024,7 +4208,7 @@ func (q *Queries) UpdateStockInfo(ctx context.Context, arg *UpdateStockInfoParam
 }</span>
 </pre>
 		
-		<pre class="file" id="file22" style="display: none">package stockrepository
+		<pre class="file" id="file23" style="display: none">package stockrepository
 
 import (
         "context"
@@ -4032,16 +4216,23 @@ import (
         "github.com/jackc/pgx/v5"
         "github.com/jackc/pgx/v5/pgxpool"
         "go.uber.org/multierr"
+        apperrors "route256/loms/internal/errors"
+        "route256/loms/internal/infra"
         "route256/loms/internal/model"
         "route256/loms/internal/repository"
 )
 
 type Repository struct {
         q    *Queries
-        pool *pgxpool.Pool
+        pool ConnectionPooler
 }
 
-func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">{
+type ConnectionPooler interface {
+        DBTX
+        Acquire(ctx context.Context) (*pgxpool.Conn, error)
+}
+
+func NewRepository(pool ConnectionPooler) *Repository <span class="cov8" title="1">{
         return &amp;Repository{
                 q:    New(pool),
                 pool: pool,
@@ -4049,11 +4240,7 @@ func NewRepository(pool *pgxpool.Pool) *Repository <span class="cov8" title="1">
 }</span>
 
 func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks []*model.Stock, err error) <span class="cov0" title="0">{
-        conn, err := r.pool.Acquire(ctx)
-        if err != nil </span><span class="cov0" title="0">{
-                return nil, fmt.Errorf("unable to acquire a connection: %w", err)
-        }</span>
-        <span class="cov0" title="0">defer conn.Release()
+        ctx = context.WithValue(ctx, infra.ReadOnlyKey, true)
         intSku := make([]int64, 0, len(sku))
         for _, s := range sku </span><span class="cov0" title="0">{
                 intSku = append(intSku, int64(s))
@@ -4076,7 +4263,7 @@ func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks
                                 unfindedSku = append(unfindedSku, s)
                         }</span>
                 }
-                <span class="cov0" title="0">return nil, fmt.Errorf("sku %v in database not found", unfindedSku)</span>
+                <span class="cov0" title="0">return nil, fmt.Errorf("sku %v in database", apperrors.ErrNotFound)</span>
         }
         <span class="cov0" title="0">stocks, err = repackRepositoryStockToModelStock(repositoryStocks)
         if err != nil </span><span class="cov0" title="0">{
@@ -4086,14 +4273,16 @@ func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks
 }
 
 func (r *Repository) UpdateStock(ctx context.Context, stocks map[model.SKUType]*model.Stock) error <span class="cov0" title="0">{
+        ctx = context.WithValue(ctx, infra.ReadOnlyKey, false)
         conn, err := r.pool.Acquire(ctx)
         if err != nil </span><span class="cov0" title="0">{
                 return fmt.Errorf("unable to acquire a connection: %w", err)
         }</span>
         <span class="cov0" title="0">defer conn.Release()
         err = pgx.BeginFunc(ctx, conn, func(tx pgx.Tx) (err error) </span><span class="cov0" title="0">{
+                repTx := New(tx)
                 updateParamStock := repackStocksMapToUpdateStockParam(stocks)
-                result, err := r.q.db.Exec(ctx, updateStockInfo, updateParamStock.Skus,
+                result, err := repTx.db.Exec(ctx, updateStockInfo, updateParamStock.Skus,
                         updateParamStock.TotalCounts,
                         updateParamStock.ReservedCounts)
                 if err != nil </span><span class="cov0" title="0">{
@@ -4147,7 +4336,7 @@ func repackRepositoryStockToModelStock(stocksFromDB []*Stock) ([]*model.Stock, e
 }
 </pre>
 		
-		<pre class="file" id="file23" style="display: none">package repository
+		<pre class="file" id="file24" style="display: none">package repository
 
 import (
         "fmt"
@@ -4162,7 +4351,7 @@ func SafeInt64ToUint32(value int64) (uint32, error) <span class="cov0" title="0"
 }
 </pre>
 		
-		<pre class="file" id="file24" style="display: none">package orderrepository
+		<pre class="file" id="file25" style="display: none">package orderrepository
 
 import (
         "context"
@@ -4215,7 +4404,7 @@ func (r *Repository) GetById(_ context.Context, orderID int64) (*model.Order, er
 }
 </pre>
 		
-		<pre class="file" id="file25" style="display: none">package stockrepository
+		<pre class="file" id="file26" style="display: none">package stockrepository
 
 import (
         "context"
@@ -4266,7 +4455,7 @@ func (r *Repository) UpdateStock(_ context.Context, stocks map[model.SKUType]*mo
 }
 </pre>
 		
-		<pre class="file" id="file26" style="display: none">package orderservice
+		<pre class="file" id="file27" style="display: none">package orderservice
 
 import (
         "context"
@@ -4395,7 +4584,7 @@ func (s *Service) OrderCancel(ctx context.Context, orderID int64) error <span cl
 }
 </pre>
 		
-		<pre class="file" id="file27" style="display: none">package stockservice
+		<pre class="file" id="file28" style="display: none">package stockservice
 
 import (
         "context"
@@ -4512,7 +4701,7 @@ func makeSkuCountMap(items []*model.Item) map[model.SKUType]uint32 <span class="
 }
 </pre>
 		
-		<pre class="file" id="file28" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file29" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.28.1
 //         protoc        (unknown)
@@ -4750,7 +4939,7 @@ func file_protoc_gen_openapiv2_options_annotations_proto_init() <span class="cov
 }
 </pre>
 		
-		<pre class="file" id="file29" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file30" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.28.1
 //         protoc        (unknown)
@@ -7978,7 +8167,7 @@ func file_protoc_gen_openapiv2_options_openapiv2_proto_init() <span class="cov0"
 }
 </pre>
 		
-		<pre class="file" id="file30" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
+		<pre class="file" id="file31" style="display: none">// Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 //         protoc-gen-go v1.30.0
 //         protoc        v3.21.12

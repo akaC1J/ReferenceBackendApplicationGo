@@ -11,6 +11,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"route256/loms/internal/app/grpccontroller"
 	"route256/loms/internal/generated/api/loms/v1"
 	"route256/loms/internal/infra"
@@ -20,6 +22,8 @@ import (
 	"route256/loms/internal/repository/stockrepository"
 	"route256/loms/internal/service/orderservice"
 	"route256/loms/internal/service/stockservice"
+	"syscall"
+	"time"
 )
 
 type App struct {
@@ -38,17 +42,51 @@ func (application *App) Run(config *Config) {
 	}
 
 	log.Println("[main] Application initialization successful")
-	log.Printf("[main] server listening at %v", lis.Addr())
+	log.Printf("[main] gRPC server listening at %v", lis.Addr())
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	serverErrors := make(chan error, 2)
 
 	go func() {
-		if err = application.GrpcServer.Serve(lis); err != nil {
-			log.Fatalf("[main] failed to serve: %v", err)
+		if err := application.GrpcServer.Serve(lis); err != nil && err != grpc.ErrServerStopped {
+			log.Printf("[main] gRPC server error: %v", err)
+			serverErrors <- err
 		}
 	}()
-	log.Printf("[main] server listening at %v", application.GwServer.Addr)
-	if err = application.GwServer.ListenAndServe(); err != nil {
-		log.Fatalf("[main] failed to serve: %v", err)
+
+	log.Printf("[main] HTTP server listening at %v", application.GwServer.Addr)
+
+	go func() {
+		if err := application.GwServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Printf("[main] HTTP server error: %v", err)
+			serverErrors <- err
+		}
+	}()
+
+	select {
+	case sig := <-quit:
+		log.Printf("[main] Caught signal %v. Shutting down gracefully...", sig)
+	case err := <-serverErrors:
+		log.Printf("[main] Received server error: %v", err)
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	go func() {
+		application.GrpcServer.GracefulStop()
+		log.Println("[main] gRPC server stopped")
+	}()
+
+	if err := application.GwServer.Shutdown(ctx); err != nil {
+		log.Printf("[main] HTTP server forced to shutdown: %v", err)
+	} else {
+		log.Println("[main] HTTP server stopped")
+	}
+
+	log.Println("[main] Application gracefully stopped")
 }
 
 func MustNew(config *Config) (*App, error) {

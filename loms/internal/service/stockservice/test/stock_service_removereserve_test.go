@@ -24,9 +24,10 @@ func TestService_ReserveRemove_Success(t *testing.T) {
 
 	repoMock := NewRepositoryMock(mc)
 
-	repoMock.GetStocksMock.
-		When(ctx, []model.SKUType{1, 2}).
-		Then([]*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}, {SKU: 2, TotalCount: 15, ReservedCount: 5}}, nil)
+	repoMock.GetStocksMock.Set(func(ctx context.Context, skus []model.SKUType) ([]*model.Stock, error) {
+		assert.ElementsMatch(t, []model.SKUType{1, 2}, skus)
+		return []*model.Stock{{SKU: 1, TotalCount: 20, ReservedCount: 10}, {SKU: 2, TotalCount: 15, ReservedCount: 5}}, nil
+	})
 
 	expectedUpdateStocks := map[model.SKUType]*model.Stock{
 		1: {SKU: 1, TotalCount: 15, ReservedCount: 5}, // 10 - 5
