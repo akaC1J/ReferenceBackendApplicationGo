@@ -55,11 +55,14 @@ func MustNew(config *Config) (*App, error) {
 	log.Println("[cart] Starting application initialization")
 	dbpoolMaster, err := initDbPool(config.DBConfigMaster)
 	if err != nil {
-		log.Fatalf("Unable to create connection pool: %v", err)
+		log.Fatalf("Unable to create connection pool for master: %v", err)
 	}
 
 	// либо мы успешно инициализировали пул метрик, либо мы считаем что она отсутствует
-	dbpoolReplica, _ := initDbPool(config.DBConfigReplica)
+	dbpoolReplica, err := initDbPool(config.DBConfigReplicaOptional)
+	if err != nil {
+		log.Printf("Unable to create connection pool for replice. Will be use only master mode: %v", err)
+	}
 	dbRouter := infra.NewDBRouter(dbpoolMaster, dbpoolReplica)
 
 	orderRepository := orderrepository.NewRepository(dbRouter)
@@ -118,11 +121,11 @@ func initDbPool(dbConfig *DBConfig) (*pgxpool.Pool, error) {
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse configuration for master: %w", err)
+		return nil, fmt.Errorf("unable to parse configuration for db (host:port %s): %w", dbConfig.DBHostPort, err)
 	}
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create master-pool: %w", err)
+		return nil, fmt.Errorf("unable to create pool with host:port %s: %w", dbConfig.DBHostPort, err)
 	}
 	return pool, nil
 }
