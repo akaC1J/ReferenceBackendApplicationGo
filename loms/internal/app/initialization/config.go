@@ -9,12 +9,12 @@ import (
 )
 
 type Config struct {
-	StockFilePath   string
-	GgrpcHostPort   string
-	HttpPort        int
-	SwagerUrl       string
-	DBConfigMaster  *DBConfig
-	DBConfigReplica *DBConfig
+	StockFilePath           string
+	GgrpcHostPort           string
+	HttpPort                int
+	SwagerUrl               string
+	DBConfigMaster          *DBConfig
+	DBConfigReplicaOptional *DBConfig
 }
 
 type DBConfig struct {
@@ -60,16 +60,16 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 	swaggerUrl := os.Getenv("SWAGGER_FOR_CORS_ALLOWED_URL")
 	configMaster, configReplica := MustLoadDBConfig()
 	return &Config{
-		StockFilePath:   stockFilePath,
-		GgrpcHostPort:   grpcPort,
-		HttpPort:        httpPort,
-		SwagerUrl:       swaggerUrl,
-		DBConfigMaster:  configMaster,
-		DBConfigReplica: configReplica,
+		StockFilePath:           stockFilePath,
+		GgrpcHostPort:           grpcPort,
+		HttpPort:                httpPort,
+		SwagerUrl:               swaggerUrl,
+		DBConfigMaster:          configMaster,
+		DBConfigReplicaOptional: configReplica,
 	}, nil
 }
 
-func MustLoadDBConfig() (masterConfig, replicaConfig *DBConfig) {
+func MustLoadDBConfig() (masterConfig, replicaConfigOptional *DBConfig) {
 	masterConfig = &DBConfig{
 		DBUser:     os.Getenv("DATABASE_MASTER_USER"),
 		DBPassword: os.Getenv("DATABASE_MASTER_PASSWORD"),
@@ -87,7 +87,7 @@ func MustLoadDBConfig() (masterConfig, replicaConfig *DBConfig) {
 		log.Fatalf("DATABASE_MASTER_NAME is not set")
 	}
 
-	replicaConfig = &DBConfig{
+	replicaConfigOptional = &DBConfig{
 		DBUser:     os.Getenv("DATABASE_REPLICA_USER"),
 		DBPassword: os.Getenv("DATABASE_REPLICA_PASSWORD"),
 		DBHostPort: os.Getenv("DATABASE_REPLICA_HOST_PORT"),
@@ -103,7 +103,8 @@ func MustLoadDBConfig() (masterConfig, replicaConfig *DBConfig) {
 	case masterConfig.DBHostPort:
 		fallthrough
 	case masterConfig.DBName:
-		replicaConfig = nil
+		log.Printf("[config] replica configuration is incomplete, using only master")
+		replicaConfigOptional = nil
 	}
 
 	return

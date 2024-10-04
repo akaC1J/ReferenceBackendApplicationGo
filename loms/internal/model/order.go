@@ -15,6 +15,14 @@ const (
 	CANCELLED                  = "CANCELLED"
 )
 
+var availableStates = map[StateType]struct{}{
+	NEW:              {},
+	AWAITING_PAYMENT: {},
+	FAILED:           {},
+	PAYED:            {},
+	CANCELLED:        {},
+}
+
 type Order struct {
 	ID     int64
 	state  StateType
@@ -23,13 +31,6 @@ type Order struct {
 }
 
 func (order *Order) SetState(state StateType) error {
-	availableStates := map[StateType]struct{}{
-		NEW:              {},
-		AWAITING_PAYMENT: {},
-		FAILED:           {},
-		PAYED:            {},
-		CANCELLED:        {},
-	}
 	state = StateType(strings.ToUpper(string(state)))
 	if _, ok := availableStates[state]; !ok {
 		return fmt.Errorf("invalid state: %s", state)
