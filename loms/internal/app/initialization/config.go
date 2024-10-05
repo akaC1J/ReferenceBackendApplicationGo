@@ -58,7 +58,10 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 	}
 
 	swaggerUrl := os.Getenv("SWAGGER_FOR_CORS_ALLOWED_URL")
-	configMaster, configReplica := MustLoadDBConfig()
+	configMaster, configReplica, err := MustLoadDBConfig()
+	if err != nil {
+		log.Printf("[config] replica configuration is incomplete, using only master")
+	}
 	return &Config{
 		StockFilePath:           stockFilePath,
 		GgrpcHostPort:           grpcPort,
@@ -69,7 +72,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 	}, nil
 }
 
-func MustLoadDBConfig() (masterConfig, replicaConfigOptional *DBConfig) {
+func MustLoadDBConfig() (masterConfig, replicaConfigOptional *DBConfig, err error) {
 	masterConfig = &DBConfig{
 		DBUser:     os.Getenv("DATABASE_MASTER_USER"),
 		DBPassword: os.Getenv("DATABASE_MASTER_PASSWORD"),
@@ -103,7 +106,7 @@ func MustLoadDBConfig() (masterConfig, replicaConfigOptional *DBConfig) {
 	case masterConfig.DBHostPort:
 		fallthrough
 	case masterConfig.DBName:
-		log.Printf("[config] replica configuration is incomplete, using only master")
+		err = fmt.Errorf("replica configuration is incomplete")
 		replicaConfigOptional = nil
 	}
 
