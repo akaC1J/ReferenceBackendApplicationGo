@@ -18,6 +18,9 @@ export GOBIN := $(BIN_DIR)
 build: .install-tools .protoc-generate .sqlc-generate ### Собрать проект
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o  $(BIN_DIR)/loms cmd/loms/main.go
 
+build-cache:  ## Собрать проект не устанавливая зависимости
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/loms ./cmd/loms
+
 .PHONY: fast-run
 #Цель для локального запуска
 fast-run: ## Запустить проект
@@ -69,7 +72,7 @@ LOMS_PROTO_PATH:="api/loms/v1"
 
 
 .PHONY: .sqlc-generate
-.sqlc-generate: ## Генерация кода из sql-файлов
+sqlc-generate: ## Генерация кода из sql-файлов
 	@echo "Generating sqlc code"
 	$(BIN_DIR)/sqlc generate
 
@@ -79,8 +82,12 @@ ifneq (,$(wildcard ../.env))
 endif
 .PHONY: apply-migrations
 apply-migrations: ## Применить миграции goose
-	bin/goose -dir migrations postgres \
-	"postgresql://$(POSTGRES_MASTER_USER):${POSTGRES_MASTER_PASSWORD}@$(POSTGRES_MASTER_HOST_PORT)/loms?sslmode=disable" up
+	$(foreach idx,0 1,\
+		bin/goose -dir migrations/common postgres \
+		"postgresql://$(POSTGRES_MASTER_USER_$(idx)):$(POSTGRES_MASTER_PASSWORD_$(idx))@$(POSTGRES_MASTER_HOST_PORT_$(idx))/loms?sslmode=disable" up; \
+		bin/goose -dir migrations/shard_$(idx) postgres \
+		"postgresql://$(POSTGRES_MASTER_USER_$(idx)):$(POSTGRES_MASTER_PASSWORD_$(idx))@$(POSTGRES_MASTER_HOST_PORT_$(idx))/loms?sslmode=disable" up; \
+	)
 
 .PHONY: add_migrations
 add_migrations: .install-tools ### Создать новый файл миграции, обязателен параметр MIGR_NAME

@@ -1,5 +1,5 @@
 ### add 5 sku to cart
-POST http://localhost:8082/user/31337/cart/773297411
+POST http://localhost:8082/user/31337/cart/5415913
 Content-Type: application/json
 
 {

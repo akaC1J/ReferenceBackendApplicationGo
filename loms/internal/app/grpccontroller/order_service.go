@@ -50,7 +50,7 @@ func convertOrderToResponse(order *model.Order) *lomsGrpc.Order {
 		})
 	}
 
-	orderRs.Status = string(order.State())
+	orderRs.Status = string(order.State)
 
 	return orderRs
 }

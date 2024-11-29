@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
+	"route256/cart/internal/logger"
 	"strconv"
 )
 
@@ -17,6 +18,7 @@ type Config struct {
 	Port               string
 	LomsBaseUrl        string
 	RequestsPerSecond  uint
+	CacheCapacity      int
 }
 
 func LoadDefaultConfig() (*Config, error) {
@@ -67,6 +69,17 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		return nil, fmt.Errorf("LOMS_BASE_URL environment variable is required")
 	}
 
+	cacheCapacity := os.Getenv("CACHE_CAPACITY")
+	cacheCapacityInt := 10
+	if cacheCapacity == "" {
+		logger.Warnw(nil, fmt.Sprintf("CACHE_CAPACITY environment variable is not exist. Default value 10 will be used"))
+	} else {
+		cacheCapacityInt, err = strconv.Atoi(cacheCapacity)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &Config{
 		MaxRetries:         maxRetries,
 		RetryDelayMs:       retryMs,
@@ -76,6 +89,7 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		HostPort:           hostPort,
 		LomsBaseUrl:        lomsBaseUrl,
 		RequestsPerSecond:  uint(requestsPerSecond),
+		CacheCapacity:      cacheCapacityInt,
 	}, nil
 }
 

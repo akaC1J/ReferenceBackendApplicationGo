@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
+	pkgLogger "route256/cart/internal/logger"
 	"strings"
 	"time"
 )
@@ -76,7 +76,6 @@ func (rc *responseCapture) Write(b []byte) (int, error) {
 
 func (m *LogMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
-
 	clientIP := r.RemoteAddr
 	if ip := r.Header.Get("X-Real-IP"); ip != "" {
 		clientIP = ip
@@ -107,5 +106,5 @@ func (m *LogMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(startTime)
 
 	fullLog := fmt.Sprintf("%s%s Duration: %v", rqMessageLog, responseLog, duration)
-	log.Println("[middleware] " + fullLog)
+	pkgLogger.Infow(r.Context(), fullLog+"\n")
 }

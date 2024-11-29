@@ -12,7 +12,7 @@ GRPC localhost:50051/Loms/OrderCreate
 
 {
   "order": {
-    "user": 12345,
+    "user": 12459,
     "items": [
       {
         "sku": 1002,
@@ -39,7 +39,7 @@ GRPC localhost:50051/Loms/StocksInfo
 GRPC localhost:50051/Loms/OrderInfo
 
 {
-  "order_id": 1
+  "order_id": 2001
 }
 ### Expected Order with state AWAITING_PAY Status OK, must be return order from second request
 

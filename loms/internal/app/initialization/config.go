@@ -4,17 +4,25 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
+	"math"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Config struct {
-	StockFilePath           string
-	GgrpcHostPort           string
-	HttpPort                int
-	SwagerUrl               string
-	DBConfigMaster          *DBConfig
-	DBConfigReplicaOptional *DBConfig
+	StockFilePath  string
+	GgrpcHostPort  string
+	HttpPort       int
+	SwagerUrl      string
+	DBConfigs      []*DBConfigs
+	KafkaConfig    *KafkaConfig
+	IntervalOutbox time.Duration
+}
+
+type DBConfigs struct {
+	Master          *DBConfig
+	ReplicaOptional *DBConfig
 }
 
 type DBConfig struct {
@@ -22,6 +30,12 @@ type DBConfig struct {
 	DBPassword string
 	DBHostPort string
 	DBName     string
+}
+
+type KafkaConfig struct {
+	Brokers  []string
+	RetryMax uint
+	Topic    string
 }
 
 const defaultHostPortGrpc = ":50051"
@@ -58,59 +72,100 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 	}
 
 	swaggerUrl := os.Getenv("SWAGGER_FOR_CORS_ALLOWED_URL")
-	configMaster, configReplica, err := MustLoadDBConfig()
+	dbConfigs, err := MustLoadDBConfig()
 	if err != nil {
 		log.Printf("[config] replica configuration is incomplete, using only master")
 	}
+
+	intervalOutboxStr := os.Getenv("INTERVAL_OUTBOX")
+	intervalOutbox, err := strconv.ParseUint(intervalOutboxStr, 10, 64)
+
+	if err != nil || intervalOutbox > math.MaxInt64 {
+		log.Printf("[config] failed to parse INTERVAL_OUTBOX: %v", err)
+		intervalOutbox = 1_000_000_000
+	}
 	return &Config{
-		StockFilePath:           stockFilePath,
-		GgrpcHostPort:           grpcPort,
-		HttpPort:                httpPort,
-		SwagerUrl:               swaggerUrl,
-		DBConfigMaster:          configMaster,
-		DBConfigReplicaOptional: configReplica,
+		StockFilePath:  stockFilePath,
+		GgrpcHostPort:  grpcPort,
+		HttpPort:       httpPort,
+		SwagerUrl:      swaggerUrl,
+		DBConfigs:      dbConfigs,
+		KafkaConfig:    MustLoadKafkaConfig(),
+		IntervalOutbox: time.Duration(intervalOutbox),
 	}, nil
 }
 
-func MustLoadDBConfig() (masterConfig, replicaConfigOptional *DBConfig, err error) {
-	masterConfig = &DBConfig{
-		DBUser:     os.Getenv("DATABASE_MASTER_USER"),
-		DBPassword: os.Getenv("DATABASE_MASTER_PASSWORD"),
-		DBHostPort: os.Getenv("DATABASE_MASTER_HOST_PORT"),
-		DBName:     os.Getenv("DATABASE_MASTER_NAME"),
+func MustLoadDBConfig() ([]*DBConfigs, error) {
+	var dbConfigs []*DBConfigs
+	var err error
+	generateEnvNameWithIndex := func(envName string, index int) string {
+		return fmt.Sprintf("%s_%d", envName, index)
 	}
-	switch "" {
-	case masterConfig.DBUser:
-		log.Fatalf("DATABASE_MASTER_USER is not set")
-	case masterConfig.DBPassword:
-		log.Fatalf("DATABASE_MASTER_PASSWORD is not set")
-	case masterConfig.DBHostPort:
-		log.Fatalf("DATABASE_MASTER_HOST_PORT is not set")
-	case masterConfig.DBName:
-		log.Fatalf("DATABASE_MASTER_NAME is not set")
+	for i := 0; i < 2; i++ {
+		masterConfig := &DBConfig{
+			DBUser:     os.Getenv(generateEnvNameWithIndex("DATABASE_MASTER_USER", i)),
+			DBPassword: os.Getenv(generateEnvNameWithIndex("DATABASE_MASTER_PASSWORD", i)),
+			DBHostPort: os.Getenv(generateEnvNameWithIndex("DATABASE_MASTER_HOST_PORT", i)),
+			DBName:     os.Getenv(generateEnvNameWithIndex("DATABASE_MASTER_NAME", i)),
+		}
+		switch "" {
+		case masterConfig.DBUser:
+			log.Fatalf(generateEnvNameWithIndex("DATABASE_MASTER_USER", i) + " is not set")
+		case masterConfig.DBPassword:
+			log.Fatalf(generateEnvNameWithIndex("DATABASE_MASTER_PASSWORD", i) + " is not set")
+		case masterConfig.DBHostPort:
+			log.Fatalf(generateEnvNameWithIndex("DATABASE_MASTER_HOST_PORT", i) + " is not set")
+		case masterConfig.DBName:
+			log.Fatalf(generateEnvNameWithIndex("DATABASE_MASTER_NAME", i) + " is not set")
+		}
+
+		replicaConfigOptional := &DBConfig{
+			DBUser:     os.Getenv(generateEnvNameWithIndex("DATABASE_REPLICA_USER", i)),
+			DBPassword: os.Getenv(generateEnvNameWithIndex("DATABASE_REPLICA_PASSWORD", i)),
+			DBHostPort: os.Getenv(generateEnvNameWithIndex("DATABASE_REPLICA_HOST_PORT", i)),
+			DBName:     os.Getenv(generateEnvNameWithIndex("DATABASE_REPLICA_NAME", i)),
+		}
+
+		//если чего-то не хватает делаем nil, значит реплики у нас не будет
+		switch "" {
+		case replicaConfigOptional.DBUser:
+			fallthrough
+		case replicaConfigOptional.DBPassword:
+			fallthrough
+		case replicaConfigOptional.DBHostPort:
+			fallthrough
+		case replicaConfigOptional.DBName:
+			err = fmt.Errorf("replica with index" + fmt.Sprintf("%d ", i) + "configuration is incomplete")
+			replicaConfigOptional = nil
+		}
+		dbConfigs = append(dbConfigs, &DBConfigs{
+			Master:          masterConfig,
+			ReplicaOptional: replicaConfigOptional,
+		})
 	}
 
-	replicaConfigOptional = &DBConfig{
-		DBUser:     os.Getenv("DATABASE_REPLICA_USER"),
-		DBPassword: os.Getenv("DATABASE_REPLICA_PASSWORD"),
-		DBHostPort: os.Getenv("DATABASE_REPLICA_HOST_PORT"),
-		DBName:     os.Getenv("DATABASE_REPLICA_NAME"),
+	return dbConfigs, err
+}
+
+func MustLoadKafkaConfig() (kafkaConfig *KafkaConfig) {
+	maxRetryStr := os.Getenv("KAFKA_RETRY_MAX")
+	maxRetry, err := strconv.ParseUint(maxRetryStr, 10, 0)
+	if err != nil {
+		log.Fatalf("KAFKA_RETRY_MAX is incorrect: %v", err)
 	}
 
-	//если чего-то не хватает делаем nil, значит реплики у нас не будет
-	switch "" {
-	case masterConfig.DBUser:
-		fallthrough
-	case masterConfig.DBPassword:
-		fallthrough
-	case masterConfig.DBHostPort:
-		fallthrough
-	case masterConfig.DBName:
-		err = fmt.Errorf("replica configuration is incomplete")
-		replicaConfigOptional = nil
+	kafkaConfig = &KafkaConfig{
+		Brokers:  []string{os.Getenv("KAFKA_BROKER")},
+		RetryMax: uint(maxRetry),
+		Topic:    os.Getenv("KAFKA_TOPIC"),
 	}
-
-	return
+	if kafkaConfig.Brokers[0] == "" {
+		log.Fatalf("KAFKA_BROKER is not set")
+	}
+	if kafkaConfig.Topic == "" {
+		log.Fatalf("KAFKA_TOPIC is not set")
+	}
+	return kafkaConfig
 }
 
 func loadEnv(pathToEnv string) error {

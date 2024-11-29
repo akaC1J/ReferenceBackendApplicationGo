@@ -25,7 +25,7 @@ var availableStates = map[StateType]struct{}{
 
 type Order struct {
 	ID     int64
-	state  StateType
+	State  StateType
 	Items  []*Item
 	UserId int64
 }
@@ -33,12 +33,8 @@ type Order struct {
 func (order *Order) SetState(state StateType) error {
 	state = StateType(strings.ToUpper(string(state)))
 	if _, ok := availableStates[state]; !ok {
-		return fmt.Errorf("invalid state: %s", state)
+		return fmt.Errorf("invalid State: %s", state)
 	}
-	order.state = state
+	order.State = state
 	return nil
-}
-
-func (order *Order) State() StateType {
-	return order.state
 }

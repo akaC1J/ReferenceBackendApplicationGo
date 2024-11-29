@@ -77,8 +77,8 @@ func (s *Service) OrderPay(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	if order.State() != model.AWAITING_PAYMENT {
-		log.Printf("[order_service] Invalid order state: %v", order.State())
+	if order.State != model.AWAITING_PAYMENT {
+		log.Printf("[order_service] Invalid order state: %v", order.State)
 		return appErr.ErrOrderState
 	}
 
@@ -105,8 +105,8 @@ func (s *Service) OrderCancel(ctx context.Context, orderID int64) error {
 		return err
 	}
 
-	if order.State() != model.AWAITING_PAYMENT {
-		log.Printf("[order_service] Invalid order state: %v", order.State())
+	if order.State != model.AWAITING_PAYMENT {
+		log.Printf("[order_service] Invalid order state: %v", order.State)
 		return appErr.ErrOrderState
 	}
 

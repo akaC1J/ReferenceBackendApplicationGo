@@ -70,7 +70,7 @@ func TestMain(m *testing.M) {
 	}
 
 	log.Println("Database connected successfully!")
-	os.Setenv("DATABASE_MASTER_HOST_PORT", fmt.Sprintf("localhost:%s", port.Port()))
+	os.Setenv("DATABASE_MASTER_HOST_PORT_0", fmt.Sprintf("localhost:%s", port.Port()))
 	code := m.Run()
 
 	if err := postgresContainer.Terminate(ctx); err != nil {

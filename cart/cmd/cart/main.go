@@ -2,16 +2,23 @@ package main
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"route256/cart/internal/app/initialization"
+	pkgLogger "route256/cart/internal/logger"
 	"syscall"
 	"time"
 )
 
 func main() {
+	zapConfig := zap.NewProductionConfig()
+	zapConfig.ErrorOutputPaths = []string{"stdout"}
+	zapConfig.Level.SetLevel(zap.InfoLevel)
+	zapLogger := pkgLogger.NewLogger(zapConfig)
+
 	envPath := os.Getenv("ENV_PATH")
 	var config *initialization.Config
 	var err error
@@ -22,15 +29,15 @@ func main() {
 	}
 
 	if err != nil {
-		log.Fatalf("[main] Failed to load configuration: %v", err)
+		pkgLogger.PanicF(nil, "Failed to load configuration: %v\n", err)
 	}
 
-	application, err := initialization.New(config)
+	application, err := initialization.New(config, zapLogger)
 	if err != nil {
-		log.Fatalf("[main] Failed to initialize application: %v", err)
+		pkgLogger.PanicF(nil, "Failed to initialize application: %v\n", err)
 	}
 
-	log.Println("[main] Application initialization successful")
+	pkgLogger.Infow(nil, " Application initialization successful\n")
 
 	srv := &http.Server{
 		Addr:    config.HostPort,
@@ -41,21 +48,21 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("[main] Starting server on %s\n", config.HostPort)
+		pkgLogger.Infow(nil, "[main] Starting server on %s\n", config.HostPort)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("[main] Failed to start server: %v", err)
 		}
 	}()
 
 	<-quit
-	log.Println("[main] Shutting down server...")
+	pkgLogger.Infow(nil, "[main] Shutting down server...\n")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("[main] Server forced to shutdown: %v", err)
+		pkgLogger.PanicF(nil, "[main] Server forced to shutdown: %v\n", err)
 	}
 
-	log.Println("[main] Server gracefully stopped")
+	pkgLogger.Infow(nil, "[main] Server gracefully stopped\n")
 }

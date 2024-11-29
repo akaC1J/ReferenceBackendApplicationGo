@@ -19,15 +19,23 @@ services:
       - "50051:50051"
       - "8081:8081"
     environment:
-      - DATABASE_MASTER_HOST_PORT=postgres_master:5432
-      - DATABASE_REPLICA_HOST_PORT=postgres_slave:5432
+      - DATABASE_MASTER_HOST_PORT_0=postgres_master_0:5432
+      - DATABASE_REPLICA_HOST_PORT_0=postgres_slave_0:5432
       - SWAGGER_FOR_CORS_ALLOWED_URL=http://localhost:8080
-
+      - KAFKA_BROKER=kafka:29092
+    
+  notifier:
+    build: ./notifier/
+    environment:
+        - KAFKA_BROKER=kafka:29092
+    depends_on:
+      - kafka
+  
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: swagger-ui
     ports:
-      - "8080:8080"
+      - "8089:8080"
     volumes:
       - ./loms/api/openapiv2/loms.swagger.json:/app/swagger.json
     environment:
@@ -35,10 +43,10 @@ services:
     depends_on:
       - loms
   
-  postgres_master:
+  postgres_master_0:
     image: postgres:16
     volumes:
-      - pgdata_master:/var/lib/postgresql/data
+      - pgdata_master_0:/var/lib/postgresql/data
       - ./config/master/postgresql.conf:/etc/postgresql/postgresql.conf
       - ./config/master/pg_hba.conf:/etc/postgresql/data/pg_hba.conf
       - ./config/master/init-script.sh:/docker-entrypoint-initdb.d/init-script.sh
@@ -47,25 +55,26 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: loms
-      POSTGRES_USER: ${POSTGRES_MASTER_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_MASTER_PASSWORD}
-      POSTGRES_REPLICA_USER: ${POSTGRES_REPLICA_USER}
-      POSTGRES_REPLICA_PASSWORD: ${POSTGRES_REPLICA_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_MASTER_USER_0}
+      POSTGRES_PASSWORD: ${POSTGRES_MASTER_PASSWORD_0}
+      POSTGRES_REPLICA_USER: ${POSTGRES_REPLICA_USER_0}
+      POSTGRES_REPLICA_PASSWORD: ${POSTGRES_REPLICA_PASSWORD_0}
       
-  postgres_slave:
+  postgres_slave_0:
     user: postgres
     image: postgres:16
     volumes:
-      - pgdata_slave:/var/lib/postgresql/data
+      - pgdata_slave_0:/var/lib/postgresql/data
       - ./config/slave/postgresql.conf:/etc/postgresql/postgresql.conf
     ports:
       - "5433:5432"
     depends_on:
-      - postgres_master
+      - postgres_master_0
     command: >
       bash -c "
+      rm -rf /var/lib/postgresql/data/*;
       chmod 700 /var/lib/postgresql/data;
-      until PGPASSWORD=${POSTGRES_REPLICA_PASSWORD} pg_basebackup -h postgres_master -D /var/lib/postgresql/data -U ${POSTGRES_REPLICA_USER} -Fp -Xs -P -R;
+      until PGPASSWORD=${POSTGRES_REPLICA_PASSWORD_0} pg_basebackup -h postgres_master_0 -D /var/lib/postgresql/data -U ${POSTGRES_REPLICA_USER_0} -Fp -Xs -P -R;
       do
         echo 'Waiting for master to be ready...';
         sleep 1;
@@ -73,7 +82,85 @@ services:
       
       postgres -c config_file=/etc/postgresql/postgresql.conf
       "
+      
+  postgres_master_1:
+    image: postgres:16
+    volumes:
+      - pgdata_master_1:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: loms
+      POSTGRES_USER: ${POSTGRES_MASTER_USER_1}
+      POSTGRES_PASSWORD: ${POSTGRES_MASTER_PASSWORD_1}
+      
+  kafka:
+    image: confluentinc/cp-kafka:7.7.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29093"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+    ports:
+      - "9092:9092" # Порт для доступа к Kafka с хоста
+    
+  kafka-init:
+    image: confluentinc/cp-kafka:7.7.1
+    depends_on:
+      - kafka
+    entrypoint: >
+      bash -c "
+      /bin/kafka-topics --create
+      --topic loms.order-events
+      --bootstrap-server kafka:29092
+      --replication-factor 1
+      --partitions 2
+      "
+  
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+        
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+  
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4318:4318"      
 
 volumes:
-  pgdata_master:
-  pgdata_slave:
+  pgdata_master_0:
+  pgdata_slave_0:
+  pgdata_master_1:
+  prometheus_data:
+  grafana_data:

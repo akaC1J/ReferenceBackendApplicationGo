@@ -4,38 +4,37 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/multierr"
 	apperrors "route256/loms/internal/errors"
-	"route256/loms/internal/infra"
+	"route256/loms/internal/infra/database"
 	"route256/loms/internal/model"
 	"route256/loms/internal/repository"
 )
 
 type Repository struct {
-	q    *Queries
 	pool ConnectionPooler
 }
 
 type ConnectionPooler interface {
-	DBTX
-	Acquire(ctx context.Context) (*pgxpool.Conn, error)
+	PickDefaultShard(ctx context.Context, readOnly bool) (*database.FallbackConnection, error)
 }
 
 func NewRepository(pool ConnectionPooler) *Repository {
 	return &Repository{
-		q:    New(pool),
 		pool: pool,
 	}
 }
 
 func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks []*model.Stock, err error) {
-	ctx = context.WithValue(ctx, infra.ReadOnlyKey, true)
 	intSku := make([]int64, 0, len(sku))
 	for _, s := range sku {
 		intSku = append(intSku, int64(s))
 	}
-	repositoryStocks, err := r.q.GetStockBySkus(ctx, intSku)
+	conn, err := r.pool.PickDefaultShard(ctx, true)
+	if err != nil {
+		return nil, fmt.Errorf("unable to acquire a connection: %w", err)
+	}
+	repositoryStocks, err := New(conn).GetStockBySkus(ctx, intSku)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +62,7 @@ func (r *Repository) GetStocks(ctx context.Context, sku []model.SKUType) (stocks
 }
 
 func (r *Repository) UpdateStock(ctx context.Context, stocks map[model.SKUType]*model.Stock) error {
-	ctx = context.WithValue(ctx, infra.ReadOnlyKey, false)
-	conn, err := r.pool.Acquire(ctx)
+	conn, err := r.pool.PickDefaultShard(ctx, false)
 	if err != nil {
 		return fmt.Errorf("unable to acquire a connection: %w", err)
 	}

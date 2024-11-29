@@ -20,6 +20,8 @@ export GOBIN := $(BIN_DIR)
 build:  .vendor-proto .protoc-generate  ## Собрать проект
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/cart ./cmd/cart
 
+build-cache:  ## Собрать проект не устанавливая зависимости
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $(BIN_DIR)/cart ./cmd/cart
 #Цель для быстрого запуска
 fast-run:
 	go run cmd/cart/main.go
