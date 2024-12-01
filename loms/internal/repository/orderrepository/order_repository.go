@@ -12,6 +12,7 @@ import (
 	"route256/loms/internal/model"
 	"route256/loms/internal/repository"
 	"route256/loms/internal/repository/outboxrepository"
+	"slices"
 )
 
 type Repository struct {
@@ -22,6 +23,7 @@ type Repository struct {
 type ConnectionPooler interface {
 	PickConnFromUserId(ctx context.Context, userId int64, readOnlyOperation bool) (*database.FallbackConnection, error)
 	PickConnFromOrderId(ctx context.Context, orderID int64, readOnlyOperation bool) (*database.FallbackConnection, error)
+	PickAllShards(ctx context.Context, readOnlyOperation bool) ([]*database.FallbackConnection, error)
 }
 
 func NewRepository(pool ConnectionPooler, oR *outboxrepository.Repository) *Repository {
@@ -121,6 +123,55 @@ func (r *Repository) GetById(ctx context.Context, orderID int64) (*model.Order, 
 		return nil, fmt.Errorf("unable to repack order from DB: %w", err)
 	}
 	return order, nil
+}
+
+func (r *Repository) GetAllOrders(ctx context.Context) ([]*model.Order, error) {
+	connections, err := r.pool.PickAllShards(ctx, true)
+	if err != nil {
+		return nil, fmt.Errorf("error pick all shards: %w", err)
+	}
+	orders := make([]*model.Order, 0)
+	for id, conn := range connections {
+		ordersFromDb, err := New(conn).GetAllOrders(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("unable to get orders from shard id %d: %w", id, err)
+		}
+		toOrders, err := repackOrdersFromDBToOrders(ordersFromDb)
+		if err != nil {
+			return nil, fmt.Errorf("unable to repack order from DB for shard id %d: %w", id, err)
+		}
+		orders = append(orders, toOrders...)
+	}
+
+	slices.SortFunc(orders, func(i, j *model.Order) int {
+		return -int(i.ID - j.ID)
+	})
+
+	return orders, nil
+}
+
+func repackOrdersFromDBToOrders(ordersFromDB []*GetAllOrdersRow) ([]*model.Order, error) {
+	ordersRes := make([]*model.Order, 0)
+	orders := make(map[int64][]*GetOrderByIdRow)
+	for _, orderFromDB := range ordersFromDB {
+		orders[orderFromDB.ID] = append(orders[orderFromDB.ID], &GetOrderByIdRow{
+			ID:     orderFromDB.ID,
+			State:  orderFromDB.State,
+			UserID: orderFromDB.UserID,
+			Sku:    orderFromDB.Sku,
+			Count:  orderFromDB.Count,
+		})
+	}
+
+	for key := range orders {
+		order, err := repackOrderFromDBToOrder(orders[key])
+		if err != nil {
+			return nil, err
+		}
+		ordersRes = append(ordersRes, order)
+	}
+
+	return ordersRes, nil
 }
 
 func repackOrderFromDBToOrder(orderFromDB []*GetOrderByIdRow) (*model.Order, error) {

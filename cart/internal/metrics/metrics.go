@@ -38,6 +38,18 @@ var (
 		},
 		[]string{"url", "status"},
 	)
+	CacheHits = promauto.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "cache_hits_total",
+			Help: "Количество попаданий в кеш.",
+		}, []string{},
+	)
+	CacheMisses = promauto.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "cache_misses_total",
+			Help: "Количество промахов кеша.",
+		}, []string{},
+	)
 )
 
 // RecordRequest записывает метрики для запросов к API
@@ -50,4 +62,14 @@ func RecordRequest(method, url, status string, duration time.Duration) {
 func RecordExternalRequest(url, status string, duration time.Duration) {
 	ExternalRequests.WithLabelValues(url, status).Inc()
 	ExternalRequestDuration.WithLabelValues(url, status).Observe(duration.Seconds())
+}
+
+// RecordCacheHit записывает метрику для попадания в кеш
+func RecordCacheHit() {
+	CacheHits.WithLabelValues().Inc()
+}
+
+// RecordCacheMiss записывает метрику для промаха кеша
+func RecordCacheMiss() {
+	CacheMisses.WithLabelValues().Inc()
 }

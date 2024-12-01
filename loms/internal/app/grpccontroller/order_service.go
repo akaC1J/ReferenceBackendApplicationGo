@@ -39,8 +39,21 @@ func (o *LomsController) OrderInfo(ctx context.Context, request *lomsGrpc.OrderI
 	return &lomsGrpc.OrderInfoResponse{Order: convertOrderToResponse(order)}, nil
 }
 
+func (o *LomsController) OrdersAll(ctx context.Context, _ *emptypb.Empty) (*lomsGrpc.OrderAllResponse, error) {
+	orders, err := o.orderService.GetAllOrders(ctx)
+	if err != nil {
+		return nil, mapErrorToGRPC(err)
+	}
+	var ordersRs []*lomsGrpc.Order
+	for _, order := range orders {
+		ordersRs = append(ordersRs, convertOrderToResponse(order))
+	}
+	return &lomsGrpc.OrderAllResponse{Orders: ordersRs}, nil
+}
+
 func convertOrderToResponse(order *model.Order) *lomsGrpc.Order {
 	orderRs := &lomsGrpc.Order{
+		Id:   order.ID,
 		User: order.UserId,
 	}
 	for _, item := range order.Items {

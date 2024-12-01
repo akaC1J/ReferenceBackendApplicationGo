@@ -29,6 +29,14 @@ func NewLogger(config zap.Config) *Logger {
 	return globalLogger
 }
 
+func NewNopLogger() *Logger {
+	l := zap.NewNop() // Пустой логгер
+	once.Do(func() {
+		globalLogger = &Logger{l: l.Sugar()}
+	})
+	return globalLogger
+}
+
 type CtxKey string
 
 const LoggerCtxKey CtxKey = "logger"
@@ -57,7 +65,6 @@ func Infow(ctx context.Context, msg string, args ...interface{}) {
 	if globalLogger == nil {
 		panic("global logger is nil")
 	}
-
 	globalLogger.l.Infow(msg, args...)
 }
 

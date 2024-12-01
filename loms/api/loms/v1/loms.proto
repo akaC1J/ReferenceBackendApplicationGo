@@ -46,6 +46,12 @@ service Loms {
         };
     }
 
+    rpc OrdersAll(google.protobuf.Empty) returns (OrderAllResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders"
+        };
+    }
+
     // Получение информации о наличии товаров на складе
     rpc StocksInfo(StocksInfoRequest) returns (StocksInfoResponse) {
         option (google.api.http) = {
@@ -56,6 +62,7 @@ service Loms {
 
 // Сообщение заказа с валидацией
 message Order {
+
     string status = 1 [
         (validate.rules).string = {in: ["", "NEW", "AWAITING_PAYMENT", "FAILED", "PAYED", "CANCELLED"]}
     ];
@@ -64,6 +71,9 @@ message Order {
     ];
     repeated Item items = 3 [
         (validate.rules).repeated.min_items = 1
+    ];
+    int64 id = 4 [
+        (validate.rules).int64.gt = 0
     ];
 }
 
@@ -120,4 +130,8 @@ message StocksInfoRequest {
 message StocksInfoResponse {
     uint64 count = 1 [
         (validate.rules).uint64.gt = 0];
+}
+
+message OrderAllResponse {
+    repeated Order orders = 1;
 }

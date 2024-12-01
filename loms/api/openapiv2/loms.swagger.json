@@ -18,6 +18,26 @@
   ],
   "paths": {
     "/v1/orders": {
+      "get": {
+        "operationId": "Loms_OrdersAll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/OrderAllResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Loms"
+        ]
+      },
       "post": {
         "summary": "Создание заказа",
         "operationId": "Loms_OrderCreate",
@@ -236,9 +256,25 @@
             "type": "object",
             "$ref": "#/definitions/Item"
           }
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       },
       "title": "Сообщение заказа с валидацией"
+    },
+    "OrderAllResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Order"
+          }
+        }
+      }
     },
     "OrderCreateRequest": {
       "type": "object",

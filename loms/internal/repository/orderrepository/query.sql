@@ -23,3 +23,13 @@ SELECT orders.id,
 FROM orders
 JOIN items i on orders.id = i.order_id
 WHERE orders.id = @order_id;
+
+-- name: GetAllOrders :many
+SELECT orders.id,
+       orders.state,
+       orders.user_id,
+       i.sku,
+       i.count
+FROM orders
+JOIN items i on orders.id = i.order_id;
+

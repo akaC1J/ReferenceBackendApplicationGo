@@ -2,7 +2,8 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries: "internal/repository/orderrepository/query.sql"
-    schema: "migrations"
+    schema: 
+      - "migrations/common"
     gen:
       go:
         package: "orderrepository"
@@ -15,7 +16,7 @@ sql:
         omit_unused_structs: true  
   - engine: "postgresql"
     queries: "internal/repository/stockrepository/query.sql"
-    schema: "migrations"
+    schema: "migrations/shard_0"
     gen:
       go:
         package: "stockrepository"
@@ -28,7 +29,7 @@ sql:
         omit_unused_structs: true
   - engine: "postgresql"
     queries: "internal/repository/outboxrepository/query.sql"
-    schema: "migrations"
+    schema: "migrations/common"
     gen:
       go:
         package: "outboxrepository"

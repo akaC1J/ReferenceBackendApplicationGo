@@ -11,6 +11,7 @@ services:
     environment:
       - LOMS_BASE_URL=loms:50051
       - SWAGGER_URL=http://localhost:8080
+      - REDIS_ADDRESS=redis:6379
 
   loms:
     container_name: loms
@@ -30,7 +31,14 @@ services:
         - KAFKA_BROKER=kafka:29092
     depends_on:
       - kafka
-  
+        
+        
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: swagger-ui

@@ -17,6 +17,7 @@ type OrderService interface {
 	GetById(ctx context.Context, orderID int64) (*model.Order, error)
 	OrderPay(ctx context.Context, orderID int64) error
 	OrderCancel(ctx context.Context, orderID int64) error
+	GetAllOrders(ctx context.Context) ([]*model.Order, error)
 }
 
 type StockService interface {

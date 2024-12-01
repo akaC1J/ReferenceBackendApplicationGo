@@ -14,6 +14,7 @@ type Repository interface {
 	SaveOrder(ctx context.Context, order *model.Order) (*model.Order, error)
 	UpdateOrder(ctx context.Context, order *model.Order) error
 	GetById(ctx context.Context, orderID int64) (*model.Order, error)
+	GetAllOrders(ctx context.Context) ([]*model.Order, error)
 }
 
 type StockService interface {
@@ -124,4 +125,13 @@ func (s *Service) OrderCancel(ctx context.Context, orderID int64) error {
 	}
 
 	return nil
+}
+
+func (s *Service) GetAllOrders(ctx context.Context) ([]*model.Order, error) {
+	orders, err := s.repository.GetAllOrders(ctx)
+	if err != nil {
+		log.Printf("[order_service] Error getting orders: %v", err)
+		return nil, err
+	}
+	return orders, nil
 }

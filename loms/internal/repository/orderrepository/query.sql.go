@@ -9,6 +9,50 @@ import (
 	"context"
 )
 
+const getAllOrders = `-- name: GetAllOrders :many
+SELECT orders.id,
+       orders.state,
+       orders.user_id,
+       i.sku,
+       i.count
+FROM orders
+JOIN items i on orders.id = i.order_id
+`
+
+type GetAllOrdersRow struct {
+	ID     int64
+	State  OrderStatus
+	UserID int64
+	Sku    int64
+	Count  int64
+}
+
+func (q *Queries) GetAllOrders(ctx context.Context) ([]*GetAllOrdersRow, error) {
+	rows, err := q.db.Query(ctx, getAllOrders)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetAllOrdersRow
+	for rows.Next() {
+		var i GetAllOrdersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.State,
+			&i.UserID,
+			&i.Sku,
+			&i.Count,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOrderById = `-- name: GetOrderById :many
 SELECT orders.id,
        orders.state,

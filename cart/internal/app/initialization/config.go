@@ -6,6 +6,7 @@ import (
 	"os"
 	"route256/cart/internal/logger"
 	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -19,6 +20,14 @@ type Config struct {
 	LomsBaseUrl        string
 	RequestsPerSecond  uint
 	CacheCapacity      int
+	RedisClient        *RedisConf
+}
+
+type RedisConf struct {
+	Addr     string
+	Password string
+	DB_Index int
+	KeyTtl   time.Duration
 }
 
 func LoadDefaultConfig() (*Config, error) {
@@ -80,6 +89,11 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		}
 	}
 
+	redisConf, err := initRedisClient()
+
+	if err != nil {
+		return nil, err
+	}
 	return &Config{
 		MaxRetries:         maxRetries,
 		RetryDelayMs:       retryMs,
@@ -90,6 +104,33 @@ func LoadConfig(pathToEnv string) (*Config, error) {
 		LomsBaseUrl:        lomsBaseUrl,
 		RequestsPerSecond:  uint(requestsPerSecond),
 		CacheCapacity:      cacheCapacityInt,
+		RedisClient:        redisConf,
+	}, nil
+}
+
+func initRedisClient() (*RedisConf, error) {
+	dbIndex := 0
+	err := error(nil)
+	if os.Getenv("REDIS_DB_INDEX") != "" {
+		dbIndex, err = strconv.Atoi(os.Getenv("REDIS_DB_INDEX"))
+		if err != nil {
+			return nil, fmt.Errorf("enviroment REDIS_DB_INDEX not a number")
+		}
+	}
+	keyTtl := time.Hour
+	if os.Getenv("REDIS_TTL_KEY") == "" {
+		keyTtlInt, err := strconv.ParseInt(os.Getenv("REDIS_TTL_KEY"), 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("enviroment REDIS_TTL_KEY not a number")
+		}
+		keyTtl = time.Duration(keyTtlInt)
+
+	}
+	return &RedisConf{
+		Addr:     os.Getenv("REDIS_ADDRESS"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB_Index: dbIndex,
+		KeyTtl:   keyTtl,
 	}, nil
 }
 

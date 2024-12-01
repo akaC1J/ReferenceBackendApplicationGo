@@ -125,6 +125,18 @@ func (db *DBRouter) PickDefaultShard(ctx context.Context, readOnlyOperation bool
 	return db.pickConnectionFromShards(ctx, 0, readOnlyOperation)
 }
 
+func (db *DBRouter) PickAllShards(ctx context.Context, readOnlyOperation bool) ([]*FallbackConnection, error) {
+	var connections []*FallbackConnection
+	for i := 0; i < db.countShard; i++ {
+		conn, err := db.pickConnectionFromShards(ctx, i, readOnlyOperation)
+		if err != nil {
+			return connections, err
+		}
+		connections = append(connections, conn)
+	}
+	return connections, nil
+}
+
 func (db *DBRouter) pickConnectionFromShards(ctx context.Context, shardIndex int, readOnlyOperation bool) (*FallbackConnection, error) {
 	masterConn, err := db.shards[shardIndex][0].Acquire(ctx)
 	if err != nil {

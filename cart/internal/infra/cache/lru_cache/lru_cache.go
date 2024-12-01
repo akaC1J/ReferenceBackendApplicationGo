@@ -1,6 +1,10 @@
-package cache
+package lru_cache
 
-import "sync"
+import (
+	"context"
+	"fmt"
+	"sync"
+)
 
 type Node[K comparable, T any] struct {
 	key   K
@@ -27,20 +31,20 @@ func NewLruCache[K comparable, T any](capacity int) *LruCache[K, T] {
 	}
 }
 
-func (lc *LruCache[K, T]) Get(key K) (T, bool) {
+func (lc *LruCache[K, T]) Get(_ context.Context, key K) (T, error) {
 	lc.mx.Lock()
 	defer lc.mx.Unlock()
 	node, ok := lc.cache[key]
 	if !ok {
 		var zero T
-		return zero, false
+		return zero, fmt.Errorf("key not found")
 	}
 
 	lc.moveToHead(node)
-	return node.value, true
+	return node.value, nil
 }
 
-func (lc *LruCache[K, T]) Put(key K, value T) {
+func (lc *LruCache[K, T]) Put(_ context.Context, key K, value T) {
 	lc.mx.Lock()
 	defer lc.mx.Unlock()
 	if lc.capacity == 0 {

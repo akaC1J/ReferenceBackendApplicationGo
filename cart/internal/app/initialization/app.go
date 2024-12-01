@@ -3,6 +3,7 @@ package initialization
 import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	redisCli "github.com/redis/go-redis/v9"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -13,6 +14,7 @@ import (
 	"net/http/pprof"
 	"route256/cart/internal/generated/api/loms/v1"
 	"route256/cart/internal/http/middleware"
+	"route256/cart/internal/infra/cache/redis"
 	"route256/cart/internal/logger"
 	"route256/cart/internal/metrics"
 	"route256/cart/internal/pkg/service/lomsservice"
@@ -62,8 +64,11 @@ func New(config *Config, pkgLoger *logger.Logger) (*App, error) {
 		config.ProductServiceURL,
 		config.ProductServicePath,
 	)
+	redisClient := MustInitRedisClient(config.RedisClient)
+	redisCasher := redis.NewRedisCacher[productservice.SKUWrapper, *productservice.ProductWrapper](redisClient, config.RedisClient.KeyTtl)
 
-	cacheProductService := productservice.NewCacheProductService(config.CacheCapacity, productService)
+	cacheProductService := productservice.NewCacheProductService(config.CacheCapacity, productService,
+		productservice.NewProductCacherAdapterImpl(redisCasher))
 
 	// Инициализация сервиса корзины
 	cartService := cartservice.NewService(cartRepository, cacheProductService, lomsService)
@@ -84,6 +89,25 @@ func New(config *Config, pkgLoger *logger.Logger) (*App, error) {
 	app.setupRoutes()
 
 	return app, nil
+}
+
+func MustInitRedisClient(redisConf *RedisConf) *redisCli.Client {
+	rdb := redisCli.NewClient(&redisCli.Options{
+		Addr:     redisConf.Addr,     // Адрес Redis-сервера
+		Password: redisConf.Password, // Пароль (если есть)
+		DB:       redisConf.DB_Index, // Номер базы данных (по умолчанию 0)
+	})
+
+	// Проверяем соединение
+	pong, err := rdb.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatalf("Не удалось подключиться к Redis: %v", err)
+	}
+
+	logger.Debugw(nil, pong)
+
+	return rdb
+
 }
 
 type metadataCarrier metadata.MD

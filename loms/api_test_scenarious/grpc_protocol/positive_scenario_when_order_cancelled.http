@@ -12,7 +12,7 @@ GRPC localhost:50051/Loms/OrderCreate
 
 {
   "order": {
-    "user": 12459,
+    "user": 12441,
     "items": [
       {
         "sku": 1002,
@@ -68,5 +68,9 @@ GRPC localhost:50051/Loms/StocksInfo
 }
 ### Expected {count from first rq: int} Status OK, must be return count of items with sku 1002
 
+### AllOrders Request
+GRPC localhost:50051/Loms/OrdersAll
+
+### Expected {orders: []} Status OK, must be return empty list of orders
 
 

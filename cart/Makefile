@@ -52,6 +52,7 @@ generate_mocks: install-tools ## Генерация моков
 	$(BIN_DIR)/minimock -i  route256/cart/internal/pkg/repository.* -o internal/pkg/repository
 	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/cartservice.* -o internal/pkg/service/cartservice
 	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/productservice.* -o internal/pkg/service/productservice
+	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/productservice.* -o internal/pkg/service/productservice
 	$(BIN_DIR)/minimock -i route256/cart/internal/pkg/service/lomsservice.* -o internal/pkg/service/lomsservice
 	$(BIN_DIR)/minimock -i route256/cart/internal/generated/api/loms/v1.LomsClient -o internal/pkg/service/lomsservice
 
