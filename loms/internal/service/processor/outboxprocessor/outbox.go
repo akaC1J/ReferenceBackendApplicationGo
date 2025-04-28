@@ -9,6 +9,7 @@ import (
 	"route256/loms/internal/repository/outboxrepository"
 	transactionmanager "route256/loms/internal/service/transactionamanger"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -22,8 +23,7 @@ type OutboxRepository interface {
 var _ TransactionManager = (*transactionmanager.TransactionManager)(nil)
 
 type TransactionManager interface {
-	Begin(ctx context.Context) (tx pgx.Tx, closeFunc func(), err error)
-	Commit(tx pgx.Tx, closeFunc func()) error
+	BeginTransactionsOnAllShards(ctx context.Context) ([]pgx.Tx, error)
 }
 
 type OutboxProcessor struct {
@@ -45,7 +45,6 @@ func NewOutboxProcessor(repo OutboxRepository, producer sarama.SyncProducer, int
 }
 
 func (p *OutboxProcessor) Start(ctx context.Context) {
-	return
 	ticker := time.NewTicker(p.interval)
 	defer ticker.Stop()
 
@@ -61,37 +60,47 @@ func (p *OutboxProcessor) Start(ctx context.Context) {
 }
 
 func (p *OutboxProcessor) processEvents(ctx context.Context) {
-	tx, closeTx, err := p.tm.Begin(ctx)
+	transactions, err := p.tm.BeginTransactionsOnAllShards(ctx)
 	if err != nil {
-		log.Printf("Failed to start transaction: %v", err)
+		log.Printf("Failed to start transactions: %v", err)
 		return
 	}
-	defer closeTx()
-	events, err := p.repo.GetPendingOutboxEvents(ctx, tx, 10) // Получаем до 10 событий за раз
-	if err != nil {
-		log.Printf("Error fetching outbox events: %v", err)
-		return
-	}
+	wg := sync.WaitGroup{}
 
-	for _, event := range events {
-		msg := p.createProducerMessage(event)
-		partition, offset, err := p.producer.SendMessage(msg)
-		if err != nil {
-			log.Printf("Failed to send message: %v", err)
-			return
-		}
-		log.Printf("Sent message to partition %d at offset %d", partition, offset)
+	for _, tx := range transactions {
+		wg.Add(1)
+		go func(tx pgx.Tx) {
+			defer tx.Rollback(ctx)
 
-		if err = p.repo.MarkOutboxEventProcessed(ctx, tx, event.ID); err != nil {
-			log.Printf("Failed to mark event as processed: %v", err)
-			return
-		}
+			events, err := p.repo.GetPendingOutboxEvents(ctx, tx, 10) // Получаем до 10 событий за раз
+			if err != nil {
+				log.Printf("Error fetching outbox events: %v", err)
+				return
+			}
+
+			for _, event := range events {
+				msg := p.createProducerMessage(event)
+				partition, offset, err := p.producer.SendMessage(msg)
+				if err != nil {
+					log.Printf("Failed to send message: %v", err)
+					return
+				}
+				log.Printf("Sent message to partition %d at offset %d", partition, offset)
+
+				if err = p.repo.MarkOutboxEventProcessed(ctx, tx, event.ID); err != nil {
+					log.Printf("Failed to mark event as processed: %v", err)
+					return
+				}
+			}
+			err = tx.Commit(ctx)
+			if err != nil {
+				log.Printf("Failed to commit transaction: %v", err)
+				return
+			}
+		}(tx)
+
 	}
-	err = p.tm.Commit(tx, closeTx)
-	if err != nil {
-		log.Printf("Failed to commit transaction: %v", err)
-		return
-	}
+	wg.Wait()
 
 }
 

@@ -72,9 +72,7 @@ message Order {
     repeated Item items = 3 [
         (validate.rules).repeated.min_items = 1
     ];
-    int64 id = 4 [
-        (validate.rules).int64.gt = 0
-    ];
+    int64 id = 4;
 }
 
 // Сообщение элемента заказа с валидацией

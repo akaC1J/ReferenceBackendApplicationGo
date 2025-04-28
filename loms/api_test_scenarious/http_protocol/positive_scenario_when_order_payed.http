@@ -37,7 +37,7 @@ Accept: application/json
 ### Expected Order with state AWAITING_PAY Status OK, must be return order from second request
 
 ### OrderPay Request
-POST http://localhost:8081/v1/orders/1/pay
+POST http://localhost:8081/v1/orders/1001/pay
 Content-Type: application/json
 Accept: application/json
 

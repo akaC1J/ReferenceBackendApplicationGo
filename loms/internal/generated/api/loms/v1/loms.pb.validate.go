@@ -123,16 +123,7 @@ func (m *Order) validate(all bool) error {
 
 	}
 
-	if m.GetId() <= 0 {
-		err := OrderValidationError{
-			field:  "Id",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Id
 
 	if len(errors) > 0 {
 		return OrderMultiError(errors)

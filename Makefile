@@ -25,7 +25,7 @@ test-all: ### Запустить тесты на всех сервисах
 
 run-postgres: ### Поднять postgres инфраструктуру из шардов
 	docker-compose up -d postgres_slave_0 postgres_master_1
-	sleep 2;
+	sleep 3;
 	cd loms && make apply-migrations
 
 run-observ-infra: ### Поднять инфраструктуру для observability
